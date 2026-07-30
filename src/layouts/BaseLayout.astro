@@ -49,6 +49,10 @@ const currentPath = Astro.url.pathname;
     <Font cssVariable="--font-display" preload />
     <Font cssVariable="--font-meta" />
 
+    {/* For pages that need extra font faces or head tags of their own — the
+        specimen page loads its candidate stack through here. */}
+    <slot name="head" />
+
     {/* Cross-page fade. The animation itself is scoped to the main column
         below; ClientRouter is what makes the navigation client-side so the
         header and margin column can survive it.

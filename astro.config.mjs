@@ -67,6 +67,41 @@ export default defineConfig({
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
+    // ---- SPECIMEN ONLY -----------------------------------------------------
+    // Candidate stack under evaluation on /specimen. Delete these three
+    // entries along with that page once the decision is made, or promote them
+    // to --font-body / --font-display / --font-meta if they win.
+    {
+      provider: fontProviders.google(),
+      name: 'Alegreya',
+      cssVariable: '--font-alegreya',
+      // 600 is not optional: --weight-semibold is 600 and section headings use
+      // it. Without it the browser snaps to the nearest loaded weight, which
+      // here is 900, and every H2 silently renders as Black.
+      weights: [400, 500, 600, 900],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Alegreya SC',
+      cssVariable: '--font-alegreya-sc',
+      weights: [400, 500],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Alegreya Sans',
+      cssVariable: '--font-alegreya-sans',
+      weights: [400, 500],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    // ---- END SPECIMEN ONLY -------------------------------------------------
     {
       // Metadata sans — datelines, labels, captions, sidenotes ONLY.
       provider: fontProviders.google(),
