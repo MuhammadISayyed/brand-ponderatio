@@ -227,7 +227,22 @@
      So the column moved with it: 21px in a 592px column gives 66.9
      characters. Same measure, smaller type. See --grid-main-col. */
   --type-body-size: 1.3125rem;      /* 21px */
-  --type-body-leading: 1.6;
+
+  /* LEADING IS A RATIO TO X-HEIGHT, NOT TO THE EM, and that is why this is
+     1.45 rather than the 1.6 it sat at for months.
+
+     1.6 was derived when the body face was Literata, x-height 0.517 — giving
+     leading of 3.09 times the x-height, which is comfortable. Ysabeau's
+     x-height is 0.414. The same 1.6 produced 3.86 times the x-height: 25%
+     more air, inherited across a face swap without being re-derived, and the
+     reason the page read large when the type was in fact modest (21px
+     Ysabeau has the x-height of 18px Georgia).
+
+     1.45 puts it at 3.50 — inside the comfortable band, and closer to what
+     Literata was actually giving. The lesson generalises: on the next face
+     swap this token has to move with the size, because a line-height set in
+     ems is a measurement of the wrong thing. */
+  --type-body-leading: 1.45;
 
   /* Running text in the DOCUMENT register — a note, set in Goudy.
      Equal to the essay's size, because Goudy (0.415) and Ysabeau (0.414) have
@@ -500,6 +515,26 @@
      Every timeline is wrapped in a prefers-reduced-motion check that renders
      the finished end state instead of animating — see src/lib/gsap.ts.
      ====================================================================== */
+
+  /* AMENDMENT, made deliberately rather than by drift. The rule above says
+     nothing moves but diagrams on scroll. One more thing now moves: the rule
+     beneath the running head fills as the reader advances through a part.
+
+     Admitted because parts are long and the native affordance has quietly
+     disappeared — overlay scrollbars fade at rest on macOS and on every
+     touch device, so "how much of this is left" is a question the browser no
+     longer answers. It is granted on three conditions, and a future indicator
+     that cannot meet them should be refused:
+
+       1. it adds NO new element to the page — it fills a rule that was
+          already there,
+       2. it has no transition, so it advances only as fast as the reader
+          scrolls and never animates at them,
+       3. it measures the PROSE rather than the document, so it does not
+          report ninety per cent while the argument is still going.
+
+     A floating bar, a corner circle, or anything with an easing curve would
+     fail all three and should not be added on the strength of this. */
 
   /* Cross-page transition: a fade on the MAIN COLUMN ONLY.
      The margin column and the header stay put. */
