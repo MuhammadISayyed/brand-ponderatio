@@ -279,7 +279,24 @@
 
   /* Metadata label — sans, uppercase, tracked. Datelines, kind labels,
      document headers, "filed under", Fig. N. */
-  --type-label-size: var(--type-apparatus-size);
+  /* SMALLER THAN THE APPARATUS SIZE ON PURPOSE, and this is the third
+     attempt at it — the first two set it equal and both looked wrong.
+
+     Equal numbers do not make equal-looking text when one run is capitals.
+     Measured in Ysabeau at 16px: every glyph in a CAPS run stands 10.69px
+     tall, while the lowercase it sits beside has a bulk of 6.76px, with only
+     the occasional ascender reaching 11.47. So a label carries 58% more mass
+     per glyph than a sidenote at the identical size, and reads bigger because
+     it IS bigger everywhere the eye actually looks.
+
+     0.8 puts the cap height at 8.55px — between the lowercase bulk and its
+     ascenders, which is where a capital run has to sit to read as the same
+     size. Tracking and --weight-medium add a little more presence on top,
+     which is why the factor leans low rather than splitting the difference.
+
+     Worth noting the label size started at 11px against a 13px sidenote and
+     was optically about right. Unifying the numbers is what broke it. */
+  --type-label-size: calc(var(--type-apparatus-size) * 0.8);
   --type-label-tracking: 0.09em;
   --type-label-transform: uppercase;
 
