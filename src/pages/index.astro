@@ -30,7 +30,7 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
           const { title, deck, date, kind, ref } = post.data;
           return (
             <li class="entry">
-              <div class="entry__meta">
+              <div class="entry__meta stub">
                 <p class="label">
                   {kind === 'note' && ref ? ref : kindLabel(kind)}
                 </p>
@@ -66,43 +66,50 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
   .index__heading {
     font-size: var(--type-title-note-size);
     line-height: var(--type-title-note-leading);
-    margin-block-end: var(--space-8);
+    /* The first entry brings its own top padding; anything more here opens a
+       hole between the heading and the list it heads. */
+    margin-block-end: var(--space-4);
   }
 
+  /* Entries were separated by a full-width oxide rule each, which turned a
+     reading list into a table and spent the accent on every row — where it
+     marked nothing, because everything had one.
+
+     What separates them now is the space between them and the hard vertical
+     edge of the right-aligned margin column. The accent survives as the stub
+     above each entry's metadata: a run of short ticks down the left of the
+     page, which reads as a filing run in a way a stack of full-width rules
+     never did. */
   .entry {
     display: grid;
     grid-template-columns:
       var(--grid-margin-col)
       var(--grid-gutter)
       var(--grid-main-col);
-    padding-block: var(--space-6);
-    /* The rule beside an index entry — one of the accent's listed homes. It
-       is load-bearing here: it is what makes the list read as a filing run
-       rather than as a stack of headlines. */
-    border-block-start: var(--rule-weight) solid var(--accent);
-  }
-
-  .entry:last-child {
-    border-block-end: var(--rule-weight) solid var(--accent);
+    padding-block: var(--space-7);
   }
 
   .entry__meta {
     grid-column: 1;
+    /* Right-aligned against the gutter. The metadata column ends on one
+       straight edge instead of ragging, and that edge does the dividing. */
+    text-align: end;
+  }
+
+  /* The stub aligns with the column's right edge, not its left. */
+  .entry__meta.stub::before {
+    margin-inline-start: auto;
+    margin-block-end: var(--space-3);
   }
 
   .entry__body {
     grid-column: 3;
   }
 
-  .label {
-    font-family: var(--font-sans-meta);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    font-weight: var(--weight-medium);
+  .entry .label {
+    /* Index labels carry the entry's identity — its reference code or its
+       kind — so they take the reader's ink rather than metadata grey. */
     color: var(--ink);
-    line-height: 1.4;
-    margin-block-end: 0;
   }
 
   .entry__date {
@@ -110,6 +117,7 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
     font-family: var(--font-sans-meta);
     font-size: var(--type-sidenote-size);
     line-height: var(--type-sidenote-leading);
+    font-variant-numeric: lining-nums tabular-nums;
     color: var(--muted);
   }
 
@@ -134,7 +142,12 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
   .entry__deck {
     margin-block: var(--space-3) 0;
+    font-size: var(--type-index-deck-size);
+    line-height: var(--type-index-deck-leading);
     color: var(--ink-2);
+    /* The index is a list of pointers, not a place to read. Two lines of
+       summary is a pointer; five is the post itself, badly set. */
+    max-width: 58ch;
     text-wrap: pretty;
   }
 
@@ -154,9 +167,24 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
     }
 
     .entry__meta {
-      display: flex;
-      gap: var(--space-4);
-      align-items: baseline;
+      /* No margin column to align against, so the metadata goes back to
+         reading left to right. The two paragraphs run inline on one line
+         rather than the column becoming a flex row — as flex items the
+         stub would be stretched to the full width and stop being a stub. */
+      text-align: start;
+      margin-block-end: var(--space-3);
+    }
+
+    .entry__meta p {
+      display: inline;
+    }
+
+    .entry__date {
+      margin-inline-start: var(--space-3);
+    }
+
+    .entry__meta.stub::before {
+      margin-inline-start: 0;
       margin-block-end: var(--space-3);
     }
 

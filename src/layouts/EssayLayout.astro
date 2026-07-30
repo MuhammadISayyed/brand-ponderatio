@@ -37,11 +37,11 @@ const { title, deck, date, kind, tags, sources } = post.data;
       <p class="essay__deck">{deck}</p>
     </header>
 
-    <div class="prose">
+    <div class="prose prose--editorial">
       <slot />
     </div>
 
-    <footer class="essay__foot">
+    <footer class="essay__foot stub">
       {
         sources && sources.length > 0 && (
           <aside class="essay__sources" aria-labelledby="sources-heading">
@@ -106,9 +106,10 @@ const { title, deck, date, kind, tags, sources } = post.data;
   .essay__foot {
     grid-column: 3;
     grid-row: 3;
-    margin-block-start: var(--space-9);
-    padding-block-start: var(--space-4);
-    border-block-start: var(--rule-weight) solid var(--rule);
+    /* The gap is what separates the apparatus from the argument — a full
+       hairline here would be the second on the page, and the one above the
+       site footer has already been spent. The stub marks it instead. */
+    margin-block-start: var(--space-10);
   }
 
   .essay__tags {
@@ -129,10 +130,11 @@ const { title, deck, date, kind, tags, sources } = post.data;
   .essay__dateline {
     display: flex;
     flex-wrap: wrap;
+    /* No rule under it. The dateline is already 11px tracked sans against a
+       64px display serif — two registers apart. A line between them would be
+       insisting on a separation the type has already made. */
     gap: var(--space-2) var(--space-4);
-    margin-block-end: var(--space-5);
-    padding-block-end: var(--space-3);
-    border-block-end: var(--rule-weight) solid var(--rule);
+    margin-block-end: var(--space-4);
   }
 
   .essay__dateline span {
@@ -159,20 +161,9 @@ const { title, deck, date, kind, tags, sources } = post.data;
 
   /* ==========================================================================
      APPARATUS
-     Everything that is not the argument itself is metadata sans: dateline,
-     sources, tags. This is the register that separates them from the prose.
+     `.label` itself lives in global.css — dateline, sources heading and tags
+     all use it, as does the index. Only the arrangement is local.
      ====================================================================== */
-
-  .label {
-    font-family: var(--font-sans-meta);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    font-weight: var(--weight-medium);
-    color: var(--muted);
-    line-height: 1.4;
-    margin-block-end: 0;
-  }
 
   .essay__sources ul {
     margin-block-start: var(--space-4);

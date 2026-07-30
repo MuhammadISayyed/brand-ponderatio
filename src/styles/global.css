@@ -72,6 +72,59 @@
     /* Ligatures and proper kerning are the point of shipping a real serif. */
     font-kerning: normal;
     text-rendering: optimizeLegibility;
+    /* Old-style figures in running text. Lining figures are drawn to cap
+       height, so a date or a page count in the middle of a sentence reads as
+       a row of small capitals; old-style ones have ascenders and descenders
+       and sit in the line like lowercase letters do.
+
+       Applied at the body and overridden on the metadata sans below, where
+       lining tabular figures are correct — those numbers are being scanned in
+       a column, not read in a sentence. */
+    font-variant-numeric: oldstyle-nums proportional-nums;
+    /* Pulls opening quotes and hyphens into the margin so the text edge stays
+       optically straight. Safari-only for now; a no-op everywhere else. */
+    hanging-punctuation: first last;
+  }
+
+  /* ==========================================================================
+     APPARATUS
+     The shared register for everything that is not the argument: datelines,
+     labels, sources, captions, filing lines. Sans, small, tracked, upper.
+     ====================================================================== */
+
+  .label {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--muted);
+    line-height: 1.4;
+    /* Lining figures, tabular widths: these numbers are scanned down a
+       column, so they must align. */
+    font-variant-numeric: lining-nums tabular-nums;
+    /* A label is a label whatever element carries it. The sources block uses
+       an `<h2>` so the list has an accessible name, and it must not inherit
+       the 96px of section air that a real heading gets. */
+    margin-block: 0;
+  }
+
+  /* ==========================================================================
+     THE STUB
+     Rule 1 of the doctrine in tokens.css: a short oxide tick that marks a
+     block rather than dividing the page. The only rule in the system that
+     recurs, and the reason nothing else needs a line under it.
+     ====================================================================== */
+
+  .stub::before,
+  /* Sätteri generates the footnotes section, so it cannot be given the class
+     in markup and is named here instead. */
+  .prose .footnotes::before {
+    content: '';
+    display: block;
+    inline-size: var(--rule-stub-length);
+    border-block-start: var(--rule-weight) solid var(--accent);
+    margin-block-end: var(--space-4);
   }
 
   /* ==========================================================================
@@ -91,16 +144,20 @@
     text-wrap: balance;
   }
 
+  /* The space above a heading is what marks the section break — it is doing
+     the job a rule would otherwise be asked to do, so it has to be decisive.
+     Roughly four times the space below it: the heading belongs to the text it
+     introduces, not to the text it follows. */
   h2 {
     font-size: var(--type-h2-size);
     line-height: var(--type-h2-leading);
-    margin-block: var(--space-8) var(--space-4);
+    margin-block: var(--space-9) var(--space-4);
   }
 
   h3 {
     font-size: var(--type-h3-size);
     line-height: var(--type-h3-leading);
-    margin-block: var(--space-6) var(--space-3);
+    margin-block: var(--space-7) var(--space-3);
   }
 
   /* A heading immediately after another heading gets no stacked space. */
@@ -123,6 +180,33 @@
 
   p:last-child {
     margin-block-end: 0;
+  }
+
+  /* ==========================================================================
+     DROP CAP
+     Editorial register only, first paragraph only — the mark that says the
+     piece starts here.
+
+     `initial-letter` is the whole implementation: the browser sinks the glyph
+     the requested number of lines and does the optical work of aligning its
+     cap height to the first baseline and its foot to the last. Doing this by
+     hand means hardcoding a font-size, a line-height and a nudge, all three
+     of which are wrong the moment the body face is swapped.
+
+     Firefox does not support it yet and renders an ordinary first letter in
+     the display serif. That degrades to something deliberate-looking rather
+     than broken, which is the reason not to reach for the manual version.
+     ====================================================================== */
+
+  .prose--editorial > p:first-of-type::first-letter {
+    -webkit-initial-letter: var(--dropcap-lines);
+    initial-letter: var(--dropcap-lines);
+    font-family: var(--font-serif-display);
+    font-weight: var(--weight-medium);
+    /* Space between the sunken letter and the lines wrapping around it.
+       In em of the drop cap, so it scales with it. */
+    margin-inline-end: 0.08em;
+    color: var(--ink);
   }
 
   strong,
@@ -307,10 +391,11 @@
      even though they land at the foot.
      ====================================================================== */
 
+  /* Marked with the stub, not divided with a rule — the same treatment as the
+     sources block at the foot of a post, because it is the same thing:
+     apparatus following the argument. */
   .prose .footnotes {
-    margin-block-start: var(--space-8);
-    padding-block-start: var(--space-5);
-    border-block-start: var(--rule-weight) solid var(--rule);
+    margin-block-start: var(--space-9);
     font-family: var(--font-sans-meta);
     font-size: var(--type-sidenote-size);
     line-height: var(--type-sidenote-leading);

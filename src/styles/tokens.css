@@ -107,6 +107,12 @@
   --type-deck-size: 1.5rem;         /* 24px */
   --type-deck-leading: 1.4;
 
+  /* Deck as it appears in the index, where it is a summary line rather than a
+     standfirst. Set below body size on purpose: an index that sets its decks
+     at reading size competes with the posts it is pointing at. */
+  --type-index-deck-size: 1.0625rem; /* 17px */
+  --type-index-deck-leading: 1.45;
+
   /* Running text. Body serif. */
   --type-body-size: 1.25rem;        /* 20px */
   --type-body-leading: 1.6;
@@ -140,6 +146,14 @@
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
+
+  /* Drop cap. The opening letter of an editorial post, in the display serif,
+     sunk this many lines into the paragraph. Editorial register only — a note
+     opens flat, like the document it is.
+
+     One per post and only on the first paragraph. A drop cap says "the piece
+     starts here"; a second one says nothing. */
+  --dropcap-lines: 3;
 
   /* ==========================================================================
      5. GRID
@@ -191,6 +205,35 @@
 
   --rule-weight: 1px;
   --rule-hairline: 0.5px; /* The note sheet edge. Deliberately sub-pixel. */
+
+  /* --------------------------------------------------------------------------
+     RULES — a doctrine, because a rule per section is how a page starts
+     looking like a wireframe.
+
+     A rule is a typographic mark, not a spacer. If whitespace and a change of
+     register — serif to sans, 20px to 13px, ink to muted — already separate
+     two things, then a line between them is separating something that was
+     never joined. Space does that work here; rules are spent, not applied.
+
+     There are exactly three, and each has one job:
+
+     1. THE STUB. A short oxide tick, --rule-stub-length long, set above a
+        block. It MARKS rather than divides: this is an index entry, this is
+        the apparatus at the foot of a post, this is a note's filing line. It
+        is the signature mark of the system and the only rule that recurs.
+
+     2. THE CLOSE. One neutral full-width hairline per page, above the site
+        footer, closing the document. One. If a second one is wanted somewhere
+        the answer is space, not a line.
+
+     3. THE FOLD. The hairline under a note's document header. It is part of
+        the form the sheet is imitating, not a separator between sections, and
+        it appears nowhere outside NoteLayout.
+
+     Anything else — a rule under a dateline, a rule between index entries, a
+     rule above every heading — is scaffolding left in the build.
+     ----------------------------------------------------------------------- */
+  --rule-stub-length: 1.5rem; /* 24px */
 
   /* Containers have a MINIMUM height and text is top-aligned within them.
      When content is short, whitespace collects at the bottom and stays

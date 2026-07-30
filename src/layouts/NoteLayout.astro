@@ -41,7 +41,7 @@ if (supersededBy) {
   <div class="note-ground">
     <article class="note-sheet">
       <header class="note-header">
-        <p class="note-header__row">
+        <p class="note-header__row label">
           <span class="note-header__ref">{ref}</span>
           <span class="note-header__status" data-status={status}>{status}</span>
           <time datetime={machineDate(date)}>{formatDateline(date)}</time>
@@ -63,7 +63,7 @@ if (supersededBy) {
 
       {
         tags.length > 0 && (
-          <p class="note-filed">Filed under {tags.join(' · ')}</p>
+          <p class="note-filed stub label">Filed under {tags.join(' · ')}</p>
         )
       }
     </article>
@@ -112,17 +112,13 @@ if (supersededBy) {
     border-block-end: var(--rule-weight) solid var(--rule);
   }
 
+  /* Type comes from `.label` in global.css; only the arrangement is local. */
   .note-header__row {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2) var(--space-4);
     align-items: baseline;
     margin-block-end: var(--space-4);
-    font-family: var(--font-sans-meta);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    color: var(--muted);
   }
 
   .note-header__ref {
@@ -167,17 +163,11 @@ if (supersededBy) {
      as filed.
      ====================================================================== */
 
+  /* The filing line takes the oxide stub. It was a full-width oxide rule,
+     which put a second heavy line on a sheet that already has its fold — two
+     rules bracketing four lines of text. The tick marks it just as clearly
+     and leaves the sheet quiet. */
   .note-filed {
-    margin-block-start: var(--space-8);
-    padding-block-start: var(--space-3);
-    border-block-start: var(--rule-weight) solid var(--accent);
-    font-family: var(--font-sans-meta);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    color: var(--muted);
-    /* Unlike the text on the sheet, this rule runs the sheet's full inner
-       width — it matches the rule under the document header, and the two
-       together are what bracket the note as a filed sheet. */
+    margin-block-start: var(--space-9);
   }
 </style>
