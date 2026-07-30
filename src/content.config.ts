@@ -202,4 +202,36 @@ const posts = defineCollection({
   schema: postSchema,
 });
 
-export const collections = { posts };
+/**
+ * Parts of the Inquiry — a single long work, published complete, read in
+ * order. Separate from `posts` because the two are different objects, not two
+ * flavours of one: a post is entered directly and stands alone, a part is a
+ * move in an argument and means less out of sequence.
+ *
+ * There is no `status` here and there should never be one. Status existed to
+ * describe work published while still moving; this work ships finished, which
+ * is also what makes its part numbers permanent and therefore citable.
+ */
+const inquirySchema = z.object({
+  title: z.string().min(1, 'title must not be empty'),
+
+  /** Position in the argument. 1-based, contiguous, unique — checked below. */
+  part: z.number().int().positive(),
+
+  /**
+   * One line of SUBSTANCE for the spine — what this part establishes, not
+   * what it is about. The spine is meant to read as the argument in outline,
+   * and a contents page of titles cannot do that.
+   */
+  deck: z.string().min(1, 'deck must not be empty'),
+
+  sources: z.array(sourceSchema).optional(),
+  draft: z.boolean().default(false),
+});
+
+const inquiry = defineCollection({
+  loader: glob({ base: './src/content/inquiry', pattern: '**/*.mdx' }),
+  schema: inquirySchema,
+});
+
+export const collections = { posts, inquiry };

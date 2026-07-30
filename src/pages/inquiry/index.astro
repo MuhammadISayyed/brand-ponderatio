@@ -1,0 +1,151 @@
+---
+/**
+ * The spine.
+ *
+ * NOT a list of titles. For a cumulative argument the contents page is the
+ * argument in outline, and a reader should be able to see the shape of the
+ * case — and why part 5 has to follow part 4 — before reading a word of it.
+ * That is what the `deck` on each part is for: one line of what the part
+ * ESTABLISHES, not what it is about.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { INQUIRY, getParts, partHref } from '../../lib/inquiry';
+
+const parts = await getParts();
+---
+
+<BaseLayout title={INQUIRY.title} description={INQUIRY.abstract}>
+  <div class="spine">
+    <header class="spine__header">
+      <p class="label spine__kind">Inquiry · {parts.length} parts</p>
+      <h1 class="spine__title display-title">{INQUIRY.title}</h1>
+      <p class="spine__abstract">{INQUIRY.abstract}</p>
+    </header>
+
+    <ol class="spine__parts">
+      {
+        parts.map((part) => (
+          <li class="spine__part">
+            <p class="label spine__number">Part {part.data.part}</p>
+            <div class="spine__body">
+              <h2 class="spine__part-title">
+                <a href={partHref(part.data.part)}>{part.data.title}</a>
+              </h2>
+              <p class="spine__deck">{part.data.deck}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    {parts.length === 0 && <p class="spine__empty">No parts written yet.</p>}
+  </div>
+</BaseLayout>
+
+<style>
+  .spine {
+    display: grid;
+    grid-template-columns:
+      var(--grid-margin-col)
+      var(--grid-gutter)
+      var(--grid-main-col);
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+  }
+
+  .spine__header {
+    grid-column: 1 / -1;
+    margin-block-end: var(--space-9);
+  }
+
+  .spine__kind {
+    margin-block-end: var(--space-4);
+  }
+
+  .spine__title {
+    font-size: var(--type-title-size);
+    line-height: var(--type-title-leading);
+    margin-block-end: var(--space-5);
+  }
+
+  .spine__abstract {
+    font-family: var(--font-text);
+    font-style: italic;
+    font-size: var(--type-deck-size);
+    line-height: var(--type-deck-leading);
+    color: var(--ink-2);
+    max-width: var(--grid-main-col);
+    text-wrap: pretty;
+  }
+
+  .spine__parts {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  .spine__part {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    padding-block: var(--space-6);
+  }
+
+  /* The number sits in the margin column, right-aligned against the gutter —
+     the same edge the index metadata and figure numbers align to. */
+  .spine__number {
+    grid-column: 1;
+    text-align: end;
+  }
+
+  .spine__body {
+    grid-column: 3;
+  }
+
+  .spine__part-title {
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+    margin-block: 0;
+  }
+
+  .spine__part-title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .spine__part-title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .spine__deck {
+    margin-block: var(--space-2) 0;
+    font-size: var(--type-index-deck-size);
+    line-height: var(--type-index-deck-leading);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .spine__empty {
+    grid-column: 3;
+    color: var(--muted);
+  }
+
+  @media (max-width: 56.25em) {
+    .spine,
+    .spine__parts,
+    .spine__part {
+      display: block;
+      max-width: var(--grid-main-col);
+    }
+
+    .spine__number {
+      text-align: start;
+      margin-block-end: var(--space-2);
+    }
+
+    .spine__title {
+      font-size: clamp(2.25rem, 9vw, var(--type-title-size));
+    }
+  }
+</style>

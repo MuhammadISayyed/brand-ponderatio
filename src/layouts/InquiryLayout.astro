@@ -1,0 +1,386 @@
+---
+/**
+ * A part of the Inquiry.
+ *
+ * Reuses the essay grid exactly — margin column, gutter, main column — because
+ * a part is read the same way an essay is. What it adds is PLACE: where you
+ * are in the work, and where you are inside a part that may run long.
+ *
+ * Two indicators, deliberately different in kind:
+ *
+ *   the position line   at the head, static text, "Part 3 of 12". Answers
+ *                       "where am I in the work" and scales identically at
+ *                       eight parts or forty.
+ *   the running head    sticky, shows the section you are currently inside.
+ *                       Answers "where am I in this part", which is the
+ *                       question that only appears once a part runs long.
+ *
+ * Neither is a progress bar. The motion doctrine in tokens.css permits
+ * scroll-built diagrams and nothing else; a bar that fills is a second moving
+ * element in the reader's peripheral vision for the whole of a long read. A
+ * running head replaces TEXT on scroll rather than animating geometry, which
+ * is the same thing a printed book does and costs the doctrine nothing.
+ */
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import { scanCitations, citeId, sourceId } from '../lib/citations';
+import { INQUIRY, partHref, inquiryHref, type Part } from '../lib/inquiry';
+
+interface Props {
+  part: Part;
+  headings: MarkdownHeading[];
+  total: number;
+  previous?: Part;
+  next?: Part;
+}
+
+const { part, headings, total, previous, next } = Astro.props;
+const { title, deck, sources } = part.data;
+const n = part.data.part;
+
+// Same audit as an essay, same reasons — a citation pointing at nothing and a
+// source citing nothing are both silent failures. See lib/citations.
+const citedCounts = scanCitations(part.body ?? '');
+{
+  const declared = new Set((sources ?? []).map((s) => s.key));
+  for (const key of citedCounts.keys()) {
+    if (!declared.has(key)) {
+      throw new Error(
+        `${part.id}: <Cite source="${key}"> does not match any entry in this part's sources. ` +
+          `Declared keys: ${[...declared].join(', ') || '(none)'}.`,
+      );
+    }
+  }
+  for (const source of sources ?? []) {
+    if (!citedCounts.has(source.key) && !source.background) {
+      throw new Error(
+        `${part.id}: source "${source.key}" is never cited. ` +
+          `Cite it, mark it \`background: true\`, or remove it.`,
+      );
+    }
+  }
+}
+
+// Only h2s become sections. h3 is a subdivision inside a move, not a move.
+const sections = headings.filter((h) => h.depth === 2);
+---
+
+<BaseLayout title={`${title} — ${INQUIRY.short}`} description={deck}>
+  {/* Sticky, and empty until the reader is past the header — the script
+      below fills it. Rendered with the part label already in place so it
+      never appears blank mid-scroll. */}
+  <div class="runninghead" data-runninghead hidden>
+    <div class="runninghead__inner">
+      <a class="runninghead__work" href={inquiryHref()}>{INQUIRY.short}</a>
+      <span class="runninghead__part">Part {n}</span>
+      <span class="runninghead__section" data-runninghead-section></span>
+    </div>
+  </div>
+
+  <article class="part">
+    <header class="part__header">
+      <p class="part__position label">
+        <a href={inquiryHref()}>{INQUIRY.short}</a>
+        <span>Part {n} of {total}</span>
+      </p>
+      <h1 class="part__title display-title">{title}</h1>
+      <p class="part__deck">{deck}</p>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="part__foot stub">
+      {
+        sources && sources.length > 0 && (
+          <aside class="essay__sources" aria-labelledby="sources-heading">
+            <h2 id="sources-heading" class="label">
+              Sources
+            </h2>
+            <ul>
+              {sources.map((source) => {
+                const uses = citedCounts.get(source.key) ?? 0;
+                return (
+                  <li id={sourceId(source.key)}>
+                    <span class="essay__source-text">{source.text}</span>
+                    {Array.from({ length: uses }, (_, i) => (
+                      <a class="essay__source-back" href={`#${citeId(source.key, i + 1)}`}>
+                        <span aria-hidden="true">↩</span>
+                        {uses > 1 && <span class="essay__source-backnum">{i + 1}</span>}
+                        <span class="u-sr-only">Back to citation in the text</span>
+                      </a>
+                    ))}
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
+        )
+      }
+
+      <nav class="part__nav" aria-label="Parts">
+        {
+          previous ? (
+            <a class="part__nav-link" href={partHref(previous.data.part)}>
+              <span class="label">Part {previous.data.part}</span>
+              <span class="part__nav-title">{previous.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next ? (
+            <a class="part__nav-link part__nav-link--next" href={partHref(next.data.part)}>
+              <span class="label">Part {next.data.part}</span>
+              <span class="part__nav-title">{next.data.title}</span>
+            </a>
+          ) : (
+            <a class="part__nav-link part__nav-link--next" href={inquiryHref()}>
+              <span class="label">End of the argument</span>
+              <span class="part__nav-title">Back to the contents</span>
+            </a>
+          )
+        }
+      </nav>
+    </footer>
+  </article>
+</BaseLayout>
+
+<script>
+  // The running head names the section you are currently inside. It is the
+  // one piece of client JS on the site.
+  //
+  // Runs on astro:page-load rather than DOMContentLoaded: the client router
+  // means the second navigation never fires the latter.
+  function setUpRunningHead() {
+    const bar = document.querySelector<HTMLElement>('[data-runninghead]');
+    const out = document.querySelector<HTMLElement>('[data-runninghead-section]');
+    const header = document.querySelector<HTMLElement>('.part__header');
+    if (!bar || !out || !header) return;
+
+    const sections = [...document.querySelectorAll<HTMLElement>('.prose h2')];
+    if (!sections.length) return;
+
+    // Show the bar only once the header has scrolled away. While the title is
+    // on screen it already says where you are, and two answers to one question
+    // is worse than one.
+    const headerWatch = new IntersectionObserver(
+      ([entry]) => {
+        bar.hidden = entry.isIntersecting;
+      },
+      { threshold: 0 },
+    );
+    headerWatch.observe(header);
+
+    // The current section is the last one whose top has passed the bar.
+    // Computed from scroll position rather than from intersection ratios,
+    // because a section taller than the viewport intersects nothing.
+    const update = () => {
+      const y = window.scrollY + 96;
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.offsetTop <= y) current = s;
+        else break;
+      }
+      const label = current.textContent?.trim() ?? '';
+      if (out.textContent !== label) out.textContent = label;
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', update);
+      headerWatch.disconnect();
+    }, { once: true });
+  }
+
+  document.addEventListener('astro:page-load', setUpRunningHead);
+</script>
+
+<style>
+  /* ==========================================================================
+     GRID — identical to the essay's. A part is read like an essay.
+     ====================================================================== */
+
+  .part {
+    display: grid;
+    grid-template-columns:
+      var(--grid-margin-col)
+      var(--grid-gutter)
+      var(--grid-main-col);
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+  }
+
+  .part__header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-block-end: var(--space-8);
+  }
+
+  .prose {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .part__foot {
+    grid-column: 3;
+    grid-row: 3;
+    margin-block-start: var(--space-10);
+  }
+
+  /* ==========================================================================
+     POSITION — static, and the reason the design does not care how many
+     parts there are. A rail listing every part works at nine and breaks at
+     forty; "Part 3 of 12" is the same two words either way.
+     ====================================================================== */
+
+  .part__position {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-block-end: var(--space-4);
+  }
+
+  .part__position a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part__position a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .part__title {
+    font-size: var(--type-title-size);
+    line-height: var(--type-title-leading);
+    margin-block-end: var(--space-5);
+  }
+
+  .part__deck {
+    font-family: var(--font-text);
+    font-style: italic;
+    font-size: var(--type-deck-size);
+    line-height: var(--type-deck-leading);
+    color: var(--ink-2);
+    max-width: var(--grid-main-col);
+    margin-block-end: 0;
+    text-wrap: pretty;
+  }
+
+  /* ==========================================================================
+     RUNNING HEAD
+     What a book does. Sticky, apparatus register, and it replaces text rather
+     than animating anything.
+     ====================================================================== */
+
+  .runninghead {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background: var(--paper);
+    border-block-end: var(--rule-weight) solid var(--rule);
+    /* Full bleed, so the rule under it reads as the edge of a page rather
+       than as a floating box. Same technique as the note ground; see the
+       overflow note on html in global.css for why it needs no scrollbar
+       correction. */
+    margin-inline: calc(50% - 50vw);
+    padding-inline: calc(50vw - 50%);
+  }
+
+  .runninghead__inner {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+    padding-block: var(--space-3);
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .runninghead__work {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .runninghead__section {
+    /* The only part of the bar that changes, and the only reason it exists.
+       Truncated rather than wrapped: a running head that grows to two lines
+       moves the page under the reader. */
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: var(--weight-regular);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* ==========================================================================
+     NAV
+     ====================================================================== */
+
+  .part__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  .part__nav-link {
+    display: block;
+    max-width: 22ch;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part__nav-link--next {
+    text-align: end;
+  }
+
+  .part__nav-title {
+    display: block;
+    margin-block-start: var(--space-1);
+    font-family: var(--font-doc);
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+  }
+
+  .part__nav-link:hover .part__nav-title {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .part {
+      display: block;
+      max-width: var(--grid-main-col);
+    }
+
+    .part__title {
+      font-size: clamp(2.25rem, 9vw, var(--type-title-size));
+    }
+
+    .part__nav {
+      flex-direction: column;
+    }
+
+    .part__nav-link--next {
+      text-align: start;
+    }
+  }
+</style>
