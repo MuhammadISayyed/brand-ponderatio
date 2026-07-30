@@ -1,0 +1,252 @@
+---
+/**
+ * TEMPORARY. Body-face specimen.
+ *
+ * Goudy Bookletter 1911 carries the title in every option — that part is
+ * settled. What is being chosen is the body face, so each block shows a full
+ * paragraph of real prose rather than a headline, because the question is what
+ * happens to the eye after four hundred words and not what looks good in a
+ * screenshot.
+ *
+ * Each stack is set at the size that puts roughly 66 characters on the 592px
+ * line. Comparing faces at a shared pixel size compares their x-heights
+ * instead, which is not the question.
+ *
+ * The last block shows what Goudy costs a NOTE, which is the one place the
+ * decision is not free.
+ *
+ * Delete this file and the SPECIMEN ONLY block in astro.config.mjs when done.
+ */
+import { Font } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const stacks = [
+  {
+    id: 'jost',
+    label: 'Jost',
+    lineage: 'Geometric · Futura lineage · Google Fonts',
+    body: 'var(--font-jost)',
+    size: '1.25rem',
+    note: 'Your pick. Watch the a / o / e / c — they share a circle, so each one resolves a beat slower than a humanist face.',
+  },
+  {
+    id: 'clarity',
+    label: 'Clarity City',
+    lineage: 'Geometric · Metropolis lineage · vendored, OFL, upstream archived',
+    body: 'var(--font-clarity)',
+    size: '1.125rem',
+    note: 'Your pick. Slightly warmer than Jost and a larger x-height, but the same closed apertures.',
+  },
+  {
+    id: 'alegreya-sans',
+    label: 'Alegreya Sans',
+    lineage: 'Humanist · already loaded · keeps the superfamily',
+    body: 'var(--font-meta)',
+    size: '1.4375rem',
+    note: 'The reversal you floated earlier. Calligraphic skeleton under a sans skin — the letterforms vary, so words keep their shape.',
+  },
+  {
+    id: 'source-sans',
+    label: 'Source Sans 3',
+    lineage: 'Humanist · drawn by Adobe for extended text',
+    body: 'var(--font-source-sans)',
+    size: '1.3125rem',
+    note: 'The conservative choice. Open apertures, unambiguous I / l / 1, designed for exactly this job.',
+  },
+];
+
+const SAMPLE_A = `Every design system I have been handed arrives as a catalogue. Here are the colours, here are the type sizes, here are the spacing steps, here are the components; and here, usually in an appendix, usually written last, are some notes on when to reach for which. The catalogue is generous. It is also, within about six months, useless — not because anyone violated it, but because everyone followed it.`;
+
+const SAMPLE_B = `A list of permitted moves does not narrow a design space. It enumerates one, and an enumerated space is a space you can wander in forever. The load-bearing part of a system is never the inventory of what is available. It is the record of what has been ruled out, and the reason attached to each entry.`;
+---
+
+<BaseLayout title="Body face specimen" description="Candidate body faces, in situ.">
+  <Fragment slot="head">
+    <Font cssVariable="--font-goudy" preload />
+    <Font cssVariable="--font-jost" />
+    <Font cssVariable="--font-source-sans" />
+    <Font cssVariable="--font-clarity" />
+  </Fragment>
+
+  <div class="specimen">
+    <h1 class="specimen__heading">Body face specimen</h1>
+    <p class="specimen__intro">
+      Goudy Bookletter 1911 carries the title throughout. Each body face is set
+      at the size that holds about 66 characters on the 592&thinsp;px line, so
+      what differs between blocks is the face and not its size. Read a whole
+      paragraph in each — the differences that matter only show up after a few
+      lines.
+    </p>
+
+    {
+      stacks.map((stack) => (
+        <section class="spec" id={stack.id} style={`--spec-body:${stack.body};--spec-size:${stack.size}`}>
+          <div class="spec__tag">
+            <p class="label">{stack.label}</p>
+            <p class="spec__meta">{stack.lineage}</p>
+            <p class="spec__meta spec__meta--note">{stack.note}</p>
+          </div>
+
+          <article class="spec__page">
+            <p class="spec__dateline">
+              <span>Essay</span>
+              <time datetime="2026-07-30">30 July 2026</time>
+            </p>
+            <h2 class="spec__title">A system is what it refuses</h2>
+            <p class="spec__deck">
+              Design systems ship as catalogues of what you may do. The ones
+              that survive are catalogues of what you may not.
+            </p>
+            <div class="spec__prose">
+              <p>{SAMPLE_A}</p>
+              <h3 class="spec__h2">Two kinds of constraint</h3>
+              <p>
+                {SAMPLE_B} A constraint that <em>creates a relation</em> between
+                the options left is the <strong>only generative kind</strong>.
+              </p>
+            </div>
+          </article>
+        </section>
+      ))
+    }
+
+    <section class="spec spec--note" id="goudy-note" style="--spec-body:var(--font-goudy);--spec-size:1.3125rem">
+      <div class="spec__tag">
+        <p class="label">Goudy Bookletter 1911 as the note face</p>
+        <p class="spec__meta">
+          What you asked for, shown honestly. Goudy has one weight and no
+          italic.
+        </p>
+        <p class="spec__meta spec__meta--note">
+          The emphasis and the bold in the paragraph below are marked up
+          exactly as they are in the essays above. Neither survives.
+        </p>
+      </div>
+
+      <article class="spec__page">
+        <p class="spec__dateline"><span>CN-014</span><span>Working</span></p>
+        <h2 class="spec__title spec__title--note">
+          Measure the column, don’t estimate it
+        </h2>
+        <div class="spec__prose">
+          <p>
+            {SAMPLE_B} A constraint that <em>creates a relation</em> between the
+            options left is the <strong>only generative kind</strong>.
+          </p>
+        </div>
+      </article>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .specimen {
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+  }
+
+  .specimen__heading {
+    font-size: var(--type-title-note-size);
+    line-height: var(--type-title-note-leading);
+    margin-block-end: var(--space-4);
+  }
+
+  .specimen__intro {
+    max-width: var(--grid-main-col);
+    color: var(--ink-2);
+    margin-block-end: var(--space-9);
+  }
+
+  .spec + .spec {
+    margin-block-start: var(--space-9);
+    padding-block-start: var(--space-7);
+    border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  .spec__tag {
+    margin-block-end: var(--space-6);
+  }
+
+  .spec__meta {
+    margin-block-start: var(--space-2);
+    max-width: var(--grid-main-col);
+    font-family: var(--font-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--muted);
+  }
+
+  .spec__meta--note {
+    color: var(--accent);
+  }
+
+  /* ---- the specimen page itself ---------------------------------------- */
+
+  .spec__dateline {
+    display: flex;
+    gap: var(--space-4);
+    margin-block-end: var(--space-4);
+    font-family: var(--font-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--muted);
+  }
+
+  .spec__dateline span:first-child {
+    color: var(--ink);
+  }
+
+  .spec__title {
+    font-family: var(--font-goudy);
+    font-size: 4rem;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-block: 0 var(--space-5);
+    text-wrap: balance;
+  }
+
+  .spec__title--note {
+    font-size: var(--type-title-note-size);
+    line-height: var(--type-title-note-leading);
+  }
+
+  .spec__deck {
+    font-family: var(--spec-body);
+    font-size: var(--type-deck-size);
+    line-height: 1.4;
+    color: var(--ink-2);
+    max-width: var(--grid-main-col);
+    margin-block-end: var(--space-7);
+    text-wrap: pretty;
+  }
+
+  .spec__prose {
+    max-width: var(--grid-main-col);
+    font-family: var(--spec-body);
+    font-size: var(--spec-size);
+    line-height: var(--type-body-leading);
+  }
+
+  .spec__prose p {
+    margin-block-end: var(--space-5);
+    text-wrap: pretty;
+  }
+
+  .spec__h2 {
+    font-family: var(--spec-body);
+    font-size: var(--type-h2-size);
+    font-weight: var(--weight-semibold);
+    line-height: 1.25;
+    margin-block: var(--space-7) var(--space-4);
+  }
+
+  .spec--note .spec__page {
+    background: var(--paper);
+    border: var(--rule-hairline) solid var(--sheet-edge);
+    padding: var(--space-7);
+    max-width: calc(var(--grid-note-measure) + 2 * var(--space-7));
+  }
+</style>

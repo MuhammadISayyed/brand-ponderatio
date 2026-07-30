@@ -64,6 +64,75 @@ export default defineConfig({
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
+    // ---- SPECIMEN ONLY -----------------------------------------------------
+    // Candidates under evaluation on /specimen. Delete these entries along
+    // with that page once the decision is made, or promote the winners.
+    {
+      // Title candidate. ONE weight, no bold, no italic — verified against
+      // the Google API, which 400s on any other request. Fine for a title;
+      // see the specimen page for what it costs a note.
+      provider: fontProviders.google(),
+      name: 'Goudy Bookletter 1911',
+      cssVariable: '--font-goudy',
+      weights: [400],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      // Body candidate — geometric, Futura lineage.
+      provider: fontProviders.google(),
+      name: 'Jost',
+      cssVariable: '--font-jost',
+      weights: [400, 500, 600],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      // Body candidate — humanist, drawn for extended text.
+      provider: fontProviders.google(),
+      name: 'Source Sans 3',
+      cssVariable: '--font-source-sans',
+      weights: [400, 600],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      // Body candidate — geometric, Metropolis lineage. Not on Google Fonts
+      // or Fontsource, so the files are vendored in src/assets/fonts under
+      // OFL, with the licence alongside them as that licence requires. The
+      // upstream repo is archived; the licence is what makes that survivable.
+      provider: fontProviders.local(),
+      name: 'Clarity City',
+      cssVariable: '--font-clarity',
+      // Local families declare their files under `options.variants`, not as
+      // weights/styles like a remote provider.
+      options: {
+        variants: [
+          {
+            weight: 400,
+            style: 'normal',
+            src: ['./src/assets/fonts/clarity-city/ClarityCity-Regular.woff2'],
+          },
+          {
+            weight: 400,
+            style: 'italic',
+            src: [
+              './src/assets/fonts/clarity-city/ClarityCity-RegularItalic.woff2',
+            ],
+          },
+          {
+            weight: 600,
+            style: 'normal',
+            src: ['./src/assets/fonts/clarity-city/ClarityCity-SemiBold.woff2'],
+          },
+        ],
+      },
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    // ---- END SPECIMEN ONLY -------------------------------------------------
     {
       // Metadata sans — datelines, labels, captions, sidenotes ONLY.
       // Alegreya Sans is the companion drawn for this job by the same
