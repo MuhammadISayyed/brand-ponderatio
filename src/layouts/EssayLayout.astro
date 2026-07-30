@@ -205,6 +205,11 @@ const citedCounts = scanCitations(post.body ?? '');
 
   .essay__deck {
     font-family: var(--font-text);
+    /* Italic. A deck is not a short first paragraph — it is the editor's
+       voice rather than the author's, and the italic is what tells a reader
+       that before they have read a word of it. Clarity City ships a real
+       italic, so nothing is synthesised here. */
+    font-style: italic;
     font-size: var(--type-deck-size);
     line-height: var(--type-deck-leading);
     color: var(--ink-2);
@@ -336,8 +341,11 @@ const citedCounts = scanCitations(post.body ?? '');
     padding-inline: 0.1em 0.2em;
   }
 
+  /* Dotted, like every other in-page reference — a sidenote marker moves you
+     down the same page, and must not adopt a link's resting appearance when
+     hovered. */
   .sidenote-ref:hover {
-    text-decoration: underline;
+    text-decoration: underline dotted;
     text-underline-offset: 0.2em;
   }
 
@@ -380,7 +388,7 @@ const citedCounts = scanCitations(post.body ?? '');
   }
 
   .sidenote__num:hover {
-    text-decoration: underline;
+    text-decoration: underline dotted;
     text-underline-offset: 0.2em;
   }
 

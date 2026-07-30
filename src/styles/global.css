@@ -130,19 +130,20 @@
      its own leading because the two are not independent.
      ====================================================================== */
 
-  /* One family throughout, so what separates a heading from its prose is
-     weight and size — not a change of voice. Headings sit at semibold; the
-     post title takes the black.
+  /* EVERY heading takes the document face — in an essay, in a note, in the
+     index, anywhere. A heading names a thing; that is the printed voice's job
+     even when the prose beneath it is set in the working face. It also means
+     the two faces divide by ROLE rather than by page: Goudy titles and names,
+     Clarity City argues and annotates.
 
-     `.display-title` is scoped by ROLE rather than by tag on purpose. Note
-     titles and the index heading are `h1` too, and the black weight would
-     give a filed sheet the authority of a published argument. There is
-     exactly one display title per page. */
+     --weight-regular is not a choice. Goudy has one weight, so headings step
+     up in size alone, and asking for semibold here would have every heading on
+     the site silently faux-bolded. */
   h1,
   h2,
   h3 {
-    font-family: var(--font-text);
-    font-weight: var(--weight-semibold);
+    font-family: var(--font-doc);
+    font-weight: var(--weight-regular);
     letter-spacing: -0.005em;
     text-wrap: balance;
   }
@@ -212,11 +213,13 @@
   .prose--editorial > p:first-of-type::first-letter {
     -webkit-initial-letter: var(--dropcap-lines);
     initial-letter: var(--dropcap-lines);
-    font-family: var(--font-doc);
-    /* Regular, NOT the title's black. A drop cap sunk three lines is already
-       the largest thing in the column; at 900 it stops being an initial and
-       becomes a logo, and it drags the eye back to it on every line that
-       wraps around it. The title can be black because nothing is beside it. */
+    /* The WORKING face, not the document face — the drop cap is the first
+       letter of the paragraph it sits in, and it has to be that paragraph's
+       letter enlarged rather than a different typeface pasted into the text.
+       Set it in Goudy and the reader sees a serif initial marooned in a sans
+       column, which reads as decoration rather than as the start of the
+       sentence. */
+    font-family: var(--font-text);
     font-weight: var(--weight-regular);
     /* Space between the sunken letter and the lines wrapping around it.
        In em of the drop cap, so it scales with it. */
@@ -237,10 +240,28 @@
   }
 
   /* ==========================================================================
-     LINKS
-     The oxide accent is permitted here — this is one of its listed homes.
-     The underline is offset far enough to clear descenders, and thin enough
-     not to compete with the hairline rules.
+     LINKS — and the one rule that governs all of them.
+
+     THE UNDERLINE STYLE IS A PROMISE ABOUT DESTINATION, AND IT NEVER CHANGES
+     ON HOVER.
+
+       solid underline   this takes you to another page
+       dotted underline  this moves you within the page you are on
+
+     Hover and focus may change the COLOUR — that is the affordance, saying
+     "yes, this is live" — but never the style. The earlier version got this
+     wrong: a citation began dotted and turned solid on hover, so pointing at
+     an in-page reference made it adopt the exact resting appearance of a link
+     that leaves the page. A hover state that impersonates another element's
+     resting state is the most confusing thing an interface can do, because
+     the reader learns the wrong rule from the more memorable event.
+
+     Both are <a>. The semantics are identical and correct; what differs is
+     where they land, and that is what the underline encodes.
+
+     The accent is permitted on both, at rest for links and on hover for
+     in-page references. The underline is offset far enough to clear
+     descenders and thin enough not to compete with the hairline rules.
      ====================================================================== */
 
   a {
@@ -256,20 +277,9 @@
     text-decoration-thickness: 2px;
   }
 
-  /* A citation is NOT styled as an ordinary link, and the distinction is the
-     point: a link takes you off the page, a citation points at the foot of
-     the one you are reading. Styling them alike promises a journey the
-     citation does not make.
-
-     So there are two treatments for two destinations:
-       solid underline, cinnabar   leaves the page
-       dotted underline, ink       points down the page
-
-     Dotted-for-reference is an old convention and it survives here because it
-     is legible without colour — the underline still marks it as interactive
-     for a reader who cannot see the hue. On hover and focus it resolves to
-     the ordinary link treatment, which is the moment the reader has committed
-     and the accent is doing real work. */
+  /* A citation points at the sources block on this same page, so it is
+     dotted, and it STAYS dotted while you point at it. Hover and focus change
+     the colour only. */
   .cite {
     color: inherit;
     text-decoration: underline;
@@ -282,7 +292,6 @@
   .cite:hover,
   .cite:focus-visible {
     color: var(--accent);
-    text-decoration-style: solid;
     text-decoration-color: currentColor;
   }
 
@@ -330,14 +339,6 @@
   .note-prose strong,
   .note-prose b {
     font-weight: var(--weight-semibold);
-  }
-
-  /* Section headings in a note cannot step up in weight, because there is no
-     heavier weight to step to. They step up in size alone. */
-  .note-prose h2,
-  .note-prose h3 {
-    font-family: var(--font-doc);
-    font-weight: var(--weight-regular);
   }
 
   /* ==========================================================================

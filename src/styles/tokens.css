@@ -225,19 +225,39 @@
      different ones. */
   --type-body-note-size: 1.375rem;  /* 22px */
 
-  /* Section headings. Body serif at --weight-semibold. */
-  --type-h2-size: 1.625rem;         /* 26px */
+  /* Section headings — the DOCUMENT face, everywhere: in an essay, in a note,
+     in the index. Headings belong to the printed voice even when the prose
+     under them does not.
+
+     Sizes are up from 26/20, and that is not a change of emphasis. Goudy sits
+     at 0.415 of its em against Clarity City's 0.517, so a heading set at the
+     old numbers had barely more x-height than the body it introduced. 32 and
+     25 restore the ratio the old sizes encoded. Set in --weight-regular,
+     because Goudy has no other weight — headings step up in size alone. */
+  --type-h2-size: 2rem;             /* 32px */
   --type-h2-leading: 1.25;
-  --type-h3-size: 1.25rem;          /* 20px */
+  --type-h3-size: 1.5625rem;        /* 25px */
   --type-h3-leading: 1.3;
 
-  /* Sans, small. Sidenotes and figure captions share a size deliberately —
-     they are the same register of apparatus. Stepped up with everything else:
-     Alegreya Sans runs smaller on the body than Inter did. */
-  --type-sidenote-size: 0.875rem;   /* 14px */
-  --type-sidenote-leading: 1.5;
-  --type-caption-size: 0.875rem;    /* 14px */
-  --type-caption-leading: 1.5;
+  /* ONE SIZE FOR ALL APPARATUS. Datelines, tags, sidenotes, sources, figure
+     captions and document headers are all the same register — everything on
+     the page that is not the argument — so they are all one size. Setting
+     them at 12, 13 and 14 was three decisions where there is only one
+     distinction.
+
+     Note the optical cost, since it is real: the uppercase tracked roles
+     (dateline, tags, "filed under") read LARGER than the sentence-case ones
+     at the same px, because caps fill the em. They are the same size by
+     measurement and slightly unequal by eye. That is the honest trade for
+     having one number instead of three, and it is the direction to correct
+     if it ever needs correcting. */
+  --type-apparatus-size: 0.875rem;  /* 14px */
+  --type-apparatus-leading: 1.5;
+
+  --type-sidenote-size: var(--type-apparatus-size);
+  --type-sidenote-leading: var(--type-apparatus-leading);
+  --type-caption-size: var(--type-apparatus-size);
+  --type-caption-leading: var(--type-apparatus-leading);
 
   /* Sidenotes grow when they collapse inline below the breakpoint: at full
      width, 14px reads as an aside; inline under a paragraph it reads as
@@ -246,7 +266,7 @@
 
   /* Metadata label — sans, uppercase, tracked. Datelines, kind labels,
      document headers, "filed under", Fig. N. */
-  --type-label-size: 0.75rem;       /* 12px */
+  --type-label-size: var(--type-apparatus-size);
   --type-label-tracking: 0.09em;
   --type-label-transform: uppercase;
 
