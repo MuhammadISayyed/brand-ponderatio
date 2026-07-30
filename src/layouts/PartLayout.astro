@@ -1,6 +1,6 @@
 ---
 /**
- * One part of the Inquiry — a chapter, on its own page.
+ * One part of a grounding — a chapter, on its own page.
  *
  * A part IS an essay in every respect except its header, so it uses the same
  * `.article*` classes from styles/article.css rather than a parallel set that
@@ -13,9 +13,12 @@
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
-import { INQUIRY, partHref, inquiryHref, type Part } from '../lib/inquiry';
+import {
+  GROUNDINGS, groundingHref, partHref, roman, type Part,
+} from '../lib/groundings';
 
 interface Props {
+  grounding: string;
   part: Part;
   headings: MarkdownHeading[];
   total: number;
@@ -23,7 +26,8 @@ interface Props {
   next?: Part;
 }
 
-const { part, total, previous, next } = Astro.props;
+const { grounding, part, total, previous, next } = Astro.props;
+const work = GROUNDINGS[grounding];
 const { title, deck, sources } = part.data;
 const n = part.data.part;
 
@@ -51,14 +55,14 @@ const citedCounts = scanCitations(part.body ?? '');
 }
 ---
 
-<BaseLayout title={`${title} — ${INQUIRY.short}`} description={deck}>
+<BaseLayout title={`${title} — ${work.short}`} description={deck}>
   {/* Sticky, and empty until the header has scrolled away. Answers "where am
       I in this part", which is the question that only appears once a part
       runs long. Position in the WORK is answered statically below. */}
   <div class="runninghead" data-runninghead hidden>
     <div class="runninghead__inner">
-      <a class="runninghead__work" href={inquiryHref()}>{INQUIRY.short}</a>
-      <span class="runninghead__part">Part {n}</span>
+      <a class="runninghead__work" href={groundingHref(grounding)}>{work.short}</a>
+      <span class="runninghead__part">Part {roman(n)}</span>
       <span class="runninghead__section" data-runninghead-section></span>
     </div>
     {/* The rule under the running head IS the progress indicator — it fills
@@ -72,8 +76,8 @@ const citedCounts = scanCitations(part.body ?? '');
       {/* Occupies the dateline's slot and takes its styling — an essay says
           when, a part says where. */}
       <p class="article__dateline label">
-        <a class="part__work" href={inquiryHref()}>{INQUIRY.short}</a>
-        <span>Part {n} of {total}</span>
+        <a class="part__work" href={groundingHref(grounding)}>{work.short}</a>
+        <span>Part {roman(n)} of {roman(total)}</span>
       </p>
       <h1 class="article__title display-title">{title}</h1>
       <p class="article__deck">{deck}</p>
@@ -117,25 +121,25 @@ const citedCounts = scanCitations(part.body ?? '');
       <nav class="part-nav" aria-label="Parts">
         {
           previous ? (
-            <a class="part-nav__link" href={partHref(previous.data.part)}>
-              <span class="label">Part {previous.data.part}</span>
+            <a class="part-nav__link" href={partHref(grounding, previous.data.part)}>
+              <span class="label">Part {roman(previous.data.part)}</span>
               <span class="part-nav__title">{previous.data.title}</span>
             </a>
           ) : (
-            <a class="part-nav__link" href={inquiryHref()}>
+            <a class="part-nav__link" href={groundingHref(grounding)}>
               <span class="label">Contents</span>
-              <span class="part-nav__title">{INQUIRY.short}</span>
+              <span class="part-nav__title">{work.short}</span>
             </a>
           )
         }
         {
           next ? (
-            <a class="part-nav__link part-nav__link--next" href={partHref(next.data.part)}>
-              <span class="label">Part {next.data.part}</span>
+            <a class="part-nav__link part-nav__link--next" href={partHref(grounding, next.data.part)}>
+              <span class="label">Part {roman(next.data.part)}</span>
               <span class="part-nav__title">{next.data.title}</span>
             </a>
           ) : (
-            <a class="part-nav__link part-nav__link--next" href={inquiryHref()}>
+            <a class="part-nav__link part-nav__link--next" href={groundingHref(grounding)}>
               <span class="label">End of the argument</span>
               <span class="part-nav__title">Back to the contents</span>
             </a>
@@ -280,6 +284,25 @@ const citedCounts = scanCitations(part.body ?? '');
     background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
+    /* Eased, so the rule trails the scroll and settles rather than snapping
+       frame-by-frame with it. Linear rather than a curve: an ease-out would
+       make it lunge and then creep, which draws the eye — the point is that
+       it should be findable when looked for and unnoticeable when not.
+
+       This is a revision to condition 2 of the motion amendment in
+       tokens.css, which originally forbade any transition. The condition was
+       written to keep the indicator from animating AT the reader; a 240ms
+       linear catch-up does the opposite, since it removes the jitter that was
+       drawing attention in the first place. */
+    transition: transform 240ms linear;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Asked for no motion: the rule still reports position, it just arrives
+       there immediately instead of travelling. */
+    .runninghead__progress {
+      transition: none;
+    }
   }
 
   .runninghead__section {

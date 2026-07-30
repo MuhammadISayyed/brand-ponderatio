@@ -1,38 +1,45 @@
 ---
 /**
- * The spine — the work's front door and its table of contents.
+ * A grounding's spine — its front door and table of contents.
  *
  * NOT a list of titles. For a cumulative argument the contents page is the
  * argument in outline, and a reader should be able to see the shape of the
- * case — and why part 3 has to follow part 2 — before reading a word. That is
- * what `deck` carries on each part: what the part ESTABLISHES, not what it is
- * about.
+ * case — and why Part III has to follow Part II — before reading a word. That
+ * is what `deck` carries on each part: what the part ESTABLISHES.
  */
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { INQUIRY, getParts, partHref } from '../../lib/inquiry';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  GROUNDINGS, groundingSlugs, getParts, partHref, roman,
+} from '../../../lib/groundings';
 
-const parts = await getParts();
+export const getStaticPaths = (async () =>
+  groundingSlugs().map((grounding) => ({ params: { grounding } }))) satisfies GetStaticPaths;
+
+const { grounding } = Astro.params;
+const work = GROUNDINGS[grounding!];
+const parts = await getParts(grounding!);
 ---
 
-<BaseLayout title={INQUIRY.title} description={INQUIRY.abstract}>
+<BaseLayout title={work.title} description={work.abstract}>
   <div class="article">
     <header class="article__header">
       <p class="article__dateline label">
-        <span>Inquiry</span>
-        <span>{parts.length} parts</span>
+        <span>Grounding</span>
+        <span>{roman(parts.length)} parts</span>
       </p>
-      <h1 class="article__title display-title">{INQUIRY.title}</h1>
-      <p class="article__deck">{INQUIRY.abstract}</p>
+      <h1 class="article__title display-title">{work.title}</h1>
+      <p class="article__deck">{work.abstract}</p>
     </header>
 
     <ol class="contents">
       {
         parts.map((part) => (
           <li class="contents__item">
-            <p class="label contents__number">Part {part.data.part}</p>
+            <p class="label contents__number">Part {roman(part.data.part)}</p>
             <div class="contents__body">
               <h2 class="contents__title">
-                <a href={partHref(part.data.part)}>{part.data.title}</a>
+                <a href={partHref(grounding!, part.data.part)}>{part.data.title}</a>
               </h2>
               <p class="contents__deck">{part.data.deck}</p>
             </div>
@@ -46,9 +53,9 @@ const parts = await getParts();
 </BaseLayout>
 
 <style>
-  /* The contents spans the whole grid so each entry can put its number in the
-     margin column — the same edge the index metadata and figure numbers align
-     to, so the page keeps one vertical line for apparatus. */
+  /* The contents spans the whole grid so each entry can put its numeral in
+     the margin column — the same edge the index metadata and figure numbers
+     align to, so the page keeps one vertical line for apparatus. */
   .contents {
     grid-column: 1 / -1;
     grid-row: 2;

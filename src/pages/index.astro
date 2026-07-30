@@ -10,13 +10,21 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { formatDateline, kindLabel, machineDate, postHref } from '../lib/format';
-import { INQUIRY, getParts, inquiryHref } from '../lib/inquiry';
+import {
+  GROUNDINGS, groundingSlugs, getParts, groundingHref,
+} from '../lib/groundings';
 
-// The Inquiry appears ONCE, as a work — not as n entries. A twelve-part
-// argument listed as twelve rows would bury everything else on the page and
+// A grounding appears ONCE, as a work — not as n entries. A twelve-part
+// argument listed as twelve rows would bury everything else on the page, and
 // would display backwards, since this index runs newest-first and an argument
 // runs first-to-last.
-const parts = await getParts();
+const groundings = await Promise.all(
+  groundingSlugs().map(async (slug) => ({
+    slug,
+    work: GROUNDINGS[slug],
+    count: (await getParts(slug)).length,
+  })),
+);
 
 const posts = await getCollection('posts', ({ data }) =>
   import.meta.env.PROD ? !data.draft : true,
@@ -35,18 +43,18 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
     <h1 class="u-sr-only">Index</h1>
 
     {
-      parts.length > 0 && (
-        <a class="work" href={inquiryHref()}>
+      groundings.map(({ slug, work, count }) => (
+        <a class="work" href={groundingHref(slug)}>
           <div class="work__meta stub">
-            <p class="label">Inquiry</p>
-            <p class="entry__date">{parts.length} parts · one page</p>
+            <p class="label">Grounding</p>
+            <p class="entry__date">{count} parts</p>
           </div>
           <div class="work__body">
-            <h2 class="work__title">{INQUIRY.title}</h2>
-            <p class="entry__deck">{INQUIRY.abstract}</p>
+            <h2 class="work__title">{work.title}</h2>
+            <p class="entry__deck">{work.abstract}</p>
           </div>
         </a>
-      )
+      ))
     }
 
     <ol class="index__list">
