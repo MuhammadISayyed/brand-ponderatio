@@ -276,9 +276,23 @@ const citedCounts = scanCitations(post.body ?? '');
     color: var(--muted);
   }
 
-  .essay__sources li:target .essay__source-text {
+  /* The highlight goes on the <li>, which is a block, NOT on the inline span
+     inside it.
+
+     An inline element that wraps produces one box per line fragment, and a
+     box-shadow spread is painted around EVERY fragment. Here the entry ran to
+     three lines set 2.5px apart, so an 8px spread drew an opaque cream slab
+     8px into the line above and the line below — the highlight covered the
+     text it was meant to be drawing attention to. A block has one box and
+     cannot do that.
+
+     Spread is --space-1 rather than --space-2 because entries are only
+     --space-3 apart; 8px each side would have adjacent entries bleeding into
+     one another. */
+  .essay__sources li:target {
     background: var(--ground);
-    box-shadow: 0 0 0 var(--space-2) var(--ground);
+    box-shadow: 0 0 0 var(--space-1) var(--ground);
+    border-radius: 1px;
   }
 
   /* ==========================================================================
@@ -441,12 +455,16 @@ const citedCounts = scanCitations(post.body ?? '');
      the title's alone.
      ====================================================================== */
 
-  .prose figure {
+  .prose figure,
+  .prose .figure {
     margin-block: var(--space-8);
     inline-size: 100%;
+    /* The margin-column figure number is positioned against this. */
+    position: relative;
   }
 
-  .prose figcaption {
+  .prose figcaption,
+  .prose .figure__caption {
     margin-block-start: var(--space-3);
     font-family: var(--font-text);
     font-size: var(--type-caption-size);

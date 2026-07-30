@@ -398,9 +398,19 @@
 
   /* Notes are set narrower than essays on purpose. The narrowness is part of
      what makes a note feel filed rather than published; it is not a rounding
-     of the essay measure. Expressed in ch because the constraint is a
-     character count, not a distance. */
-  --grid-note-measure: 52ch;
+     of the essay measure.
+
+     MEASURED, in rem — it used to be 52ch, and `ch` is not a character count.
+     It is the advance width of the digit zero, which in this face is wider
+     than the average character, so 52ch rendered 57.2 characters per line.
+     The comment on that token claimed the constraint was "a character count,
+     not a distance", which was exactly the estimate-instead-of-measure error
+     that CN-014 sits six lines away warning about.
+
+     34rem holds 55.0 characters in Ysabeau at 21px, counted from rendered
+     line boxes. Eleven characters narrower than the essay's 66.9, which is
+     the gap that makes a sheet read as a sheet. */
+  --grid-note-measure: 34rem;
 
   /* Below this width the margin column collapses: sidenotes fall inline
      beneath the paragraph they annotate, figure numbers move into the

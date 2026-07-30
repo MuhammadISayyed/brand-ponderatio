@@ -22,7 +22,10 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 <BaseLayout title="Muhammad Ibrahim">
   <div class="index">
-    <h1 class="index__heading">Index</h1>
+    {/* The site header already names the page; a visible "Index" above a
+        list of entries labels the obvious. Kept in the accessibility tree,
+        where a page still needs a heading. */}
+    <h1 class="u-sr-only">Index</h1>
 
     <ol class="index__list">
       {
@@ -61,14 +64,6 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
   .index {
     max-width: var(--grid-figure-span);
     margin-inline: auto;
-  }
-
-  .index__heading {
-    font-size: var(--type-title-note-size);
-    line-height: var(--type-title-note-leading);
-    /* The first entry brings its own top padding; anything more here opens a
-       hole between the heading and the list it heads. */
-    margin-block-end: var(--space-4);
   }
 
   /* Entries were separated by a full-width oxide rule each, which turned a

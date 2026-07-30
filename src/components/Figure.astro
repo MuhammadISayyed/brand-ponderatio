@@ -1,0 +1,81 @@
+---
+/**
+ * A figure, numbered automatically, with its number in the margin column.
+ *
+ *   <Figure>
+ *     <svg …/>
+ *     <Fragment slot="caption">What the diagram argues.</Fragment>
+ *   </Figure>
+ *
+ * The number was typed by hand into the caption before this existed, which
+ * meant renumbering was a manual edit and the token file's rule — that Fig. N
+ * lives in the margin and moves into the caption only when the margin
+ * collapses — was documented but never implemented.
+ *
+ * Numbering uses the same Request-keyed counter as sidenotes: one page render
+ * is one Request, so figures restart at 1 on every page.
+ */
+import { nextFigureNumber } from '../lib/figure-counter';
+
+interface Props {
+  /** Optional: overrides the generated id, for linking to a specific figure. */
+  id?: string;
+}
+
+const n = nextFigureNumber(Astro.request);
+const { id = `fig-${n}` } = Astro.props;
+---
+
+<figure class="figure" id={id}>
+  {/* The margin copy. aria-hidden because the caption below already carries
+      the number in its text — a screen reader should hear "Fig. 3" once. */}
+  <span class="figure__number" aria-hidden="true">Fig.&nbsp;{n}</span>
+
+  <slot />
+
+  <figcaption class="figure__caption">
+    <span class="figure__number-inline">Fig.&nbsp;{n}&nbsp;—&nbsp;</span><slot
+      name="caption"
+    />
+  </figcaption>
+</figure>
+
+<style>
+  /* The number hangs in the margin column, right-aligned against the gutter —
+     the same edge the index metadata aligns to, so the page has one vertical
+     line for apparatus rather than two. */
+  .figure__number {
+    position: absolute;
+    inset-inline-start: calc(
+      -1 * (var(--grid-margin-col) + var(--grid-gutter))
+    );
+    inline-size: var(--grid-margin-col);
+    text-align: end;
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Wide, the number is in the margin, so the caption must not repeat it. */
+  .figure__number-inline {
+    display: none;
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .figure__number {
+      display: none;
+    }
+
+    .figure__number-inline {
+      display: inline;
+      color: var(--muted);
+    }
+  }
+</style>

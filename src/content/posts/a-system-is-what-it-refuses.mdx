@@ -20,6 +20,7 @@ sources:
 
 import Sidenote from '../../components/Sidenote.astro';
 import Cite from '../../components/Cite.astro';
+import Figure from '../../components/Figure.astro';
 
 Every design system I have been handed arrives as a catalogue. Here are the
 colours, here are the type sizes, here are the spacing steps, here are the
@@ -75,7 +76,7 @@ turn off, and a team that has stopped proposing anything. Enabling constraints
 fail quietly, and they fail all at once. There is no gradual decline from a
 rule that holds to a rule that mostly holds.
 
-<figure>
+<Figure>
   {/* Static, deliberately. The diagram house style and the GSAP build
       animation land in a later step; this exists to prove the figure breakout
       and the caption, and to be replaced by something that moves. */}
@@ -93,9 +94,9 @@ rule that holds to a rule that mostly holds.
     </title>
 
     <g fill="var(--diagram-node-fill)" stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)">
-      <circle cx="28" cy="40" r="7" /><circle cx="92" cy="40" r="7" /><circle cx="157" cy="40" r="7" /><circle cx="222" cy="40" r="7" />
-      <circle cx="28" cy="100" r="7" /><circle cx="92" cy="100" r="7" /><circle cx="157" cy="100" r="7" /><circle cx="222" cy="100" r="7" />
-      <circle cx="28" cy="160" r="7" /><circle cx="92" cy="160" r="7" /><circle cx="157" cy="160" r="7" /><circle cx="222" cy="160" r="7" />
+      <circle cx="28" cy="40" r="9" /><circle cx="92" cy="40" r="9" /><circle cx="157" cy="40" r="9" /><circle cx="222" cy="40" r="9" />
+      <circle cx="28" cy="100" r="9" /><circle cx="92" cy="100" r="9" /><circle cx="157" cy="100" r="9" /><circle cx="222" cy="100" r="9" />
+      <circle cx="28" cy="160" r="9" /><circle cx="92" cy="160" r="9" /><circle cx="157" cy="160" r="9" /><circle cx="222" cy="160" r="9" />
     </g>
 
     <g stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)" fill="none">
@@ -103,21 +104,21 @@ rule that holds to a rule that mostly holds.
       <path d="M435 100 L361 160" /><path d="M435 100 L509 160" />
     </g>
     <g fill="var(--diagram-node-fill)" stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)">
-      <circle cx="361" cy="40" r="7" /><circle cx="509" cy="40" r="7" />
-      <circle cx="361" cy="160" r="7" /><circle cx="509" cy="160" r="7" />
+      <circle cx="361" cy="40" r="9" /><circle cx="509" cy="40" r="9" />
+      <circle cx="361" cy="160" r="9" /><circle cx="509" cy="160" r="9" />
     </g>
-    <circle cx="435" cy="100" r="7" fill="var(--diagram-accent)" stroke="var(--diagram-accent)" stroke-width="var(--diagram-stroke-weight)" />
+    <circle cx="435" cy="100" r="9" fill="var(--diagram-accent)" stroke="var(--diagram-accent)" stroke-width="var(--diagram-stroke-weight)" />
 
     <g fill="var(--diagram-label-color)" font-family="var(--font-text)" font-size="var(--diagram-label-size)">
       <text x="28" y="205">Twelve options</text>
       <text x="361" y="205">Five options that compose</text>
     </g>
   </svg>
-  <figcaption>
-    Fig. 1 — A catalogue enumerates; a constraint composes. The left side has
-    more available to it and can say less with any of it.
-  </figcaption>
-</figure>
+  <Fragment slot="caption">
+    A catalogue enumerates; a constraint composes. The left side has more
+    available to it and can say less with any of it.
+  </Fragment>
+</Figure>
 
 ## The fourth accent
 

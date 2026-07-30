@@ -77,9 +77,26 @@ if (supersededBy) {
      job is to be the surface a note sheet sits on.
      ====================================================================== */
 
+  /* FULL BLEED, edge to edge of the viewport.
+
+     It used to stop at `main`'s 1080px cap while the header and footer stop
+     at the 830px figure span, so the band overhung the site's text edge by
+     77px on each side — aligned to nothing, and reading as a slip rather than
+     a decision. A band either lines up with the text above it or runs off the
+     screen entirely; landing between the two is the only wrong answer.
+
+     Running off is the right one here: a note is meant to sit on a different
+     surface, and a surface that reaches the edges says so.
+
+     The margin/padding pair is the standard break-out — negative margin to
+     the viewport edge, matching padding to put the content back where it was.
+     `overflow-x: clip` on the body in global.css is what stops 100vw from
+     opening a scrollbar's worth of horizontal scroll. */
   .note-ground {
     background: var(--ground);
-    padding: var(--space-8) var(--space-5);
+    margin-inline: calc(50% - 50vw);
+    padding-block: var(--space-8);
+    padding-inline: calc(50vw - 50%);
   }
 
   .note-sheet {

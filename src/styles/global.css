@@ -60,9 +60,21 @@
        would break that and override the reader's browser setting, so it is
        deliberately not set. */
     -webkit-text-size-adjust: 100%;
+    /* Both html AND body carry this, and both are needed — tested, not
+       assumed. 100vw counts the scrollbar's width, so a full-bleed band
+       overshoots the visible area by half a scrollbar on each side. Setting
+       the clip on html alone does not stop it: html's overflow PROPAGATES to
+       the viewport, which leaves html itself behaving as visible, so the
+       child's overflow still reaches the scroller. Body needs its own clip to
+       contain it. With html alone the page still scrolled 7.5px sideways.
+
+       `clip` rather than `hidden` — hidden would make these scroll containers
+       and break `position: sticky` anywhere inside them. */
+    overflow-x: clip;
   }
 
   body {
+    overflow-x: clip; /* see the note on html above — both are required */
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-text);
@@ -398,6 +410,13 @@
     padding: var(--space-2) var(--space-3);
     border-block-end: var(--rule-weight) solid var(--rule);
     vertical-align: top;
+  }
+
+  /* The last row keeps no rule beneath it. A table closed on all sides is a
+     box, and a box is a container the eye has to get out of; open at the foot
+     it stays part of the column it sits in. */
+  .prose tbody tr:last-child td {
+    border-block-end: 0;
   }
 
   .prose td:first-child,
