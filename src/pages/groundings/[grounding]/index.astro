@@ -9,6 +9,7 @@
  */
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
 import {
   GROUNDINGS, groundingSlugs, getParts, partHref, roman,
 } from '../../../lib/groundings';
@@ -24,10 +25,12 @@ const parts = await getParts(grounding!);
 <BaseLayout title={work.title} description={work.abstract}>
   <div class="article">
     <header class="article__header">
-      <p class="article__dateline label">
-        <span>Grounding</span>
-        <span>{roman(parts.length)} parts</span>
-      </p>
+      <div class="article__topline">
+        <Breadcrumb trail={[{ href: '/groundings/', label: 'Groundings' }]} />
+        <p class="article__meta label">
+          <span>{roman(parts.length)} parts</span>
+        </p>
+      </div>
       <h1 class="article__title display-title">{work.title}</h1>
       <p class="article__deck">{work.abstract}</p>
     </header>

@@ -62,6 +62,22 @@
   margin-block-start: var(--space-6);
 }
 
+.article__up {
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-4);
+  border-block-start: var(--rule-weight) solid var(--rule);
+}
+
+.article__up a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.article__up a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
 /* ==========================================================================
    HEADER
    ====================================================================== */
@@ -73,18 +89,44 @@
 
    Above the title it still reads as a dateline, and it now runs the figure
    span with the title instead of hanging beside the body text. */
-.article__dateline {
+/* ONE LINE ABOVE THE TITLE, doing two jobs separated by position rather than
+   by styling: the breadcrumb on the left says what this belongs to, the
+   metadata on the right says what it is.
+
+   No rule under it. The line is already 12px tracked sans against a 56px
+   display serif — two registers apart — and a rule between them would insist
+   on a separation the type has already made. */
+.article__topline {
   display: flex;
   flex-wrap: wrap;
-  /* No rule under it. The dateline is already 11px tracked sans against a
-     64px display serif — two registers apart. A line between them would be
-     insisting on a separation the type has already made. */
-  gap: var(--space-2) var(--space-4);
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-5);
   margin-block-end: var(--space-4);
 }
 
-.article__dateline span {
+.article__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
   color: var(--ink);
+}
+
+@media (max-width: 56.25em) {
+  /* Duplicated from --bp-margin-collapse; media conditions cannot read
+     custom properties.
+
+     The breadcrumb wraps rather than truncating — a truncated breadcrumb
+     reintroduces the abbreviation problem it exists to remove — so on a
+     narrow screen the metadata drops beneath it instead of fighting for the
+     same line. */
+  .article__topline {
+    justify-content: flex-start;
+  }
+
+  .article__meta {
+    flex-basis: 100%;
+  }
 }
 
 .article__title {

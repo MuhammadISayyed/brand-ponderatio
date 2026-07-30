@@ -15,6 +15,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import { formatDateline, kindLabel, machineDate } from '../lib/format';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
 
 interface Props {
@@ -61,10 +62,13 @@ const citedCounts = scanCitations(post.body ?? '');
 <BaseLayout title={title} description={deck}>
   <article class="article">
     <header class="article__header">
-      <p class="article__dateline label">
-        <span>{kindLabel(kind)}</span>
-        <time datetime={machineDate(date)}>{formatDateline(date)}</time>
-      </p>
+      <div class="article__topline">
+        <Breadcrumb trail={[{ href: '/essays/', label: 'Essays' }]} />
+        <p class="article__meta label">
+          <span>{kindLabel(kind)}</span>
+          <time datetime={machineDate(date)}>{formatDateline(date)}</time>
+        </p>
+      </div>
       <h1 class="article__title display-title">{title}</h1>
       {/* Optional. A standfirst is a judgement about a particular piece; a
           piece that does not want one gets a title and then its first
@@ -119,6 +123,14 @@ const citedCounts = scanCitations(post.body ?? '');
           <p class="article__tags label">Filed under {tags.join(' · ')}</p>
         )
       }
+
+      {/* A way up at the foot as well as the top. Parts have had this since
+          they were paginated; essays reached the end and offered nothing. */}
+      <nav class="article__up" aria-label="Essays">
+        <a href="/essays/">
+          <span class="label">All essays</span>
+        </a>
+      </nav>
     </footer>
   </article>
 </BaseLayout>

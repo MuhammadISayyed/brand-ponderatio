@@ -13,6 +13,7 @@
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
+import Breadcrumb from '../components/Breadcrumb.astro';
 import {
   GROUNDINGS, groundingHref, partHref, roman, type Part,
 } from '../lib/groundings';
@@ -55,13 +56,16 @@ const citedCounts = scanCitations(part.body ?? '');
 }
 ---
 
-<BaseLayout title={`${title} — ${work.short}`} description={deck}>
+<BaseLayout title={`${title} — ${work.title}`} description={deck}>
   {/* Sticky, and empty until the header has scrolled away. Answers "where am
       I in this part", which is the question that only appears once a part
       runs long. Position in the WORK is answered statically below. */}
   <div class="runninghead" data-runninghead hidden>
     <div class="runninghead__inner">
-      <a class="runninghead__work" href={groundingHref(grounding)}>{work.short}</a>
+      {/* "Contents" rather than the work's name: the bar is sticky and has
+          no room for a 32-character title, and the answer to that is to name
+          the DESTINATION rather than abbreviate the title. */}
+      <a class="runninghead__work" href={groundingHref(grounding)}>Contents</a>
       <span class="runninghead__part">Part {roman(n)}</span>
       <span class="runninghead__section" data-runninghead-section></span>
     </div>
@@ -73,23 +77,22 @@ const citedCounts = scanCitations(part.body ?? '');
 
   <article class="article">
     <header class="article__header">
-      {/* A LABEL, NOT A BREADCRUMB. It occupies the dateline's slot and takes
-          its styling: an essay says when, a part says where.
+      {/* Breadcrumb left, position right — one line doing two jobs, separated
+          by position rather than by styling. The crumb carries the
+          grounding's FULL title, which is the whole reason `short` was
+          deleted. It ends at the parent; the h1 below says the rest. */}
+      <div class="article__topline">
+        <Breadcrumb
+          trail={[
+            { href: '/groundings/', label: 'Groundings' },
+            { href: groundingHref(grounding), label: work.title },
+          ]}
+        />
+        <p class="article__meta label">
+          <span>Part {roman(n)} of {roman(total)}</span>
+        </p>
+      </div>
 
-          The grounding's name used to be a link here, which made the line a
-          half-breadcrumb — it looked like metadata and behaved like
-          navigation, and a reader could not tell from looking which it was.
-          Navigation now lives in three places that are unambiguously
-          navigation: the site header, the running head, and the foot.
-
-          It carries the POSITION only, not the grounding's name. The short
-          name is a truncation made for the running head, where a link needs
-          something to say; standing alone above a title it reads as the
-          grounding's identity while being no such thing. The title of the
-          part and the contents link at the foot say what this belongs to. */}
-      <p class="article__dateline label">
-        <span>Part {roman(n)} of {roman(total)}</span>
-      </p>
       <h1 class="article__title display-title">{title}</h1>
       {deck && <p class="article__deck">{deck}</p>}
     </header>
@@ -146,7 +149,7 @@ const citedCounts = scanCitations(part.body ?? '');
         <div class="part-nav__slot part-nav__slot--up">
           <a class="part-nav__link" href={groundingHref(grounding)}>
             <span class="label">Contents</span>
-            <span class="part-nav__title">{work.short}</span>
+            <span class="part-nav__title">{work.title}</span>
           </a>
         </div>
 

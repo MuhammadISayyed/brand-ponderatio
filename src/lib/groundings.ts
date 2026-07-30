@@ -11,16 +11,24 @@ import { getCollection, type CollectionEntry } from 'astro:content';
  */
 export interface Grounding {
   title: string;
-  /** Used in the running head and page titles, where the full title is long. */
-  short: string;
   /** Shown on the spine, above the contents. One paragraph, no more. */
   abstract: string;
 }
 
+/*
+ * THERE IS NO `short`, DELIBERATELY. There was, and navigation used it as a
+ * NAME — a crumb reading "Demand" for a work called "The Dispositional Basis
+ * of Demand", which made the reader reconstruct the title from a fragment.
+ *
+ * A link is labelled with the destination's real name, or with what the
+ * destination does. Where the full title will not fit — the sticky running
+ * head — the honest fix is the second of those, so the link there reads
+ * "Contents". Never a truncation.
+ */
+
 export const GROUNDINGS: Record<string, Grounding> = {
   demand: {
     title: 'The Dispositional Basis of Demand',
-    short: 'Demand',
     abstract:
       'Demand is treated in economics as a quantity — something read off a schedule, revealed by what was bought. This grounding argues that it is a disposition: a causal power that exists whether or not it is exercised, that composes with other powers rather than summing with them, and that a curve fitted to transactions records only where it has already been manifested.',
   },
