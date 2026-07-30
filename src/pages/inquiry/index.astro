@@ -1,310 +1,89 @@
 ---
 /**
- * The Inquiry — the whole work, on one page.
+ * The spine — the work's front door and its table of contents.
  *
- * It was briefly a page per part, and that was wrong. Pagination is an
- * artifact of two conditions: physical binding, and publishing over time.
- * Neither applies here. Published complete and read in order, a page per part
- * puts a click between every move of a single argument and gives each part a
- * URL implying an independence it does not have. This is one document; the
- * parts are divisions within it, not separate objects.
- *
- * They stay the citable identifiers: §2 is #part-2, permanently.
+ * NOT a list of titles. For a cumulative argument the contents page is the
+ * argument in outline, and a reader should be able to see the shape of the
+ * case — and why part 3 has to follow part 2 — before reading a word. That is
+ * what `deck` carries on each part: what the part ESTABLISHES, not what it is
+ * about.
  */
-import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { INQUIRY, getParts } from '../../lib/inquiry';
-import { scanCitations, citeId, sourceId } from '../../lib/citations';
+import { INQUIRY, getParts, partHref } from '../../lib/inquiry';
 
 const parts = await getParts();
-const rendered = await Promise.all(
-  parts.map(async (part) => ({ part, ...(await render(part)) })),
-);
-
-/**
- * ONE BIBLIOGRAPHY FOR THE WHOLE WORK — a consequence of the single page
- * rather than a preference. Sources are declared per part, because that is
- * where the author is looking when they cite, and merged here.
- *
- * Two collection-level facts need checking, neither visible to a per-entry
- * schema: one key must not name two different works, and citation counts must
- * aggregate, since <Cite> numbering runs across the whole page and the
- * back-links have to reach every occurrence.
- */
-const merged = new Map<
-  string,
-  { text: string; background: boolean; from: string }
->();
-for (const { part } of rendered) {
-  for (const source of part.data.sources ?? []) {
-    const existing = merged.get(source.key);
-    if (existing && existing.text !== source.text) {
-      throw new Error(
-        `Inquiry: source key "${source.key}" names two different works — ` +
-          `"${existing.from}" has «${existing.text}» and "${part.id}" has «${source.text}». ` +
-          `Keys are shared across the whole work because the bibliography is.`,
-      );
-    }
-    if (!existing) {
-      merged.set(source.key, {
-        text: source.text,
-        background: source.background,
-        from: part.id,
-      });
-    }
-  }
-}
-
-const citedCounts = new Map<string, number>();
-for (const { part } of rendered) {
-  for (const [key, n] of scanCitations(part.body ?? '')) {
-    citedCounts.set(key, (citedCounts.get(key) ?? 0) + n);
-  }
-}
-
-for (const key of citedCounts.keys()) {
-  if (!merged.has(key)) {
-    throw new Error(
-      `Inquiry: <Cite source="${key}"> matches no source declared in any part. ` +
-        `Declared: ${[...merged.keys()].join(', ') || '(none)'}.`,
-    );
-  }
-}
-for (const [key, source] of merged) {
-  if (!citedCounts.has(key) && !source.background) {
-    throw new Error(
-      `Inquiry: source "${key}" (declared in "${source.from}") is never cited. ` +
-        `Cite it, mark it \`background: true\`, or remove it.`,
-    );
-  }
-}
-
-const sources = [...merged.entries()].sort((a, b) =>
-  a[1].text.localeCompare(b[1].text),
-);
 ---
 
 <BaseLayout title={INQUIRY.title} description={INQUIRY.abstract}>
-  {/* Sticky. Empty until the reader is past the contents; the script fills it
-      with the part and section they are currently inside. */}
-  <div class="runninghead" data-runninghead hidden>
-    <div class="runninghead__inner">
-      <a class="runninghead__work" href="#top">{INQUIRY.short}</a>
-      <span class="runninghead__part" data-runninghead-part></span>
-      <span class="runninghead__section" data-runninghead-section></span>
-    </div>
-  </div>
-
-  <article class="work" id="top">
-    <header class="work__header">
-      <p class="label work__kind">Inquiry · {parts.length} parts</p>
-      <h1 class="work__title display-title">{INQUIRY.title}</h1>
-      <p class="work__abstract">{INQUIRY.abstract}</p>
+  <div class="article">
+    <header class="article__header">
+      <p class="article__dateline label">
+        <span>Inquiry</span>
+        <span>{parts.length} parts</span>
+      </p>
+      <h1 class="article__title display-title">{INQUIRY.title}</h1>
+      <p class="article__deck">{INQUIRY.abstract}</p>
     </header>
 
-    {/* The contents is the argument in outline, not a list of titles — each
-        line says what its part ESTABLISHES, so the shape of the case is
-        legible before a word of it is read. */}
-    <nav class="contents stub" aria-label="Contents">
-      <h2 class="label">Contents</h2>
-      <ol>
-        {
-          parts.map((part) => (
-            <li>
-              <a href={`#part-${part.data.part}`}>
-                <span class="label contents__number">Part {part.data.part}</span>
-                <span class="contents__title">{part.data.title}</span>
-              </a>
+    <ol class="contents">
+      {
+        parts.map((part) => (
+          <li class="contents__item">
+            <p class="label contents__number">Part {part.data.part}</p>
+            <div class="contents__body">
+              <h2 class="contents__title">
+                <a href={partHref(part.data.part)}>{part.data.title}</a>
+              </h2>
               <p class="contents__deck">{part.data.deck}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </nav>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
 
-    {
-      rendered.map(({ part, Content }) => (
-        <section class="part" id={`part-${part.data.part}`} data-part={part.data.part}>
-          <header class="part__header">
-            <p class="label part__number">Part {part.data.part}</p>
-            <h2 class="part__title">{part.data.title}</h2>
-          </header>
-          <div class="prose">
-            <Content />
-          </div>
-        </section>
-      ))
-    }
-
-    <footer class="work__foot stub">
-      <aside class="essay__sources" aria-labelledby="sources-heading">
-        <h2 id="sources-heading" class="label">Sources</h2>
-        <ul>
-          {
-            sources.map(([key, source]) => {
-              const uses = citedCounts.get(key) ?? 0;
-              return (
-                <li id={sourceId(key)}>
-                  <span class="essay__source-text">{source.text}</span>
-                  {Array.from({ length: uses }, (_, i) => (
-                    <a class="essay__source-back" href={`#${citeId(key, i + 1)}`}>
-                      <span aria-hidden="true">↩</span>
-                      {uses > 1 && <span class="essay__source-backnum">{i + 1}</span>}
-                      <span class="u-sr-only">Back to citation in the text</span>
-                    </a>
-                  ))}
-                  {source.background && (
-                    <span class="essay__source-background">Background</span>
-                  )}
-                </li>
-              );
-            })
-          }
-        </ul>
-      </aside>
-    </footer>
-  </article>
+    {parts.length === 0 && <p class="contents__empty">No parts written yet.</p>}
+  </div>
 </BaseLayout>
 
-<script>
-  // The running head names the part and section the reader is inside. It is
-  // the only client JS on the site.
-  //
-  // Binds on astro:page-load rather than DOMContentLoaded: with the client
-  // router, the second navigation never fires the latter.
-  function setUpRunningHead() {
-    const bar = document.querySelector<HTMLElement>('[data-runninghead]');
-    const partOut = document.querySelector<HTMLElement>('[data-runninghead-part]');
-    const sectionOut = document.querySelector<HTMLElement>('[data-runninghead-section]');
-    const contents = document.querySelector<HTMLElement>('.contents');
-    if (!bar || !partOut || !sectionOut || !contents) return;
-
-    const marks = [
-      ...document.querySelectorAll<HTMLElement>('.part__title, .prose h2'),
-    ];
-    if (!marks.length) return;
-
-    // Hidden while the contents is still on screen — it already says where
-    // you are, and two answers to one question is worse than one.
-    const watch = new IntersectionObserver(
-      ([entry]) => {
-        bar.hidden = entry.isIntersecting;
-      },
-      { threshold: 0 },
-    );
-    watch.observe(contents);
-
-    // Position comes from scroll offset rather than intersection ratios: a
-    // section taller than the viewport intersects nothing, and these sections
-    // are meant to be long.
-    const update = () => {
-      const y = window.scrollY + 96;
-      let current: HTMLElement | null = null;
-      for (const mark of marks) {
-        if (mark.offsetTop <= y) current = mark;
-        else break;
-      }
-      if (!current) return;
-
-      const section = current.closest('.part') as HTMLElement | null;
-      const partLabel = section ? `Part ${section.dataset.part}` : '';
-      // A part heading is not a section; on it the section slot stays empty
-      // rather than repeating the part title back.
-      const sectionLabel = current.classList.contains('part__title')
-        ? ''
-        : (current.textContent?.trim() ?? '');
-
-      if (partOut.textContent !== partLabel) partOut.textContent = partLabel;
-      if (sectionOut.textContent !== sectionLabel)
-        sectionOut.textContent = sectionLabel;
-    };
-
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    document.addEventListener(
-      'astro:before-swap',
-      () => {
-        window.removeEventListener('scroll', update);
-        watch.disconnect();
-      },
-      { once: true },
-    );
-  }
-
-  document.addEventListener('astro:page-load', setUpRunningHead);
-</script>
-
 <style>
-  .work {
-    display: grid;
-    grid-template-columns:
-      var(--grid-margin-col)
-      var(--grid-gutter)
-      var(--grid-main-col);
-    max-width: var(--grid-figure-span);
-    margin-inline: auto;
-  }
-
-  .work__header {
-    grid-column: 1 / -1;
-    margin-block-end: var(--space-9);
-  }
-
-  .work__kind {
-    margin-block-end: var(--space-4);
-  }
-
-  .work__title {
-    font-size: var(--type-title-size);
-    line-height: var(--type-title-leading);
-    margin-block-end: var(--space-5);
-  }
-
-  .work__abstract {
-    font-family: var(--font-text);
-    font-style: italic;
-    font-size: var(--type-deck-size);
-    line-height: var(--type-deck-leading);
-    color: var(--ink-2);
-    max-width: var(--grid-main-col);
-    text-wrap: pretty;
-  }
-
-  /* ==========================================================================
-     CONTENTS
-     ====================================================================== */
-
+  /* The contents spans the whole grid so each entry can put its number in the
+     margin column — the same edge the index metadata and figure numbers align
+     to, so the page keeps one vertical line for apparatus. */
   .contents {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  .contents__item {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    padding-block: var(--space-6);
+  }
+
+  .contents__number {
+    grid-column: 1;
+    text-align: end;
+  }
+
+  .contents__body {
     grid-column: 3;
-    margin-block-end: var(--space-10);
   }
 
-  .contents ol {
-    margin-block-start: var(--space-5);
+  .contents__title {
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+    margin-block: 0;
   }
 
-  .contents li + li {
-    margin-block-start: var(--space-6);
-  }
-
-  .contents a {
-    display: block;
+  .contents__title a {
     color: var(--ink);
     text-decoration: none;
   }
 
-  .contents__number {
-    display: block;
-    margin-block-end: var(--space-1);
-  }
-
-  .contents__title {
-    font-family: var(--font-doc);
-    font-size: var(--type-h3-size);
-    line-height: var(--type-h3-leading);
-  }
-
-  .contents a:hover .contents__title {
+  .contents__title a:hover {
     text-decoration: underline;
     text-underline-offset: 0.15em;
   }
@@ -317,119 +96,22 @@ const sources = [...merged.entries()].sort((a, b) =>
     text-wrap: pretty;
   }
 
-  /* ==========================================================================
-     PARTS
-     A part is a division of one document, so it opens with its number in the
-     margin and a heading in the main column — no title page, no rule, no
-     restart. The space above it is what marks the break.
-     ====================================================================== */
-
-  .part {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: subgrid;
-    margin-block-start: var(--space-10);
-    scroll-margin-block-start: var(--space-8);
-  }
-
-  .part__header {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-    margin-block-end: var(--space-6);
-  }
-
-  .part__number {
-    grid-column: 1;
-    text-align: end;
-    /* Optically level with the first line of the heading beside it. */
-    margin-block-start: 0.5em;
-  }
-
-  .part__title {
+  .contents__empty {
     grid-column: 3;
-    font-size: var(--type-h2-size);
-    line-height: var(--type-h2-leading);
-    margin-block: 0;
-  }
-
-  .part .prose {
-    grid-column: 3;
-  }
-
-  .work__foot {
-    grid-column: 3;
-    margin-block-start: var(--space-10);
-  }
-
-  /* ==========================================================================
-     RUNNING HEAD
-     ====================================================================== */
-
-  .runninghead {
-    position: sticky;
-    inset-block-start: 0;
-    z-index: 1;
-    background: var(--paper);
-    border-block-end: var(--rule-weight) solid var(--rule);
-    /* Full bleed, so its rule reads as the edge of a page rather than a
-       floating box. See the overflow note on html in global.css. */
-    margin-inline: calc(50% - 50vw);
-    padding-inline: calc(50vw - 50%);
-  }
-
-  .runninghead__inner {
-    display: flex;
-    gap: var(--space-4);
-    align-items: baseline;
-    max-width: var(--grid-figure-span);
-    margin-inline: auto;
-    padding-block: var(--space-3);
-    font-family: var(--font-text);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    font-weight: var(--weight-medium);
-    font-variant-numeric: lining-nums tabular-nums;
     color: var(--muted);
-    line-height: 1.4;
-  }
-
-  .runninghead__work {
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .runninghead__section {
-    /* The only part that changes, and the reason the bar exists. Truncated
-       rather than wrapped: a running head that grows to two lines moves the
-       page under the reader. */
-    color: var(--ink);
-    text-transform: none;
-    letter-spacing: normal;
-    font-weight: var(--weight-regular);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   @media (max-width: 56.25em) {
     /* Duplicated from --bp-margin-collapse; media conditions cannot read
        custom properties. */
-    .work,
-    .part,
-    .part__header {
+    .contents,
+    .contents__item {
       display: block;
-      max-width: var(--grid-main-col);
     }
 
-    .work__title {
-      font-size: clamp(2.25rem, 9vw, var(--type-title-size));
-    }
-
-    .part__number {
+    .contents__number {
       text-align: start;
-      margin-block: 0 var(--space-2);
+      margin-block-end: var(--space-2);
     }
   }
 </style>

@@ -1,0 +1,310 @@
+---
+/**
+ * One part of the Inquiry — a chapter, on its own page.
+ *
+ * A part IS an essay in every respect except its header, so it uses the same
+ * `.article*` classes from styles/article.css rather than a parallel set that
+ * happens to match today. The only differences are what replaces the dateline
+ * (position in the work), the running head, and the navigation at the foot.
+ *
+ * There is no second level of division. Parts are the chapters; nothing
+ * nests inside them but sections.
+ */
+import type { MarkdownHeading } from 'astro';
+import BaseLayout from './BaseLayout.astro';
+import { scanCitations, citeId, sourceId } from '../lib/citations';
+import { INQUIRY, partHref, inquiryHref, type Part } from '../lib/inquiry';
+
+interface Props {
+  part: Part;
+  headings: MarkdownHeading[];
+  total: number;
+  previous?: Part;
+  next?: Part;
+}
+
+const { part, total, previous, next } = Astro.props;
+const { title, deck, sources } = part.data;
+const n = part.data.part;
+
+// Same audit as an essay, same reasons — see lib/citations. Per part, because
+// each part is its own page and carries its own bibliography.
+const citedCounts = scanCitations(part.body ?? '');
+{
+  const declared = new Set((sources ?? []).map((s) => s.key));
+  for (const key of citedCounts.keys()) {
+    if (!declared.has(key)) {
+      throw new Error(
+        `${part.id}: <Cite source="${key}"> does not match any entry in this part's sources. ` +
+          `Declared keys: ${[...declared].join(', ') || '(none)'}.`,
+      );
+    }
+  }
+  for (const source of sources ?? []) {
+    if (!citedCounts.has(source.key) && !source.background) {
+      throw new Error(
+        `${part.id}: source "${source.key}" is never cited. ` +
+          `Cite it, mark it \`background: true\`, or remove it.`,
+      );
+    }
+  }
+}
+---
+
+<BaseLayout title={`${title} — ${INQUIRY.short}`} description={deck}>
+  {/* Sticky, and empty until the header has scrolled away. Answers "where am
+      I in this part", which is the question that only appears once a part
+      runs long. Position in the WORK is answered statically below. */}
+  <div class="runninghead" data-runninghead hidden>
+    <div class="runninghead__inner">
+      <a class="runninghead__work" href={inquiryHref()}>{INQUIRY.short}</a>
+      <span class="runninghead__part">Part {n}</span>
+      <span class="runninghead__section" data-runninghead-section></span>
+    </div>
+  </div>
+
+  <article class="article">
+    <header class="article__header">
+      {/* Occupies the dateline's slot and takes its styling — an essay says
+          when, a part says where. */}
+      <p class="article__dateline label">
+        <a class="part__work" href={inquiryHref()}>{INQUIRY.short}</a>
+        <span>Part {n} of {total}</span>
+      </p>
+      <h1 class="article__title display-title">{title}</h1>
+      <p class="article__deck">{deck}</p>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="article__foot stub">
+      {
+        sources && sources.length > 0 && (
+          <aside class="article__sources" aria-labelledby="sources-heading">
+            <h2 id="sources-heading" class="label">
+              Sources
+            </h2>
+            <ul>
+              {sources.map((source) => {
+                const uses = citedCounts.get(source.key) ?? 0;
+                return (
+                  <li id={sourceId(source.key)}>
+                    <span class="article__source-text">{source.text}</span>
+                    {Array.from({ length: uses }, (_, i) => (
+                      <a class="article__source-back" href={`#${citeId(source.key, i + 1)}`}>
+                        <span aria-hidden="true">↩</span>
+                        {uses > 1 && <span class="article__source-backnum">{i + 1}</span>}
+                        <span class="u-sr-only">Back to citation in the text</span>
+                      </a>
+                    ))}
+                    {source.background && (
+                      <span class="article__source-background">Background</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </aside>
+        )
+      }
+
+      <nav class="part-nav" aria-label="Parts">
+        {
+          previous ? (
+            <a class="part-nav__link" href={partHref(previous.data.part)}>
+              <span class="label">Part {previous.data.part}</span>
+              <span class="part-nav__title">{previous.data.title}</span>
+            </a>
+          ) : (
+            <a class="part-nav__link" href={inquiryHref()}>
+              <span class="label">Contents</span>
+              <span class="part-nav__title">{INQUIRY.short}</span>
+            </a>
+          )
+        }
+        {
+          next ? (
+            <a class="part-nav__link part-nav__link--next" href={partHref(next.data.part)}>
+              <span class="label">Part {next.data.part}</span>
+              <span class="part-nav__title">{next.data.title}</span>
+            </a>
+          ) : (
+            <a class="part-nav__link part-nav__link--next" href={inquiryHref()}>
+              <span class="label">End of the argument</span>
+              <span class="part-nav__title">Back to the contents</span>
+            </a>
+          )
+        }
+      </nav>
+    </footer>
+  </article>
+</BaseLayout>
+
+<script>
+  // Names the section the reader is currently inside. The only client JS on
+  // the site. Binds on astro:page-load, not DOMContentLoaded — with the
+  // client router the second navigation never fires the latter.
+  function setUpRunningHead() {
+    const bar = document.querySelector<HTMLElement>('[data-runninghead]');
+    const out = document.querySelector<HTMLElement>('[data-runninghead-section]');
+    const header = document.querySelector<HTMLElement>('.article__header');
+    if (!bar || !out || !header) return;
+
+    const sections = [...document.querySelectorAll<HTMLElement>('.prose h2')];
+    if (!sections.length) return;
+
+    // Hidden while the title is still on screen — it already says where you
+    // are, and two answers to one question is worse than one.
+    const watch = new IntersectionObserver(
+      ([entry]) => {
+        bar.hidden = entry.isIntersecting;
+      },
+      { threshold: 0 },
+    );
+    watch.observe(header);
+
+    // Computed from scroll offset rather than intersection ratios: a section
+    // taller than the viewport intersects nothing, and parts are meant to run
+    // long.
+    const update = () => {
+      const y = window.scrollY + 96;
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.offsetTop <= y) current = s;
+        else break;
+      }
+      const label = current.textContent?.trim() ?? '';
+      if (out.textContent !== label) out.textContent = label;
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        window.removeEventListener('scroll', update);
+        watch.disconnect();
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener('astro:page-load', setUpRunningHead);
+</script>
+
+<style>
+  .part__work {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part__work:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  /* ==========================================================================
+     RUNNING HEAD
+     What a printed book does. Sticky, apparatus register, and it replaces
+     TEXT rather than animating geometry — which is why it costs the motion
+     doctrine nothing where a filling progress bar would have cost it a rule.
+     ====================================================================== */
+
+  .runninghead {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background: var(--paper);
+    border-block-end: var(--rule-weight) solid var(--rule);
+    /* Full bleed, so its rule reads as the edge of a page rather than a
+       floating box. See the overflow note on html in global.css. */
+    margin-inline: calc(50% - 50vw);
+    padding-inline: calc(50vw - 50%);
+  }
+
+  .runninghead__inner {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+    padding-block: var(--space-3);
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .runninghead__work {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .runninghead__section {
+    /* The only part that changes, and the reason the bar exists. Truncated
+       rather than wrapped: a running head that grows to two lines moves the
+       page under the reader. */
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: var(--weight-regular);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* ==========================================================================
+     NAV
+     ====================================================================== */
+
+  .part-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  .part-nav__link {
+    display: block;
+    max-width: 22ch;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part-nav__link--next {
+    text-align: end;
+  }
+
+  .part-nav__title {
+    display: block;
+    margin-block-start: var(--space-1);
+    font-family: var(--font-doc);
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+  }
+
+  .part-nav__link:hover .part-nav__title {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .part-nav {
+      flex-direction: column;
+    }
+
+    .part-nav__link--next {
+      text-align: start;
+    }
+  }
+</style>

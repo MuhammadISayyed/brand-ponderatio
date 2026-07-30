@@ -1,0 +1,37 @@
+---
+/**
+ * One part of the Inquiry. Routed by part NUMBER, not by slug, because the
+ * number is the citable identifier — /inquiry/7/ has to keep meaning §7 even
+ * if the title is rewritten.
+ */
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import PartLayout from '../../layouts/PartLayout.astro';
+import { getParts } from '../../lib/inquiry';
+
+export const getStaticPaths = (async () => {
+  const parts = await getParts();
+  return parts.map((part, i) => ({
+    params: { part: String(part.data.part) },
+    props: {
+      part,
+      total: parts.length,
+      previous: parts[i - 1],
+      next: parts[i + 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { part, total, previous, next } = Astro.props;
+const { Content, headings } = await render(part);
+---
+
+<PartLayout
+  part={part}
+  headings={headings}
+  total={total}
+  previous={previous}
+  next={next}
+>
+  <Content />
+</PartLayout>

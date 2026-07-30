@@ -59,26 +59,26 @@ const citedCounts = scanCitations(post.body ?? '');
 ---
 
 <BaseLayout title={title} description={deck}>
-  <article class="essay">
-    <header class="essay__header">
-      <p class="essay__dateline label">
+  <article class="article">
+    <header class="article__header">
+      <p class="article__dateline label">
         <span>{kindLabel(kind)}</span>
         <time datetime={machineDate(date)}>{formatDateline(date)}</time>
       </p>
-      <h1 class="essay__title display-title">{title}</h1>
+      <h1 class="article__title display-title">{title}</h1>
       {/* The schema guarantees a deck on essay and case, so this is not a
           conditional — a missing one is a build error, not an empty slot. */}
-      <p class="essay__deck">{deck}</p>
+      <p class="article__deck">{deck}</p>
     </header>
 
     <div class="prose">
       <slot />
     </div>
 
-    <footer class="essay__foot stub">
+    <footer class="article__foot stub">
       {
         sources && sources.length > 0 && (
-          <aside class="essay__sources" aria-labelledby="sources-heading">
+          <aside class="article__sources" aria-labelledby="sources-heading">
             <h2 id="sources-heading" class="label">
               Sources
             </h2>
@@ -87,23 +87,23 @@ const citedCounts = scanCitations(post.body ?? '');
                 const uses = citedCounts.get(source.key) ?? 0;
                 return (
                   <li id={sourceId(source.key)}>
-                    <span class="essay__source-text">{source.text}</span>
+                    <span class="article__source-text">{source.text}</span>
                     {/* Back-links to every place the source was used — the
                         direction a reader at the foot of the page actually
                         wants. Numbered only when there is more than one, so a
                         single citation gets a bare arrow rather than a "1"
                         that could be mistaken for a sidenote marker. */}
                     {Array.from({ length: uses }, (_, i) => (
-                      <a class="essay__source-back" href={`#${citeId(source.key, i + 1)}`}>
+                      <a class="article__source-back" href={`#${citeId(source.key, i + 1)}`}>
                         <span aria-hidden="true">↩</span>
-                        {uses > 1 && <span class="essay__source-backnum">{i + 1}</span>}
+                        {uses > 1 && <span class="article__source-backnum">{i + 1}</span>}
                         <span class="u-sr-only">
                           Back to citation {uses > 1 ? i + 1 : ''} in the text
                         </span>
                       </a>
                     ))}
                     {source.background && (
-                      <span class="essay__source-background">Background</span>
+                      <span class="article__source-background">Background</span>
                     )}
                   </li>
                 );
@@ -115,406 +115,9 @@ const citedCounts = scanCitations(post.body ?? '');
 
       {
         tags.length > 0 && (
-          <p class="essay__tags label">Filed under {tags.join(' · ')}</p>
+          <p class="article__tags label">Filed under {tags.join(' · ')}</p>
         )
       }
     </footer>
   </article>
 </BaseLayout>
-
-<style>
-  /* ==========================================================================
-     GRID
-     ====================================================================== */
-
-  .essay {
-    display: grid;
-    grid-template-columns:
-      var(--grid-margin-col)
-      var(--grid-gutter)
-      var(--grid-main-col);
-    /* The grid is the figure span, not the content cap — the outer 1080px
-       lives on the page container in BaseLayout. */
-    max-width: var(--grid-figure-span);
-    margin-inline: auto;
-  }
-
-  .essay__header {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    margin-block-end: var(--space-8);
-  }
-
-  .prose {
-    grid-column: 3;
-    grid-row: 2;
-  }
-
-  /* The sources block sits at the foot of the post at every width, not only
-     below the collapse breakpoint.
-
-     This deviates from the token file, which lists sources as margin-column
-     apparatus. The two cannot share that column: sidenotes are floated out
-     of the prose and their vertical position is set by the paragraph that
-     introduces them, so nothing can stop one landing on top of a block that
-     was placed in the margin by the grid. Sidenotes have the stronger claim
-     — their position carries meaning — so the sources block moves out. */
-  .essay__foot {
-    grid-column: 3;
-    grid-row: 3;
-    /* The gap is what separates the apparatus from the argument — a full
-       hairline here would be the second on the page, and the one above the
-       site footer has already been spent. The stub marks it instead. */
-    margin-block-start: var(--space-10);
-  }
-
-  .essay__tags {
-    margin-block-start: var(--space-6);
-  }
-
-  /* ==========================================================================
-     HEADER
-     ====================================================================== */
-
-  /* The dateline sits above the title rather than in the margin column, for
-     the same reason the sources block moved: the margin column belongs to
-     the sidenotes, whose position is dictated by the prose. A sidenote in the
-     opening paragraph would land straight on top of it.
-
-     Above the title it still reads as a dateline, and it now runs the figure
-     span with the title instead of hanging beside the body text. */
-  .essay__dateline {
-    display: flex;
-    flex-wrap: wrap;
-    /* No rule under it. The dateline is already 11px tracked sans against a
-       64px display serif — two registers apart. A line between them would be
-       insisting on a separation the type has already made. */
-    gap: var(--space-2) var(--space-4);
-    margin-block-end: var(--space-4);
-  }
-
-  .essay__dateline span {
-    color: var(--ink);
-  }
-
-  .essay__title {
-    font-size: var(--type-title-size);
-    line-height: var(--type-title-leading);
-    margin-block-end: var(--space-5);
-  }
-
-  .essay__deck {
-    font-family: var(--font-text);
-    /* Italic. A deck is not a short first paragraph — it is the editor's
-       voice rather than the author's, and the italic is what tells a reader
-       that before they have read a word of it. Clarity City ships a real
-       italic, so nothing is synthesised here. */
-    font-style: italic;
-    font-size: var(--type-deck-size);
-    line-height: var(--type-deck-leading);
-    color: var(--ink-2);
-    /* The deck is a standfirst, not body text: it holds the main measure even
-       though the title above it runs the full figure span. */
-    max-width: var(--grid-main-col);
-    margin-block-end: 0;
-    text-wrap: pretty;
-  }
-
-  /* ==========================================================================
-     APPARATUS
-     `.label` itself lives in global.css — dateline, sources heading and tags
-     all use it, as does the index. Only the arrangement is local.
-     ====================================================================== */
-
-  .essay__sources ul {
-    margin-block-start: var(--space-4);
-    /* Two columns at the foot of the post: a source list set full-measure in
-       13px sans reads as an afterthought stretched thin. */
-    columns: 2;
-    column-gap: var(--grid-gutter);
-    font-family: var(--font-text);
-    font-size: var(--type-sidenote-size);
-    line-height: var(--type-sidenote-leading);
-    color: var(--ink-2);
-  }
-
-  .essay__sources li {
-    /* Entries must not be split across the column break. */
-    break-inside: avoid;
-  }
-
-  .essay__sources li + li {
-    margin-block-start: var(--space-3);
-  }
-
-  /* The back-link sits tight to the entry it belongs to and stays quiet until
-     wanted — it is a way back, not something to read. */
-  .essay__source-back {
-    margin-inline-start: 0.35em;
-    color: var(--muted);
-    text-decoration: none;
-  }
-
-  .essay__source-back:hover,
-  .essay__source-back:focus-visible {
-    color: var(--accent);
-  }
-
-  .essay__source-backnum {
-    font-size: 0.85em;
-    vertical-align: super;
-  }
-
-  /* A source that informed the piece without supporting a sentence says so
-     on the page, not only in the frontmatter. The reader is owed the same
-     distinction the schema enforces. */
-  .essay__source-background {
-    margin-inline-start: 0.5em;
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    color: var(--muted);
-  }
-
-  /* The highlight goes on the <li>, which is a block, NOT on the inline span
-     inside it.
-
-     An inline element that wraps produces one box per line fragment, and a
-     box-shadow spread is painted around EVERY fragment. Here the entry ran to
-     three lines set 2.5px apart, so an 8px spread drew an opaque cream slab
-     8px into the line above and the line below — the highlight covered the
-     text it was meant to be drawing attention to. A block has one box and
-     cannot do that.
-
-     Spread is --space-1 rather than --space-2 because entries are only
-     --space-3 apart; 8px each side would have adjacent entries bleeding into
-     one another. */
-  .essay__sources li:target {
-    background: var(--ground);
-    box-shadow: 0 0 0 var(--space-1) var(--ground);
-    border-radius: 1px;
-  }
-
-  /* ==========================================================================
-     COLLAPSE
-     ====================================================================== */
-
-  @media (max-width: 56.25em) {
-    /* Cannot be var(--bp-margin-collapse): media query conditions are
-       evaluated before custom properties resolve. The value is duplicated
-       from the token and must be changed in both places. */
-    .essay {
-      display: block;
-      max-width: var(--grid-main-col);
-    }
-
-    .essay__title {
-      /* At the collapsed width, 64px is no longer a title — it is a wall. */
-      font-size: clamp(2.25rem, 9vw, var(--type-title-size));
-    }
-
-    .essay__sources ul {
-      /* Two columns of 13px sans inside a phone-width measure is four words
-         a line. */
-      columns: 1;
-    }
-  }
-</style>
-
-<style is:global>
-  /* ==========================================================================
-     SIDENOTES
-     A sidenote is authored inline, at the point it annotates, and floats out
-     into the margin column from there — so it always lands beside its own
-     paragraph without any per-note positioning.
-
-     The float is on a `<span>` rather than an `<aside>` because the element
-     sits inside a `<p>`, where flow content is the only thing permitted.
-     ====================================================================== */
-
-  /* ---- The marker ------------------------------------------------------ */
-
-  .sidenote-ref {
-    font-family: var(--font-text);
-    font-size: 0.6em;
-    font-variant-numeric: lining-nums tabular-nums;
-    /* `super` rather than a shifted baseline: it keeps the marker out of the
-       line box, so a marked line is not spaced differently from its
-       neighbours. */
-    vertical-align: super;
-    /* Cinnabar. The marker is a pointer — it exists to send the reader
-       somewhere — which is the same job a link does, and the same reason the
-       accent is allowed in running text at all. In muted grey it read as
-       punctuation the eye could skip. */
-    color: var(--accent);
-    text-decoration: none;
-    /* A thin space before the marker, so it does not collide with the word it
-       follows, and enough padding after it to be a credible tap target at
-       this size. */
-    margin-inline-start: 0.15em;
-    padding-inline: 0.1em 0.2em;
-  }
-
-  /* Dotted, like every other in-page reference — a sidenote marker moves you
-     down the same page, and must not adopt a link's resting appearance when
-     hovered. */
-  .sidenote-ref:hover {
-    text-decoration: underline dotted;
-    text-underline-offset: 0.2em;
-  }
-
-  /* ---- The note -------------------------------------------------------- */
-
-  .sidenote {
-    display: block;
-    float: inline-start;
-    clear: inline-start;
-    inline-size: var(--grid-margin-col);
-    /* Pull the whole width of the gutter and the margin column leftward, out
-       of the main column and into the apparatus column. */
-    margin-inline-start: calc(
-      -1 * (var(--grid-margin-col) + var(--grid-gutter))
-    );
-    /* Nudged down to sit optically level with the line that introduced it,
-       rather than with the top of that line's ascenders. */
-    margin-block: 0.35rem var(--space-3);
-    font-family: var(--font-text);
-    font-size: var(--type-sidenote-size);
-    line-height: var(--type-sidenote-leading);
-    color: var(--ink-2);
-    text-align: start;
-    /* The numeral hangs in this padding rather than sitting inside the text,
-       so every line of the note starts on the same vertical edge. Inline, the
-       first line was indented by the width of the number and the rest were
-       not — a reverse hanging indent, which is the one arrangement nobody
-       chooses on purpose. */
-    position: relative;
-    padding-inline-start: 1.35rem;
-  }
-
-  .sidenote__num {
-    position: absolute;
-    inset-inline-start: 0;
-    inset-block-start: 0;
-    font-variant-numeric: lining-nums tabular-nums;
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .sidenote__num:hover {
-    text-decoration: underline dotted;
-    text-underline-offset: 0.2em;
-  }
-
-  /* ---- Pairing ---------------------------------------------------------
-     With several notes stacked in the margin, the reader's real question is
-     which note belongs to which sentence. Matching numerals by eye across
-     200px of whitespace is work. Touching either end of a pair lights up
-     both, so the answer arrives without the reader having to ask it.
-
-     `:has()` is what makes the reverse direction possible — the note comes
-     after its marker in the DOM, so the marker can be selected by what
-     follows it.
-
-     No transition. The motion doctrine in tokens.css permits scroll-built
-     diagrams and nothing else; a highlight that fades is text moving. ---- */
-
-  .sidenote-ref:hover + .sidenote,
-  .sidenote-ref:focus-visible + .sidenote,
-  .sidenote:hover,
-  .sidenote:focus-within,
-  .sidenote:target {
-    background: var(--ground);
-    /* Bleeds the highlight past the text edge so it reads as a marked block
-       rather than as a background accidentally left on. */
-    box-shadow: 0 0 0 var(--space-2) var(--ground);
-    border-radius: 1px;
-  }
-
-  .sidenote-ref:hover,
-  .sidenote-ref:focus-visible,
-  .sidenote:hover .sidenote__num,
-  .sidenote:target .sidenote__num,
-  .prose:has(.sidenote:hover) .sidenote-ref:has(+ .sidenote:hover),
-  .prose:has(.sidenote:target) .sidenote-ref:has(+ .sidenote:target) {
-    font-weight: var(--weight-semibold);
-  }
-
-  /* Jumping to either end must not park it under the top edge of the
-     viewport, or the reader arrives at something they cannot see. */
-  .sidenote,
-  .sidenote-ref {
-    scroll-margin-block: var(--space-8);
-  }
-
-  /* ==========================================================================
-     FIGURES
-     Flush with the prose, never wider. A diagram is read in sequence with the
-     sentences around it; one that breaks out of the column asks the reader to
-     re-anchor twice, out and back, for no argumentative gain. The breakout is
-     the title's alone.
-     ====================================================================== */
-
-  .prose figure,
-  .prose .figure {
-    margin-block: var(--space-8);
-    inline-size: 100%;
-    /* The margin-column figure number is positioned against this. */
-    position: relative;
-  }
-
-  .prose figcaption,
-  .prose .figure__caption {
-    margin-block-start: var(--space-3);
-    font-family: var(--font-text);
-    font-size: var(--type-caption-size);
-    line-height: var(--type-caption-leading);
-    color: var(--ink-2);
-    /* The caption is read, not scanned — it keeps a readable measure even
-       though the figure above it is nearly 900px wide. */
-    max-inline-size: var(--grid-main-col);
-  }
-
-  /* Wide content scrolls inside itself rather than pushing the page sideways.
-     Sätteri wraps GFM tables for us; this catches anything else. */
-  .prose .table-scroll {
-    overflow-x: auto;
-  }
-
-  @media (max-width: 56.25em) {
-    /* See the note on the duplicated breakpoint above. */
-    .sidenote {
-      /* Inline, under the paragraph it annotates, and a step larger — at 13px
-         in the flow it would read as small print rather than as an aside. */
-      float: none;
-      inline-size: auto;
-      margin-inline-start: 0;
-      margin-block: var(--space-4);
-      /* Room for the hanging numeral plus the rule that marks the aside. */
-      padding-inline-start: var(--space-6);
-      border-inline-start: var(--rule-weight) solid var(--rule);
-      font-size: var(--type-sidenote-inline-size);
-    }
-
-    .sidenote__num {
-      inset-inline-start: var(--space-4);
-    }
-
-    /* Collapsed, the note sits directly beneath its own sentence and there is
-       no ambiguity about which marker it belongs to. The pairing highlight
-       would be answering a question nobody is asking, and the inset shadow
-       fights the rule, so it comes off. */
-    .sidenote-ref:hover + .sidenote,
-    .sidenote-ref:focus-visible + .sidenote,
-    .sidenote:hover,
-    .sidenote:focus-within,
-    .sidenote:target {
-      background: none;
-      box-shadow: none;
-    }
-
-    .sidenote:target {
-      border-inline-start-color: var(--accent);
-    }
-  }
-</style>
