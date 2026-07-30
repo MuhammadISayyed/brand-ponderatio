@@ -44,68 +44,33 @@ export default defineConfig({
   // where the paid Klim replacements would be substituted.
   fonts: [
     {
-      // Body serif — running text, decks. Drawn by TypeTogether for extended
-      // reading: generous x-height, warm, and it holds authority at 20px
-      // without turning stern.
-      provider: fontProviders.google(),
-      name: 'Literata',
-      cssVariable: '--font-body',
-      weights: [400, 600],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
-    },
-    {
-      // Display serif — titles only. High contrast and tight; it carries a
-      // 64px title and is deliberately NOT used at H2 size, where its single
-      // 400 weight goes thin. See the note on --font-serif-display.
-      provider: fontProviders.google(),
-      name: 'Instrument Serif',
-      cssVariable: '--font-display',
-      weights: [400],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
-    },
-    // ---- SPECIMEN ONLY -----------------------------------------------------
-    // Candidate stack under evaluation on /specimen. Delete these three
-    // entries along with that page once the decision is made, or promote them
-    // to --font-body / --font-display / --font-meta if they win.
-    {
+      // The serif. Body AND display — this is a superfamily, so the title is
+      // the same face as the prose at 900 rather than a second design.
+      // Registered once and pointed at twice; see --font-serif-display in
+      // tokens.css.
+      //
+      // Weights are exactly what the system asks for and no more:
+      //   400  running text, decks, the drop cap
+      //   600  --weight-semibold: H2, H3, note and index titles
+      //   900  the post title
+      // 600 in particular is not optional. A weight the CSS asks for but the
+      // config does not load does not fail — the browser silently snaps to the
+      // nearest one it has. Omitting 600 renders every H2 at 900.
       provider: fontProviders.google(),
       name: 'Alegreya',
-      cssVariable: '--font-alegreya',
-      // 600 is not optional: --weight-semibold is 600 and section headings use
-      // it. Without it the browser snaps to the nearest loaded weight, which
-      // here is 900, and every H2 silently renders as Black.
-      weights: [400, 500, 600, 900],
+      cssVariable: '--font-body',
+      weights: [400, 600, 900],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
     {
-      provider: fontProviders.google(),
-      name: 'Alegreya SC',
-      cssVariable: '--font-alegreya-sc',
-      weights: [400, 500],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
-    },
-    {
+      // Metadata sans — datelines, labels, captions, sidenotes ONLY.
+      // Alegreya Sans is the companion drawn for this job by the same
+      // designer, which is why it replaced Inter: a neutral interface face
+      // was the one thing in the stack that had not been chosen.
       provider: fontProviders.google(),
       name: 'Alegreya Sans',
-      cssVariable: '--font-alegreya-sans',
-      weights: [400, 500],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    // ---- END SPECIMEN ONLY -------------------------------------------------
-    {
-      // Metadata sans — datelines, labels, captions, sidenotes ONLY.
-      provider: fontProviders.google(),
-      name: 'Inter',
       cssVariable: '--font-meta',
       weights: [400, 500],
       styles: ['normal'],

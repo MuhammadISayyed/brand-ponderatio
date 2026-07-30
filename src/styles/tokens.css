@@ -119,17 +119,18 @@
        3. nothing else
 
      Currently shipping (free, self-hosted via Astro's Fonts API):
-       body    Literata          TypeTogether, OFL
-       display Instrument Serif  OFL — TITLES ONLY, see below
-       meta    Inter
+       body    Alegreya 400       Huerta Tipográfica, OFL
+       display Alegreya 900       the same face, not a second design
+       meta    Alegreya Sans 400  the companion, by the same designer
 
-     Instrument Serif ships a single 400 weight and no bold. At a 64px title
-     that is exactly right; at the 28px H2 it goes thin and stops reading as a
-     heading. So the display serif is scoped to titles, and H2/H3 take the
-     body face at a heavier weight instead. That is a deviation from the
-     original rule that the display serif carries all headings, and it is a
-     property of this face — a display family with a text weight could take
-     the headings back.
+     This is a SUPERFAMILY, and that is the whole idea. One skeleton, three
+     registers, with the contrast coming from weight and size rather than from
+     putting two unrelated designers on one page. --font-serif-display is
+     therefore an alias rather than its own face: there is no second family to
+     load, and the title is the prose with the weight turned up.
+
+     If a display face with its own drawing is ever wanted, this is the line
+     that changes, and astro.config.mjs grows a third entry. Nothing else.
 
      Intended paid replacements (Klim):
        body    Tiempos Text
@@ -137,7 +138,7 @@
        meta    Söhne
      --------------------------------------------------------------------- */
   --font-serif-body: var(--font-body);
-  --font-serif-display: var(--font-display);
+  --font-serif-display: var(--font-body);
   --font-sans-meta: var(--font-meta);
   /* ---- END FONT SWAP POINT --------------------------------------------- */
 
@@ -151,65 +152,83 @@
      Each role pairs a size with its line-height; they are not independent.
      ====================================================================== */
 
+  /* EVERY SIZE BELOW WAS RE-DERIVED WHEN THE BODY FACE BECAME ALEGREYA, and
+     the reason is one number: Alegreya sets 15% narrower than Literata with a
+     10% smaller x-height. Running text moved 20px -> 23px to keep the measure
+     at roughly 66 characters, and once the body moves, every size defined in
+     relation to it has to move or the relationship it encoded is gone. A 24px
+     deck over 23px body is not a deck. A 28px H2 over 23px body is barely a
+     heading.
+
+     The sizes look large next to the old ones. They are not: 23px Alegreya
+     has about the x-height of 20.7px Literata, so the page reads at the size
+     it always did. A px value is only meaningful next to a face. */
+
   /* Post title, editorial register (essay, case). Spans the FIGURE width,
-     breaking out of the body column. Display serif — the only place it is
-     used.
+     breaking out of the body column. Alegreya at 900 — the only place the
+     black weight is used.
 
-     80px rather than the 64px this started at. Instrument Serif is a light,
-     high-contrast face with one weight, and at 64px the title carried less
-     visual weight than the 24px deck beneath it — the hierarchy read
-     backwards. Size is the only lever this face gives you, so size is what
-     restores it. A heavier display family would not need the extra 16px. */
-  --type-title-size: 5rem;          /* 80px */
-  --type-title-leading: 1.05;
+     Back to 64px from 80px. The 80px was compensation for Instrument Serif,
+     which had one light weight and could only assert itself through size.
+     Alegreya Black asserts itself through weight, so the size can come down
+     and the title stops shouting across the whole figure span. */
+  --type-title-size: 4rem;          /* 64px */
+  --type-title-leading: 1.0;
+  --type-title-weight: 900;
 
-  /* Post title, document register (note). Stays within the body measure. */
-  --type-title-note-size: 1.875rem; /* 30px */
+  /* Post title, document register (note). Stays within the body measure, and
+     stays at --weight-semibold: a note is a filed sheet, and the black weight
+     would give it the authority of a published argument. */
+  --type-title-note-size: 2.125rem; /* 34px */
   --type-title-note-leading: 1.15;
 
   /* Deck — the one-line standfirst under an editorial title. Body serif. */
-  --type-deck-size: 1.5rem;         /* 24px */
+  --type-deck-size: 1.75rem;        /* 28px */
   --type-deck-leading: 1.4;
 
   /* Deck as it appears in the index, where it is a summary line rather than a
      standfirst. Set below body size on purpose: an index that sets its decks
      at reading size competes with the posts it is pointing at. */
-  --type-index-deck-size: 1.0625rem; /* 17px */
+  --type-index-deck-size: 1.1875rem; /* 19px */
   --type-index-deck-leading: 1.45;
 
-  /* Running text. Body serif. */
-  --type-body-size: 1.25rem;        /* 20px */
+  /* Running text. Body serif. See the note above on why this is 23 and not
+     20 — it is the size that holds the measure, not a decision about
+     largeness. */
+  --type-body-size: 1.4375rem;      /* 23px */
   --type-body-leading: 1.6;
 
-  /* Display serif. */
-  --type-h2-size: 1.75rem;          /* 28px */
+  /* Section headings. Body serif at --weight-semibold. */
+  --type-h2-size: 2rem;             /* 32px */
   --type-h2-leading: 1.25;
-  --type-h3-size: 1.375rem;         /* 22px */
+  --type-h3-size: 1.5625rem;        /* 25px */
   --type-h3-leading: 1.3;
 
   /* Sans, small. Sidenotes and figure captions share a size deliberately —
-     they are the same register of apparatus. */
-  --type-sidenote-size: 0.8125rem;  /* 13px */
+     they are the same register of apparatus. Stepped up with everything else:
+     Alegreya Sans runs smaller on the body than Inter did. */
+  --type-sidenote-size: 0.875rem;   /* 14px */
   --type-sidenote-leading: 1.5;
-  --type-caption-size: 0.8125rem;   /* 13px */
+  --type-caption-size: 0.875rem;    /* 14px */
   --type-caption-leading: 1.5;
 
   /* Sidenotes grow when they collapse inline below the breakpoint: at full
-     width, 13px reads as an aside; inline under a paragraph it reads as
+     width, 14px reads as an aside; inline under a paragraph it reads as
      small print, so it steps up. */
-  --type-sidenote-inline-size: 0.9375rem; /* 15px */
+  --type-sidenote-inline-size: 1rem; /* 16px */
 
   /* Metadata label — sans, uppercase, tracked. Datelines, kind labels,
      document headers, "filed under", Fig. N. */
-  --type-label-size: 0.6875rem;     /* 11px */
+  --type-label-size: 0.75rem;       /* 12px */
   --type-label-tracking: 0.09em;
   --type-label-transform: uppercase;
 
-  /* Weights. The serifs run at regular for text; display titles take the
-     slightly heavier optical weight without going bold. */
+  /* Weights. Text runs at regular; headings at semibold; the black is
+     reserved for the post title and appears nowhere else. */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
+  --weight-black: 900;
 
   /* Drop cap. The opening letter of an editorial post, in the display serif,
      sunk this many lines into the paragraph. Editorial register only — a note
@@ -257,19 +276,25 @@
      ----------------------------------------------------------------------- */
   --grid-margin-col: 11.875rem; /* 190px — sidenotes and figure numbers */
   --grid-gutter: 3rem;          /* 48px */
-  /* 640px. Measured, not assumed: rendered in LITERATA at 20px this column
-     holds 64.9 characters per line, median 67 (counted from real line boxes
-     across 41 full lines of the sample essay, with each paragraph's ragged
-     last line and the drop-cap paragraph excluded). That is the essay target.
+  /* 640px. Measured, not assumed: rendered in ALEGREYA at 23px this column
+     holds 66.4 characters per line, median 67 (counted from real line boxes
+     across 40 full lines of the sample essay, with each paragraph's ragged
+     last line and the drop-cap paragraph excluded). That is the essay target,
+     hit almost exactly.
 
      The classic alphabet-advance estimate reads low — it ignores the space
      glyph, which is narrower than the mean lowercase letter — so the
      empirical count is the one to trust.
 
-     Re-measured when the body face changed from Source Serif 4, which gave
-     64.4 here. The two faces landing half a character apart is luck, not a
-     law: the next swap must be measured again, and note CN-014 records the
-     method. */
+     Measured three times now, once per body face:
+       Source Serif 4  20px   64.4
+       Literata        20px   64.9
+       Alegreya        20px   76.8   <- too long, which is why the size moved
+       Alegreya        23px   66.4   <- shipping
+
+     Note what the third row shows: the column did not change, the face did,
+     and the measure went ten characters out. The number belongs to the face
+     and not to this token. Note CN-014 records the method. */
   --grid-main-col: 40rem;
   /* 878px. The title breaks out to this, and it is the width the whole grid
      is centred at. Despite the name, a FIGURE DOES NOT USE IT.

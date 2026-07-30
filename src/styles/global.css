@@ -130,15 +130,14 @@
      its own leading because the two are not independent.
      ====================================================================== */
 
-  /* The display serif is scoped by SIZE, not by tag. Instrument Serif has a
-     single 400 weight and no bold: at 80px that delicacy is the whole point,
-     and anywhere below about 40px it stops reading as a heading at all. A
-     note title and the index heading are both `h1` at 30px, so tying the
-     display face to the tag would have put it exactly where it fails.
+  /* One family throughout, so what separates a heading from its prose is
+     weight and size — not a change of voice. Headings sit at semibold; the
+     post title takes the black.
 
-     So headings default to the body serif at its heavier weight — same voice
-     as the prose, louder — and only `.display-title` opts into the display
-     face. There is exactly one of those per page. */
+     `.display-title` is scoped by ROLE rather than by tag on purpose. Note
+     titles and the index heading are `h1` too, and the black weight would
+     give a filed sheet the authority of a published argument. There is
+     exactly one display title per page. */
   h1,
   h2,
   h3 {
@@ -150,10 +149,10 @@
 
   .display-title {
     font-family: var(--font-serif-display);
-    font-weight: var(--weight-regular);
-    /* Display sizes need the tracking pulled in; at 80px the default spacing
-       reads loose. */
-    letter-spacing: -0.01em;
+    font-weight: var(--type-title-weight);
+    /* Black weight closes up the counters on its own; at 64px the default
+       spacing then reads loose. */
+    letter-spacing: -0.015em;
   }
 
   /* The space above a heading is what marks the section break — it is doing
@@ -214,9 +213,10 @@
     -webkit-initial-letter: var(--dropcap-lines);
     initial-letter: var(--dropcap-lines);
     font-family: var(--font-serif-display);
-    /* Regular, not medium: Instrument Serif ships only a 400, and asking for
-       500 makes the browser synthesise a fake bold — which on a letter this
-       large is unmissable. */
+    /* Regular, NOT the title's black. A drop cap sunk three lines is already
+       the largest thing in the column; at 900 it stops being an initial and
+       becomes a logo, and it drags the eye back to it on every line that
+       wraps around it. The title can be black because nothing is beside it. */
     font-weight: var(--weight-regular);
     /* Space between the sunken letter and the lines wrapping around it.
        In em of the drop cap, so it scales with it. */

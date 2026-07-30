@@ -42,16 +42,12 @@ const currentPath = Astro.url.pathname;
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
 
-    {/* Body and display are preloaded because they set the first paint. The
-        metadata sans is not — it carries datelines and captions, which can
+    {/* The serif is preloaded because it sets the first paint — it carries
+        the title and the prose both, now that they are one family. The
+        metadata sans is not: it carries datelines and captions, which can
         afford one frame in the fallback. */}
     <Font cssVariable="--font-body" preload />
-    <Font cssVariable="--font-display" preload />
     <Font cssVariable="--font-meta" />
-
-    {/* For pages that need extra font faces or head tags of their own — the
-        specimen page loads its candidate stack through here. */}
-    <slot name="head" />
 
     {/* Cross-page fade. The animation itself is scoped to the main column
         below; ClientRouter is what makes the navigation client-side so the
