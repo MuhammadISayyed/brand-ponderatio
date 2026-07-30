@@ -196,51 +196,6 @@
   }
 
   /* ==========================================================================
-     DROP CAP
-     Editorial register only, first paragraph only — the mark that says the
-     piece starts here.
-
-     `initial-letter` is the whole implementation: the browser sinks the glyph
-     the requested number of lines and does the optical work of aligning its
-     cap height to the first baseline and its foot to the last. Doing this by
-     hand means hardcoding a font-size, a line-height and a nudge, all three
-     of which are wrong the moment the body face is swapped.
-
-     Firefox does not support it yet and renders an ordinary first letter in
-     the display serif. That degrades to something deliberate-looking rather
-     than broken, which is the reason not to reach for the manual version.
-     ====================================================================== */
-
-  .prose--editorial > p:first-of-type::first-letter {
-    -webkit-initial-letter: var(--dropcap-lines);
-    initial-letter: var(--dropcap-lines);
-    /* The WORKING face, not the document face — the drop cap is the first
-       letter of the paragraph it sits in, and it has to be that paragraph's
-       letter enlarged rather than a different typeface pasted into the text.
-       Set it in Goudy and the reader sees a serif initial marooned in a sans
-       column, which reads as decoration rather than as the start of the
-       sentence. */
-    font-family: var(--font-text);
-    font-weight: var(--weight-regular);
-    /* Space between the sunken letter and the lines wrapping around it.
-       In em of the drop cap, so it scales with it. */
-    margin-inline-end: 0.08em;
-    color: var(--ink);
-  }
-
-  strong,
-  b {
-    font-weight: var(--weight-semibold);
-  }
-
-  em,
-  i {
-    /* The body serif ships a real italic; never let the browser synthesise. */
-    font-style: italic;
-    font-synthesis-style: none;
-  }
-
-  /* ==========================================================================
      LINKS — and the one rule that governs all of them.
 
      THE UNDERLINE STYLE IS A PROMISE ABOUT DESTINATION, AND IT NEVER CHANGES

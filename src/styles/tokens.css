@@ -257,10 +257,12 @@
   --type-caption-size: var(--type-apparatus-size);
   --type-caption-leading: var(--type-apparatus-leading);
 
-  /* Sidenotes grow when they collapse inline below the breakpoint: at full
-     width, 14px reads as an aside; inline under a paragraph it reads as
-     small print, so it steps up. */
-  --type-sidenote-inline-size: 1rem; /* 16px */
+  /* Sidenotes used to step up when they collapsed inline, on the grounds that
+     an aside set at 13px in the flow reads as small print. The apparatus size
+     is now large enough that the step-up has nothing to do, so this is an
+     alias — kept named, because if the apparatus size ever drops again the
+     collapsed case is the first thing that will need its own number back. */
+  --type-sidenote-inline-size: var(--type-apparatus-size);
 
   /* Metadata label — sans, uppercase, tracked. Datelines, kind labels,
      document headers, "filed under", Fig. N. */
@@ -275,13 +277,6 @@
   --weight-semibold: 600;
   --weight-black: 900;
 
-  /* Drop cap. The opening letter of an editorial post, in the display serif,
-     sunk this many lines into the paragraph. Editorial register only — a note
-     opens flat, like the document it is.
-
-     One per post and only on the first paragraph. A drop cap says "the piece
-     starts here"; a second one says nothing. */
-  --dropcap-lines: 3;
 
   /* ==========================================================================
      5. GRID
@@ -453,7 +448,10 @@
   /* The single load-bearing element in a diagram, and nothing else. */
   --diagram-accent: var(--accent);
 
-  --diagram-label-size: 0.8125rem; /* 13px, sans */
+  /* A figure's labels are apparatus like any other, so they take the one
+     apparatus size rather than a private 13px. A diagram is not a place where
+     small print is more acceptable than it is elsewhere. */
+  --diagram-label-size: var(--type-apparatus-size);
   --diagram-label-color: var(--ink);
 
   /* ==========================================================================
