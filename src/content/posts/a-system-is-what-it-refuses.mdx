@@ -8,14 +8,18 @@ tags:
   - constraint
   - method
 sources:
-  - 'Juarrero, A. (1999). Dynamics in Action. MIT Press.'
-  - 'Alexander, C. (1964). Notes on the Synthesis of Form. Harvard University Press.'
-  - 'Ostrom, E. (1990). Governing the Commons. Cambridge University Press.'
-  - 'Brand, S. (1994). How Buildings Learn. Viking.'
-  - 'Bringhurst, R. (1992). The Elements of Typographic Style. Hartley & Marks.'
+  - key: juarrero
+    text: 'Juarrero, A. (1999). Dynamics in Action. MIT Press.'
+  - key: alexander
+    text: 'Alexander, C. (1964). Notes on the Synthesis of Form. Harvard University Press.'
+  - key: ostrom
+    text: 'Ostrom, E. (1990). Governing the Commons. Cambridge University Press.'
+  - key: brand
+    text: 'Brand, S. (1994). How Buildings Learn. Viking.'
 ---
 
 import Sidenote from '../../components/Sidenote.astro';
+import Cite from '../../components/Cite.astro';
 
 Every design system I have been handed arrives as a catalogue. Here are the
 colours, here are the type sizes, here are the spacing steps, here are the
@@ -30,7 +34,7 @@ to each entry.
 
 This is not a preference about documentation tone. It is a claim about what a
 constraint does, and there is a useful distinction to borrow
-here.<Sidenote>Juarrero's terms are *context-free* and *context-sensitive*
+here.<Sidenote><Cite source="juarrero">Juarrero</Cite>'s terms are *context-free* and *context-sensitive*
 constraint. I use "governing" and "enabling" because they are easier to say in
 a code review, at the cost of some precision.</Sidenote> Some constraints
 reduce the number of things you can do. Others change what the remaining
@@ -133,7 +137,7 @@ enabling is that it converts a shortage into a diagnosis. Wanting a fourth
 colour is now *information*: it means the diagram is carrying two arguments,
 and the fix is upstream of the palette entirely.
 
-Alexander made the general version of this point sixty years ago, in the
+<Cite source="alexander">Alexander</Cite> made the general version of this point sixty years ago, in the
 context of buildings. You cannot specify good fit positively — there is no
 list of properties whose presence makes a design correct. What you can do is
 enumerate the ways a design fails to fit, and treat the design as whatever
@@ -166,7 +170,7 @@ arbitrary — which, undocumented, it now effectively is.
 ## What prohibitions cost
 
 They have to be held by someone, and people are bad at holding
-things.<Sidenote>Ostrom's work on long-lived commons institutions is
+things.<Sidenote><Cite source="ostrom">Ostrom</Cite>'s work on long-lived commons institutions is
 instructive here: the durable ones share a small set of features, and among
 them are boundaries the participants can actually perceive and consequences
 that arrive early and in proportion.</Sidenote> This is the argument for
@@ -186,7 +190,7 @@ the first and calling the result a design system.
 
 ## The test
 
-Brand's account of buildings has them changing at several speeds at once, the
+<Cite source="brand">Brand</Cite>'s account of buildings has them changing at several speeds at once, the
 fast layers rearranging themselves inside slow ones that barely move. Design
 systems have the same structure, and the prohibitions are the slow layer. The
 components will be rewritten; the colours will be retuned; the prohibitions,

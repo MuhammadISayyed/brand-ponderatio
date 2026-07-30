@@ -15,6 +15,7 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import { formatDateline, kindLabel, machineDate } from '../lib/format';
+import { scanCitations, citeId, sourceId } from '../lib/citations';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -22,6 +23,39 @@ interface Props {
 
 const { post } = Astro.props;
 const { title, deck, date, kind, tags, sources } = post.data;
+
+/**
+ * Both directions are audited, because both are silent failures otherwise: a
+ * citation pointing at nothing renders a dead link, and a source citing
+ * nothing sits in the bibliography looking like evidence.
+ *
+ * Counts come from the post's source text, not from the render-time registry —
+ * see the note on scanCitations for why the registry cannot answer this.
+ */
+const citedCounts = scanCitations(post.body ?? '');
+
+{
+  const declared = new Set((sources ?? []).map((s) => s.key));
+
+  for (const key of citedCounts.keys()) {
+    if (!declared.has(key)) {
+      throw new Error(
+        `${post.id}: <Cite source="${key}"> does not match any entry in this post's sources. ` +
+          `Declared keys: ${[...declared].join(', ') || '(none)'}.`,
+      );
+    }
+  }
+
+  for (const source of sources ?? []) {
+    if (!citedCounts.has(source.key) && !source.background) {
+      throw new Error(
+        `${post.id}: source "${source.key}" is never cited. ` +
+          `Cite it with <Cite source="${source.key}">…</Cite>, mark it \`background: true\` if it informed the piece ` +
+          `without supporting a particular sentence, or remove it. An uncited source looks like evidence and is not.`,
+      );
+    }
+  }
+}
 ---
 
 <BaseLayout title={title} description={deck}>
@@ -49,9 +83,31 @@ const { title, deck, date, kind, tags, sources } = post.data;
               Sources
             </h2>
             <ul>
-              {sources.map((source) => (
-                <li>{source}</li>
-              ))}
+              {sources.map((source) => {
+                const uses = citedCounts.get(source.key) ?? 0;
+                return (
+                  <li id={sourceId(source.key)}>
+                    <span class="essay__source-text">{source.text}</span>
+                    {/* Back-links to every place the source was used — the
+                        direction a reader at the foot of the page actually
+                        wants. Numbered only when there is more than one, so a
+                        single citation gets a bare arrow rather than a "1"
+                        that could be mistaken for a sidenote marker. */}
+                    {Array.from({ length: uses }, (_, i) => (
+                      <a class="essay__source-back" href={`#${citeId(source.key, i + 1)}`}>
+                        <span aria-hidden="true">↩</span>
+                        {uses > 1 && <span class="essay__source-backnum">{i + 1}</span>}
+                        <span class="u-sr-only">
+                          Back to citation {uses > 1 ? i + 1 : ''} in the text
+                        </span>
+                      </a>
+                    ))}
+                    {source.background && (
+                      <span class="essay__source-background">Background</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </aside>
         )
@@ -184,6 +240,40 @@ const { title, deck, date, kind, tags, sources } = post.data;
 
   .essay__sources li + li {
     margin-block-start: var(--space-3);
+  }
+
+  /* The back-link sits tight to the entry it belongs to and stays quiet until
+     wanted — it is a way back, not something to read. */
+  .essay__source-back {
+    margin-inline-start: 0.35em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .essay__source-back:hover,
+  .essay__source-back:focus-visible {
+    color: var(--accent);
+  }
+
+  .essay__source-backnum {
+    font-size: 0.85em;
+    vertical-align: super;
+  }
+
+  /* A source that informed the piece without supporting a sentence says so
+     on the page, not only in the frontmatter. The reader is owed the same
+     distinction the schema enforces. */
+  .essay__source-background {
+    margin-inline-start: 0.5em;
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    color: var(--muted);
+  }
+
+  .essay__sources li:target .essay__source-text {
+    background: var(--ground);
+    box-shadow: 0 0 0 var(--space-2) var(--ground);
   }
 
   /* ==========================================================================

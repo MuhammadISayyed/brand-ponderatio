@@ -256,6 +256,23 @@
     text-decoration-thickness: 2px;
   }
 
+  /* A citation is an ordinary link — accent, underlined — because that is
+     what it is, and a link styled to hide is a link the reader will not use.
+     Four or five author names across a long essay is not a wall of colour. */
+  .cite {
+    text-decoration-thickness: 1px;
+  }
+
+  /* Visible only to screen readers. */
+  .u-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   /* ==========================================================================
      FOCUS
      Non-negotiable, always oxide. `:focus-visible` only — a mouse click on a

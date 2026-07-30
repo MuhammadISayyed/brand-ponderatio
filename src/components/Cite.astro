@@ -1,0 +1,29 @@
+---
+/**
+ * A citation anchored to the name already in the sentence:
+ *
+ *   <Cite source="alexander">Alexander</Cite> made the general version of
+ *   this point sixty years ago…
+ *
+ * There is no marker and no numeral. Essays cite by naming the author in the
+ * prose, which this site already did — the name simply was not connected to
+ * the entry at the foot. Adding superscript numbers instead would have put a
+ * second numbering system back into running text, next to the sidenote
+ * markers, which is the thing we removed footnotes to avoid.
+ *
+ * This component cannot check that `source` names a real entry: it has no
+ * access to the post's frontmatter. EssayLayout does that audit after the
+ * prose has rendered, and fails the build on a dangling key.
+ */
+import { registerCitation, citeId, sourceId } from '../lib/citations';
+
+interface Props {
+  /** The `key` of an entry in the post's `sources` frontmatter. */
+  source: string;
+}
+
+const { source } = Astro.props;
+const n = registerCitation(Astro.request, source);
+---
+
+<a class="cite" id={citeId(source, n)} href={`#${sourceId(source)}`}><slot /></a>

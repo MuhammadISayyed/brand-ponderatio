@@ -16,6 +16,30 @@ const KINDS = ['note', 'essay', 'case'] as const;
 const STATUSES = ['working', 'revised', 'superseded'] as const;
 
 /**
+ * Sources are keyed so the prose can point at them. A `<Cite source="brand">`
+ * in the body links the author's name to the entry, and the entry links back
+ * to every place it was used.
+ *
+ * `background` is the deliberate exception: a work that informed the piece
+ * without supporting any one sentence. It must be declared, because the
+ * alternative — silently tolerating uncited entries — is how a bibliography
+ * fills up with works nobody actually read. EssayLayout fails the build on an
+ * uncited source that has not claimed this.
+ */
+const KEY_PATTERN = /^[a-z][a-z0-9-]*$/;
+
+const sourceSchema = z.object({
+  key: z
+    .string()
+    .regex(
+      KEY_PATTERN,
+      'source key must be lowercase letters, digits and hyphens, starting with a letter (e.g. "brand", "alexander-1964").',
+    ),
+  text: z.string().min(1, 'source text must not be empty'),
+  background: z.boolean().default(false),
+});
+
+/**
  * Fields are declared permissively here and then constrained by `kind` in the
  * superRefine below. That is the only way to express "required for one kind,
  * forbidden for another" while keeping a single flat frontmatter shape.
@@ -30,7 +54,7 @@ const postSchema = z
 
     // Editorial register only (essay, case).
     deck: z.string().min(1).optional(),
-    sources: z.array(z.string().min(1)).optional(),
+    sources: z.array(sourceSchema).optional(),
 
     // Document register only (note).
     ref: z.string().optional(),
@@ -42,6 +66,23 @@ const postSchema = z
   })
   .superRefine((data, ctx) => {
     const isNote = data.kind === 'note';
+
+    // Duplicate keys would make `<Cite>` ambiguous and produce two elements
+    // with the same id, so they are rejected here rather than left to render
+    // into invalid HTML.
+    if (data.sources) {
+      const seen = new Set<string>();
+      data.sources.forEach((source, i) => {
+        if (seen.has(source.key)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['sources', i, 'key'],
+            message: `duplicate source key "${source.key}". Keys are what <Cite> points at, so they must be unique within a post.`,
+          });
+        }
+        seen.add(source.key);
+      });
+    }
 
     if (isNote) {
       // --- Required on notes ---
