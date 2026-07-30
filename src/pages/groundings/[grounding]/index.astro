@@ -41,7 +41,9 @@ const parts = await getParts(grounding!);
               <h2 class="contents__title">
                 <a href={partHref(grounding!, part)}>{part.data.title}</a>
               </h2>
-              <p class="contents__deck">{part.data.deck}</p>
+              {part.data.deck && (
+                <p class="contents__deck">{part.data.deck}</p>
+              )}
             </div>
           </li>
         ))

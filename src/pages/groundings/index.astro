@@ -15,12 +15,10 @@ const items = await groundingItems();
 >
   <div class="article">
     <header class="article__header">
-      <p class="article__dateline label"><span>Groundings</span></p>
+      {/* Headline only. A label reading "Groundings" above a headline reading
+          "Groundings" says it twice, and a section page needs no standfirst — the
+          list underneath is the description. */}
       <h1 class="article__title display-title">Groundings</h1>
-      <p class="article__deck">
-        A grounding is one thing thinking is grounded in: a long work,
-        published complete, divided into parts and read in order.
-      </p>
     </header>
 
     <EntryList items={items} empty="No groundings yet." />

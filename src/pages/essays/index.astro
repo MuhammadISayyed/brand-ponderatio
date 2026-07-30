@@ -18,12 +18,10 @@ const items = await postItems();
 >
   <div class="article">
     <header class="article__header">
-      <p class="article__dateline label"><span>Essays</span></p>
+      {/* Headline only. A label reading "Essays" above a headline reading
+          "Essays" says it twice, and a section page needs no standfirst — the
+          list underneath is the description. */}
       <h1 class="article__title display-title">Essays</h1>
-      <p class="article__deck">
-        Standalone arguments. Each is entered directly and stands on its own —
-        where a grounding is read in order, an essay is read.
-      </p>
     </header>
 
     <EntryList items={items} empty="No essays yet." />

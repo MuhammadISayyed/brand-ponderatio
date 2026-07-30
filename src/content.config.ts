@@ -68,7 +68,8 @@ const postSchema = z
     date: z.date(),
     kind: z.enum(KINDS),
 
-    // Editorial register only (essay, case).
+    // Editorial register only (essay, case). OPTIONAL: a standfirst is a
+    // judgement about a particular piece, not a slot every piece must fill.
     deck: z.string().min(1).optional(),
     sources: z.array(sourceSchema).optional(),
 
@@ -143,15 +144,6 @@ const postSchema = z
         });
       }
     } else {
-      // --- Required on essay / case ---
-      if (data.deck === undefined) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['deck'],
-          message: `deck is required when kind is "${data.kind}".`,
-        });
-      }
-
       // --- Rejected on essay / case ---
       if (data.ref !== undefined) {
         ctx.addIssue({
@@ -240,11 +232,16 @@ const groundingSchema = z.object({
   part: z.number().int().positive(),
 
   /**
-   * One line of SUBSTANCE for the spine — what this part establishes, not
-   * what it is about. The spine is meant to read as the argument in outline,
-   * and a contents page of titles cannot do that.
+   * One line of SUBSTANCE for the contents — what this part establishes, not
+   * what it is about. A contents page of bare titles cannot show the shape of
+   * an argument; one with these lines can.
+   *
+   * Optional, so it stays a judgement rather than a slot to fill. Worth
+   * knowing what is lost when it is left off: the contents falls back to the
+   * title alone for that part, and the reader can no longer see why it has to
+   * come where it does.
    */
-  deck: z.string().min(1, 'deck must not be empty'),
+  deck: z.string().min(1).optional(),
 
   sources: z.array(sourceSchema).optional(),
   draft: z.boolean().default(false),

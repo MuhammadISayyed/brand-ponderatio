@@ -91,7 +91,7 @@ const citedCounts = scanCitations(part.body ?? '');
         <span>Part {roman(n)} of {roman(total)}</span>
       </p>
       <h1 class="article__title display-title">{title}</h1>
-      <p class="article__deck">{deck}</p>
+      {deck && <p class="article__deck">{deck}</p>}
     </header>
 
     <div class="prose">
