@@ -1,0 +1,31 @@
+---
+/**
+ * Essays — the same listing as the index, filtered to posts.
+ *
+ * It renders through the same <EntryList> the index and the groundings page
+ * use, so the three cannot drift into looking like three different sites.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryList from '../../components/EntryList.astro';
+import { postItems } from '../../lib/listing';
+
+const items = await postItems();
+---
+
+<BaseLayout
+  title="Essays"
+  description="Essays — standalone arguments, newest first."
+>
+  <div class="article">
+    <header class="article__header">
+      <p class="article__dateline label"><span>Essays</span></p>
+      <h1 class="article__title display-title">Essays</h1>
+      <p class="article__deck">
+        Standalone arguments. Each is entered directly and stands on its own —
+        where a grounding is read in order, an essay is read.
+      </p>
+    </header>
+
+    <EntryList items={items} empty="No essays yet." />
+  </div>
+</BaseLayout>

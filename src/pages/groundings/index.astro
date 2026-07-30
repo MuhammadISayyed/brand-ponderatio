@@ -1,0 +1,28 @@
+---
+/**
+ * Groundings — the same listing as the index, filtered to groundings.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryList from '../../components/EntryList.astro';
+import { groundingItems } from '../../lib/listing';
+
+const items = await groundingItems();
+---
+
+<BaseLayout
+  title="Groundings"
+  description="Groundings — long works, published complete, read in order."
+>
+  <div class="article">
+    <header class="article__header">
+      <p class="article__dateline label"><span>Groundings</span></p>
+      <h1 class="article__title display-title">Groundings</h1>
+      <p class="article__deck">
+        A grounding is one thing thinking is grounded in: a long work,
+        published complete, divided into parts and read in order.
+      </p>
+    </header>
+
+    <EntryList items={items} empty="No groundings yet." />
+  </div>
+</BaseLayout>

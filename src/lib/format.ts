@@ -31,10 +31,14 @@ export const kindLabel = (kind: keyof typeof KIND_LABELS): string =>
   KIND_LABELS[kind];
 
 /**
- * Post URLs are flat: `/posts/<slug>`. The slug is whatever the frontmatter
- * says, falling back to the filename — so renaming a file does not have to
- * move a published URL, and a published URL does not have to dictate a
- * filename.
+ * Essay URLs are `/essays/<slug>`, under the section they belong to rather
+ * than a `/posts/` path that names the collection instead of the thing. The
+ * navigation says Essays; the URL should agree, or "which section am I in"
+ * has two answers.
+ *
+ * The slug is whatever the frontmatter says, falling back to the filename —
+ * so renaming a file does not have to move a published URL, and a published
+ * URL does not have to dictate a filename.
  */
 export const postSlug = (entry: {
   id: string;
@@ -44,4 +48,4 @@ export const postSlug = (entry: {
 export const postHref = (entry: {
   id: string;
   data: { slug?: string };
-}): string => `/posts/${postSlug(entry)}/`;
+}): string => `/essays/${postSlug(entry)}/`;
