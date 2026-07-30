@@ -113,9 +113,8 @@
      codebase names a typeface.
 
      Currently shipping (self-hosted via Astro's Fonts API):
-       document  Goudy Bookletter 1911   Barry Schwartz, OFL, after Goudy's
-                                         Kennerley Oldstyle
-       working   Clarity City            VMware, OFL, vendored
+       document  Libertinus Serif   the maintained fork of Linux Libertine, OFL
+       working   Ysabeau            a sans cut from French Renaissance forms, OFL
 
      TWO VOICES, and which carries what is the system:
 
@@ -138,9 +137,11 @@
      separated from body text by size, tracking, case and colour; a third
      family would be saying it again in a fourth way.
 
-     Goudy has ONE WEIGHT, no bold and no italic. See the DOCUMENT REGISTER
-     block in global.css for what that costs and how emphasis is handled
-     instead — it is the one place this choice is not free.
+     Both faces ship real italics and a real 600. Nothing in this system is
+     synthesised, and no register is running on a workaround — which was not
+     true under Goudy Bookletter 1911, whose single weight forced notes to set
+     emphasis as letterspaced roman and headings to step up in size alone.
+     Both of those compromises are deleted rather than carried forward.
      --------------------------------------------------------------------- */
   --font-doc: var(--font-document);
   --font-text: var(--font-working);
@@ -159,12 +160,10 @@
 
   /* RE-DERIVED for Ysabeau, and this time the two faces finally agree.
 
-     Ysabeau sits at 0.414 of its em. Goudy sits at 0.415. For the first time
-     the working face and the document face have the same x-height ratio,
-     which means a note and an essay read at the same optical size when set at
-     the same px — so --type-body-note-size is now simply an alias of the
-     essay's. It stays as a named token because the registers are still
-     entitled to diverge; they just have no reason to today.
+     --type-body-note-size is an alias of the essay's size. It stays a named
+     token because the registers are entitled to diverge; whether they need to
+     depends entirely on the two faces' x-heights, which is measured on every
+     swap and recorded on --grid-main-col.
 
      The trade Ysabeau asks for is real and worth stating. It is narrow as
      well as small on the body, so the size that holds the measure — 21px for
@@ -182,14 +181,12 @@
      breaking out of the body column. Alegreya at 900 — the only place the
      black weight is used.
 
-     64px in Goudy Bookletter 1911, which has one weight and no bold. Unlike
-     Instrument Serif — the last single-weight face tried here, which needed
-     80px to stop being outshouted by its own deck — Goudy holds at 64 because
-     it sits on a much smaller body and the deck under it is now 22px rather
-     than 24. The title is the only place --font-doc appears outside a note. */
+     64px, and --type-title-weight decides whether it is set at 400 or 600.
+     Libertinus is a text face before it is a display one, so it wants the
+     heavier cut at this size where a true display face would not. */
   --type-title-size: 4rem;          /* 64px */
   --type-title-leading: 1.0;
-  --type-title-weight: 400;
+  --type-title-weight: 600;
 
   /* Post title, document register (note). Stays within the body measure, and
      stays at --weight-semibold: a note is a filed sheet, and the black weight
@@ -234,11 +231,7 @@
      in the index. Headings belong to the printed voice even when the prose
      under them does not.
 
-     Sizes are up from 26/20, and that is not a change of emphasis. Goudy sits
-     at 0.415 of its em against Clarity City's 0.517, so a heading set at the
-     old numbers had barely more x-height than the body it introduced. 32 and
-     25 restore the ratio the old sizes encoded. Set in --weight-regular,
-     because Goudy has no other weight — headings step up in size alone. */
+     Set in --weight-semibold, which Libertinus ships and Goudy did not. */
   --type-h2-size: 1.875rem;         /* 30px */
   --type-h2-leading: 1.25;
   --type-h3-size: 1.5rem;           /* 24px */

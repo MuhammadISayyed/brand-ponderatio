@@ -136,14 +136,15 @@
      the two faces divide by ROLE rather than by page: Goudy titles and names,
      Clarity City argues and annotates.
 
-     --weight-regular is not a choice. Goudy has one weight, so headings step
-     up in size alone, and asking for semibold here would have every heading on
-     the site silently faux-bolded. */
+     Semibold, which under Goudy was impossible — it had one weight, so
+     headings stepped up in size alone and asking for 600 would have
+     faux-bolded every heading on the site. Libertinus ships a real 600, so
+     the hierarchy is carried by weight and size together again. */
   h1,
   h2,
   h3 {
     font-family: var(--font-doc);
-    font-weight: var(--weight-regular);
+    font-weight: var(--weight-semibold);
     letter-spacing: -0.005em;
     text-wrap: balance;
   }
@@ -303,42 +304,6 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-
-  /* ==========================================================================
-     DOCUMENT REGISTER — what Goudy costs, and what pays for it.
-
-     Goudy Bookletter 1911 ships one weight, no bold and no italic. In a note,
-     which is set in it end to end, that would silently destroy emphasis:
-     `font-synthesis-style: none` is set on this site, so <em> renders
-     byte-identical to roman. Not subtle-but-present. Absent.
-
-     Rather than turn synthesis back on and accept a mechanically slanted
-     roman, emphasis in the document register is LETTERSPACED — the convention
-     from typeset and typewritten documents that had no italic to reach for.
-     It suits the register: a note is a filed sheet, and this is how filed
-     sheets have always emphasised.
-
-     Word-spacing is pulled back because letterspacing adds a gap after the
-     final letter too, which otherwise opens a hole before the next word.
-     ====================================================================== */
-
-  .note-prose em,
-  .note-prose i {
-    font-style: normal;
-    letter-spacing: 0.08em;
-    word-spacing: -0.08em;
-  }
-
-  /* Bold is the one place synthesis is allowed to stand. Goudy has no bold
-     either, so <strong> is a faux weight — thickened strokes on a face that
-     never had them. It is crude, and it is legible, and the alternative is a
-     second emphasis level that looks identical to the first. If notes turn
-     out not to need <strong> at all, this rule should be deleted rather than
-     improved. */
-  .note-prose strong,
-  .note-prose b {
-    font-weight: var(--weight-semibold);
   }
 
   /* ==========================================================================

@@ -106,9 +106,12 @@ if (supersededBy) {
     font-size: var(--type-body-note-size);
   }
 
+  /* Face and weight both come from the global heading rule now. Under Goudy
+     this had to pin --weight-regular, there being no other weight; keeping
+     that pin would hold note titles lighter than every other heading on the
+     site for a reason that no longer exists. */
   .note-title {
     font-family: var(--font-doc);
-    font-weight: var(--weight-regular);
   }
 
   /* A note's sections are closer together than an essay's. The global heading

@@ -44,18 +44,20 @@ export default defineConfig({
   // typeface is named.
   fonts: [
     {
-      // The document face. Post titles and the whole body of a note — the
-      // printed voice.
+      // The document face. Post titles, every heading, and the whole body of
+      // a note — the printed voice.
       //
-      // ONE WEIGHT, NO ITALIC, NO BOLD. That is the face, not an oversight:
-      // the Google API 400s on any other request. It costs the note register
-      // its italic, which global.css answers with letterspaced roman rather
-      // than a synthesised slant. See the DOCUMENT REGISTER block there.
+      // Libertinus Serif is the maintained fork of Linux Libertine, and
+      // unlike the Goudy it replaces it ships 400, 600 and 700 WITH italics.
+      // That matters more than it sounds: the note register had been running
+      // on a workaround, setting emphasis as letterspaced roman because Goudy
+      // had no italic to reach for. Notes now emphasise the ordinary way, and
+      // that workaround is deleted rather than kept "just in case".
       provider: fontProviders.google(),
-      name: 'Goudy Bookletter 1911',
+      name: 'Libertinus Serif',
       cssVariable: '--font-document',
-      weights: [400],
-      styles: ['normal'],
+      weights: [400, 600],
+      styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
