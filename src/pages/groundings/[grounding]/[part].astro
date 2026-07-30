@@ -1,14 +1,14 @@
 ---
 /**
- * One part of a grounding. Routed by the ARABIC part number even though the
- * page sets it in roman: the number is the identifier, the numeral is a way
- * of rendering it, and a roman numeral in a path invites case and ambiguity
- * bugs for no gain.
+ * One part of a grounding, routed by SLUG. Not by the part number, roman or
+ * arabic — numbers move when the argument is revised, and a shared URL that
+ * silently points at a different part is worse than one that 404s. See
+ * partSlug in lib/groundings.
  */
 import { render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import PartLayout from '../../../layouts/PartLayout.astro';
-import { groundingSlugs, getParts } from '../../../lib/groundings';
+import { groundingSlugs, getParts, partSlug } from '../../../lib/groundings';
 
 export const getStaticPaths = (async () => {
   const routes = [];
@@ -16,7 +16,7 @@ export const getStaticPaths = (async () => {
     const parts = await getParts(grounding);
     for (const [i, part] of parts.entries()) {
       routes.push({
-        params: { grounding, part: String(part.data.part) },
+        params: { grounding, part: partSlug(part) },
         props: {
           grounding,
           part,

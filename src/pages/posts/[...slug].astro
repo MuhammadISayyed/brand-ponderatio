@@ -7,6 +7,7 @@
 import { getCollection, render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import EssayLayout from '../../layouts/EssayLayout.astro';
+import { postSlug } from '../../lib/format';
 import NoteLayout from '../../layouts/NoteLayout.astro';
 
 export const getStaticPaths = (async () => {
@@ -16,7 +17,7 @@ export const getStaticPaths = (async () => {
   );
 
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { slug: postSlug(post) },
     props: { post },
   }));
 }) satisfies GetStaticPaths;

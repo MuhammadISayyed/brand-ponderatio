@@ -73,10 +73,16 @@ const citedCounts = scanCitations(part.body ?? '');
 
   <article class="article">
     <header class="article__header">
-      {/* Occupies the dateline's slot and takes its styling — an essay says
-          when, a part says where. */}
+      {/* A LABEL, NOT A BREADCRUMB. It occupies the dateline's slot and takes
+          its styling: an essay says when, a part says where.
+
+          The grounding's name used to be a link here, which made the line a
+          half-breadcrumb — it looked like metadata and behaved like
+          navigation, and a reader could not tell from looking which it was.
+          Navigation now lives in three places that are unambiguously
+          navigation: the site header, the running head, and the foot. */}
       <p class="article__dateline label">
-        <a class="part__work" href={groundingHref(grounding)}>{work.short}</a>
+        <span>{work.short}</span>
         <span>Part {roman(n)} of {roman(total)}</span>
       </p>
       <h1 class="article__title display-title">{title}</h1>
@@ -118,33 +124,35 @@ const citedCounts = scanCitations(part.body ?? '');
         )
       }
 
+      {/* Three slots, always: back, up, forward. The contents link is
+          unconditional because a reader who arrived at Part V from a shared
+          link has no other way up that does not require scrolling to find the
+          running head. */}
       <nav class="part-nav" aria-label="Parts">
-        {
-          previous ? (
-            <a class="part-nav__link" href={partHref(grounding, previous.data.part)}>
+        <div class="part-nav__slot">
+          {previous && (
+            <a class="part-nav__link" href={partHref(grounding, previous)}>
               <span class="label">Part {roman(previous.data.part)}</span>
               <span class="part-nav__title">{previous.data.title}</span>
             </a>
-          ) : (
-            <a class="part-nav__link" href={groundingHref(grounding)}>
-              <span class="label">Contents</span>
-              <span class="part-nav__title">{work.short}</span>
-            </a>
-          )
-        }
-        {
-          next ? (
-            <a class="part-nav__link part-nav__link--next" href={partHref(grounding, next.data.part)}>
+          )}
+        </div>
+
+        <div class="part-nav__slot part-nav__slot--up">
+          <a class="part-nav__link" href={groundingHref(grounding)}>
+            <span class="label">Contents</span>
+            <span class="part-nav__title">{work.short}</span>
+          </a>
+        </div>
+
+        <div class="part-nav__slot part-nav__slot--next">
+          {next && (
+            <a class="part-nav__link" href={partHref(grounding, next)}>
               <span class="label">Part {roman(next.data.part)}</span>
               <span class="part-nav__title">{next.data.title}</span>
             </a>
-          ) : (
-            <a class="part-nav__link part-nav__link--next" href={groundingHref(grounding)}>
-              <span class="label">End of the argument</span>
-              <span class="part-nav__title">Back to the contents</span>
-            </a>
-          )
-        }
+          )}
+        </div>
       </nav>
     </footer>
   </article>
@@ -217,16 +225,6 @@ const citedCounts = scanCitations(part.body ?? '');
 </script>
 
 <style>
-  .part__work {
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .part__work:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.3em;
-  }
-
   /* ==========================================================================
      RUNNING HEAD
      What a printed book does. Sticky, apparatus register, and it replaces
@@ -323,12 +321,20 @@ const citedCounts = scanCitations(part.body ?? '');
      ====================================================================== */
 
   .part-nav {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     gap: var(--space-6);
     margin-block-start: var(--space-8);
     padding-block-start: var(--space-4);
     border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  .part-nav__slot--up {
+    text-align: center;
+  }
+
+  .part-nav__slot--next {
+    text-align: end;
   }
 
   .part-nav__link {
@@ -338,8 +344,12 @@ const citedCounts = scanCitations(part.body ?? '');
     text-decoration: none;
   }
 
-  .part-nav__link--next {
-    text-align: end;
+  .part-nav__slot--up .part-nav__link {
+    margin-inline: auto;
+  }
+
+  .part-nav__slot--next .part-nav__link {
+    margin-inline-start: auto;
   }
 
   .part-nav__title {
@@ -359,11 +369,17 @@ const citedCounts = scanCitations(part.body ?? '');
     /* Duplicated from --bp-margin-collapse; media conditions cannot read
        custom properties. */
     .part-nav {
-      flex-direction: column;
+      grid-template-columns: 1fr;
     }
 
-    .part-nav__link--next {
+    .part-nav__slot--up,
+    .part-nav__slot--next {
       text-align: start;
+    }
+
+    .part-nav__slot--up .part-nav__link,
+    .part-nav__slot--next .part-nav__link {
+      margin-inline: 0;
     }
   }
 </style>

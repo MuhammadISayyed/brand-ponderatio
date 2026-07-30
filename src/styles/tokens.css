@@ -186,13 +186,14 @@
      narrow face at a fixed column: 22.5px would match the old optical size
      and drop the line to about 60 characters.
 
-     20px now, down from 21 and before that 23, because the page kept reading
-     large. The measure moves with it: 69.1 characters on the 592px line,
-     which is above the 66 target and still inside the comfortable band. That
-     is the trade taken knowingly — a slightly longer line in exchange for
-     type at the size it is actually wanted, having established that the
-     leading was carrying most of the apparent bulk. Narrowing the column to
-     hold 66 exactly would cost more than the six characters are worth. */
+     18px, and THE COLUMN CAME IN WITH IT — 592px to 512px. That pairing is
+     the whole point and the reason the measure survived four size changes:
+     18px in the old 592px column measured 76.8 characters, which is past
+     comfortable and into the range where the eye loses the line return. At
+     512px it measures 67.0, which is the target.
+
+     Two free variables, one constraint. Solve for size alone and the measure
+     breaks; solve for both and the type can be whatever size it should be. */
 
   /* Post title, editorial register (essay, case). Spans the FIGURE width,
      breaking out of the body column. Alegreya at 900 — the only place the
@@ -200,24 +201,24 @@
 
      64px at --weight-regular, Goudy having one weight. It holds at that size
      without help: the deck beneath it is 26px italic, so nothing competes. */
-  --type-title-size: 4rem;          /* 64px */
+  --type-title-size: 3.5rem;        /* 56px */
   --type-title-leading: 1.0;
   --type-title-weight: 400;
 
   /* Post title, document register (note). Stays within the body measure, and
      stays at --weight-semibold: a note is a filed sheet, and the black weight
      would give it the authority of a published argument. */
-  --type-title-note-size: 2rem;     /* 32px */
+  --type-title-note-size: 1.75rem;  /* 28px */
   --type-title-note-leading: 1.15;
 
   /* Deck — the one-line standfirst under an editorial title. Body serif. */
-  --type-deck-size: 1.5rem;         /* 24px */
+  --type-deck-size: 1.375rem;       /* 22px */
   --type-deck-leading: 1.4;
 
   /* Deck as it appears in the index, where it is a summary line rather than a
      standfirst. Set below body size on purpose: an index that sets its decks
      at reading size competes with the posts it is pointing at. */
-  --type-index-deck-size: 1.125rem; /* 18px */
+  --type-index-deck-size: 1rem;     /* 16px */
   --type-index-deck-leading: 1.45;
 
   /* Running text. Body serif.
@@ -230,7 +231,7 @@
 
      So the column moved with it: 21px in a 592px column gives 66.9
      characters. Same measure, smaller type. See --grid-main-col. */
-  --type-body-size: 1.25rem;        /* 20px */
+  --type-body-size: 1.125rem;       /* 18px */
 
   /* LEADING IS A RATIO TO X-HEIGHT, NOT TO THE EM, and that is why this is
      1.45 rather than the 1.6 it sat at for months.
@@ -264,9 +265,9 @@
 
      Set in --weight-regular, Goudy having no other. Headings step up in size
      alone, which is sufficient at 30px and above. */
-  --type-h2-size: 1.75rem;          /* 28px */
+  --type-h2-size: 1.5625rem;        /* 25px */
   --type-h2-leading: 1.25;
-  --type-h3-size: 1.4375rem;        /* 23px */
+  --type-h3-size: 1.3125rem;        /* 21px */
   --type-h3-leading: 1.3;
 
   /* ONE SIZE FOR ALL APPARATUS. Datelines, tags, sidenotes, sources, figure
@@ -281,7 +282,7 @@
      measurement and slightly unequal by eye. That is the honest trade for
      having one number instead of three, and it is the direction to correct
      if it ever needs correcting. */
-  --type-apparatus-size: 1rem;      /* 16px */
+  --type-apparatus-size: 0.9375rem; /* 15px */
   --type-apparatus-leading: 1.5;
 
   --type-sidenote-size: var(--type-apparatus-size);
@@ -331,7 +332,7 @@
      5. GRID
      Content caps at 1080px. The margin column carries apparatus; the main
      column carries prose at roughly 66 characters.
-     Figure span = margin + gutter + main = 190 + 48 + 592 = 830px.
+     Figure span = margin + gutter + main = 190 + 48 + 512 = 750px.
      Post TITLES use the figure span. Figures do not — see below.
      ====================================================================== */
 
@@ -401,8 +402,8 @@
 
      Two free variables, one constraint. Note CN-014 records the method but
      not this trap, which is worth adding when it is superseded. */
-  --grid-main-col: 37rem;
-  /* 830px. The title breaks out to this, and it is the width the whole grid
+  --grid-main-col: 32rem;
+  /* 750px. The title breaks out to this, and it is the width the whole grid
      is centred at. Despite the name, a FIGURE DOES NOT USE IT.
 
      Diagrams are set to --grid-main-col, flush with the prose. A diagram is
@@ -413,7 +414,7 @@
      and is the point.
 
      The name is kept because the grid arithmetic still refers to this span. */
-  --grid-figure-span: 51.875rem;
+  --grid-figure-span: 46.875rem;
 
   /* Notes are set narrower than essays on purpose. The narrowness is part of
      what makes a note feel filed rather than published; it is not a rounding
@@ -426,10 +427,10 @@
      not a distance", which was exactly the estimate-instead-of-measure error
      that CN-014 sits six lines away warning about.
 
-     34rem holds 55.0 characters in Ysabeau at 21px, counted from rendered
-     line boxes. Eleven characters narrower than the essay's 66.9, which is
-     the gap that makes a sheet read as a sheet. */
-  --grid-note-measure: 34rem;
+     26rem, re-derived with the body size. Notes stay about eleven characters
+     narrower than an essay, which is the gap that makes a sheet read as a
+     sheet rather than as a short essay. */
+  --grid-note-measure: 26rem;
 
   /* Below this width the margin column collapses: sidenotes fall inline
      beneath the paragraph they annotate, figure numbers move into the

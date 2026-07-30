@@ -26,6 +26,21 @@ const STATUSES = ['working', 'revised', 'superseded'] as const;
  * fills up with works nobody actually read. EssayLayout fails the build on an
  * uncited source that has not claimed this.
  */
+
+/**
+ * A hand-written URL segment. Optional everywhere: left off, it is derived
+ * from the filename, which is what has been happening implicitly all along.
+ * Set it when the filename and the URL should differ — a long title, a
+ * renamed file, a URL that has to stay put.
+ */
+const slugSchema = z
+  .string()
+  .regex(
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    'slug must be lowercase words separated by single hyphens (e.g. "powers-compose"), with no leading, trailing or doubled hyphens.',
+  )
+  .optional();
+
 const KEY_PATTERN = /^[a-z][a-z0-9-]*$/;
 
 const sourceSchema = z.object({
@@ -49,6 +64,7 @@ const sourceSchema = z.object({
 const postSchema = z
   .object({
     title: z.string().min(1, 'title must not be empty'),
+    slug: slugSchema,
     date: z.date(),
     kind: z.enum(KINDS),
 
@@ -218,6 +234,7 @@ const posts = defineCollection({
  */
 const groundingSchema = z.object({
   title: z.string().min(1, 'title must not be empty'),
+  slug: slugSchema,
 
   /** Position in the argument. 1-based, contiguous, unique — checked below. */
   part: z.number().int().positive(),

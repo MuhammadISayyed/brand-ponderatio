@@ -30,6 +30,18 @@ const KIND_LABELS = {
 export const kindLabel = (kind: keyof typeof KIND_LABELS): string =>
   KIND_LABELS[kind];
 
-/** Post URLs are flat: `/posts/<slug>`. Notes are not filed separately by
- *  reference code — the code is a filing label, not a route. */
-export const postHref = (id: string): string => `/posts/${id}/`;
+/**
+ * Post URLs are flat: `/posts/<slug>`. The slug is whatever the frontmatter
+ * says, falling back to the filename — so renaming a file does not have to
+ * move a published URL, and a published URL does not have to dictate a
+ * filename.
+ */
+export const postSlug = (entry: {
+  id: string;
+  data: { slug?: string };
+}): string => entry.data.slug ?? entry.id;
+
+export const postHref = (entry: {
+  id: string;
+  data: { slug?: string };
+}): string => `/posts/${postSlug(entry)}/`;

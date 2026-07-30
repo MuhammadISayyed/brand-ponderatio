@@ -76,7 +76,7 @@ posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
               <div class="entry__body">
                 <h2 class="entry__title">
-                  <a href={postHref(post.id)}>{title}</a>
+                  <a href={postHref(post)}>{title}</a>
                 </h2>
                 {deck && <p class="entry__deck">{deck}</p>}
               </div>

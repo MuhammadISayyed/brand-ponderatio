@@ -39,7 +39,7 @@ const parts = await getParts(grounding!);
             <p class="label contents__number">Part {roman(part.data.part)}</p>
             <div class="contents__body">
               <h2 class="contents__title">
-                <a href={partHref(grounding!, part.data.part)}>{part.data.title}</a>
+                <a href={partHref(grounding!, part)}>{part.data.title}</a>
               </h2>
               <p class="contents__deck">{part.data.deck}</p>
             </div>

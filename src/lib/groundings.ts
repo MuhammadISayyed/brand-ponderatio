@@ -30,9 +30,9 @@ export type Part = CollectionEntry<'groundings'>;
 
 /**
  * Parts are numbered in ROMAN NUMERALS on the page — Part IV, not Part 4.
- * The arabic number stays the identifier in frontmatter, in the URL and in
- * every sort, because that is what a computer should be comparing; the roman
- * is a rendering of it.
+ * The arabic number stays the ordering key in frontmatter and in every sort,
+ * because that is what a computer should be comparing; the roman is a
+ * rendering of it, and the URL is neither — see partSlug.
  */
 const ROMAN: ReadonlyArray<[number, string]> = [
   [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
@@ -112,9 +112,21 @@ export async function getParts(grounding: string): Promise<Part[]> {
   return parts;
 }
 
-/** URLs stay ARABIC. A roman numeral in a path invites case and ambiguity
- *  bugs ("i" against "1", "IV" against "iv") for no gain — the numeral is a
- *  way of setting the number, not a different identifier. */
+/**
+ * A part's URL segment: its `slug` if it has one, otherwise the filename with
+ * any ordering prefix stripped ("01-powers-compose" -> "powers-compose").
+ *
+ * URLS ARE SLUGS, NOT NUMBERS, and this reverses what this file said an hour
+ * ago. The argument for numbers was that the number is the identifier. The
+ * argument against is stronger: numbers MOVE. Insert a new Part II into a
+ * finished argument and every part after it renumbers, so every numeric URL
+ * that was ever shared now points at the wrong part — silently, since the
+ * page still exists. A slug survives insertion, and the roman numeral goes on
+ * doing what it was always for, which is telling the reader where they are.
+ */
+export const partSlug = (part: Part): string =>
+  part.data.slug ?? part.id.split('/').pop()!.replace(/^\d+[-_]/, '');
+
 export const groundingHref = (grounding: string) => `/groundings/${grounding}/`;
-export const partHref = (grounding: string, part: number) =>
-  `/groundings/${grounding}/${part}/`;
+export const partHref = (grounding: string, part: Part) =>
+  `/groundings/${grounding}/${partSlug(part)}/`;
