@@ -1,14 +1,12 @@
 ---
 /**
- * The single post route. Its only job is to pick the register: the document
- * layout for notes, the editorial layout for everything else. No post decides
- * its own layout — `kind` does, and `kind` is schema-validated.
+ * The essay route. There is one layout now — the note register that this used
+ * to dispatch between is gone, so nothing chooses.
  */
 import { getCollection, render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import EssayLayout from '../../layouts/EssayLayout.astro';
 import { postSlug } from '../../lib/format';
-import NoteLayout from '../../layouts/NoteLayout.astro';
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection('posts', ({ data }) =>
@@ -24,10 +22,8 @@ export const getStaticPaths = (async () => {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
-
-const Layout = post.data.kind === 'note' ? NoteLayout : EssayLayout;
 ---
 
-<Layout post={post}>
+<EssayLayout post={post}>
   <Content />
-</Layout>
+</EssayLayout>

@@ -32,12 +32,10 @@ export async function postItems(): Promise<ListItem[]> {
 
   return posts
     .map((post): ListItem => {
-      const { title, deck, date, kind, ref } = post.data;
+      const { title, deck, date, kind } = post.data;
       return {
         href: postHref(post),
-        // A note carries its reference code, which identifies it better than
-        // its kind does. Everything else carries its kind.
-        label: kind === 'note' && ref ? ref : kindLabel(kind),
+        label: kindLabel(kind),
         meta: formatDateline(date),
         datetime: machineDate(date),
         title,

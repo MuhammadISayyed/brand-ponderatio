@@ -22,7 +22,6 @@ export const machineDate = (date: Date): string =>
   date.toISOString().slice(0, 10);
 
 const KIND_LABELS = {
-  note: 'Note',
   essay: 'Essay',
   case: 'Case',
 } as const;

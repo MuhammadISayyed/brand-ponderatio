@@ -32,13 +32,12 @@
      Contrast ratios below are against --paper and were computed, not judged.
      Anything used at 11–13px must clear 4.5:1; large text may sit at 3:1. */
 
-  --paper: #f7f1e3;      /* Page background; the note sheet itself */
-  --ground: #ece4d3;     /* ONLY as the ground behind a note sheet */
+  --paper: #f7f1e3;      /* Page background */
+  --ground: #ece4d3;     /* Highlights, code blocks, selection */
   --ink: #211d17;        /* Body text.                        14.9:1 AAA */
   --ink-2: #4f483f;      /* Decks, secondary text.             8.0:1 AAA */
   --muted: #6d6455;      /* Metadata, captions, node strokes.  5.2:1 AA  */
   --rule: #dfd6c2;       /* Hairlines */
-  --sheet-edge: #d5c9b2; /* Note sheet border */
 
   /* --muted was #8a837a and measured 3.3:1 on the old background — below AA
      at the 11px and 13px sizes it is actually used for. It was not a casualty
@@ -52,13 +51,13 @@
 
   /* Cinnabar — seal red. The ONLY accent allowed in running text.
      Permitted: links, focus states, the single load-bearing element in a
-     diagram, the rule beside an index entry, the "filed under" line on a
-     note, and both numerals of a sidenote pair.
+     diagram, the rule beside an index entry, the "filed under" line at the
+     foot of a post, and both numerals of a sidenote pair.
      Not permitted: decoration, backgrounds, borders that carry no meaning.
 
      The sidenote numerals were added to that list rather than smuggled past
      it. A marker exists to send the reader somewhere — it is a link in every
-     sense but the markup — and the note's numeral sends them back. In muted
+     sense but the markup — and the margin numeral sends them back. In muted
      grey they read as punctuation the eye learns to skip, which is precisely
      what a pointer must not be.
 
@@ -133,19 +132,12 @@
      renders byte-identical to roman and emphasis silently ceases to exist.
      A face may only set text it can inflect.
 
-     Notes used to be set in the document face end to end, and that is what
-     made them look filed. That signal is gone and the register survives it:
-     a note still has the ground, the sheet edge, the fold beneath its
-     document header, its reference code, a narrower measure and a minimum
-     height. Six signals, none of which cost a reader their italics.
-
      This inverts the arrangement the site had until now, which was a serif
      for body and display with a sans reserved for small metadata. That rule
      is gone: the serif no longer carries running text at all, and the sans is
      no longer confined to captions. The contrast is now between REGISTERS —
      printed versus working — rather than between serif and sans, and it lands
-     on the same boundary the schema already enforces between a note and an
-     essay.
+     on the boundary between what names a thing and what argues it.
 
      Metadata takes the working voice rather than a third face. It is already
      separated from body text by size, tracking, case and colour; a third
@@ -160,8 +152,8 @@
   /* ---- END FONT SWAP POINT --------------------------------------------- */
 
   /* THE REGISTER CONTRAST IS THE TYPOGRAPHIC IDEA. Not serif against sans —
-     printed against working. --font-doc sets titles and the whole of a note;
-     --font-text sets essays and all apparatus. There is no third family, and
+     printed against working. --font-doc sets titles and headings;
+     --font-text sets all body copy and every piece of apparatus. There is no third family, and
      a role that seems to need one is a role that has not been assigned to a
      register yet. */
 
@@ -172,11 +164,9 @@
 
   /* RE-DERIVED for Ysabeau, and this time the two faces finally agree.
 
-     --type-body-note-size is an alias of the essay's size, and now trivially
-     so: both registers are set in the same face, so there is no x-height
-     difference left to correct for. The token stays named because the
-     registers are still entitled to diverge in size even when they agree on
-     face.
+     There is one running-text size. There were briefly two, when a second
+     register was set in a different face and needed its own number to read
+     level with this one; that register is gone and the correction with it.
 
      The trade Ysabeau asks for is real and worth stating. It is narrow as
      well as small on the body, so the size that holds the measure — 21px for
@@ -204,12 +194,6 @@
   --type-title-size: 3.5rem;        /* 56px */
   --type-title-leading: 1.0;
   --type-title-weight: 400;
-
-  /* Post title, document register (note). Stays within the body measure, and
-     stays at --weight-semibold: a note is a filed sheet, and the black weight
-     would give it the authority of a published argument. */
-  --type-title-note-size: 1.75rem;  /* 28px */
-  --type-title-note-leading: 1.15;
 
   /* Deck — the one-line standfirst under an editorial title. Body serif. */
   --type-deck-size: 1.375rem;       /* 22px */
@@ -249,18 +233,8 @@
      ems is a measurement of the wrong thing. */
   --type-body-leading: 1.45;
 
-  /* Running text in the DOCUMENT register — a note, set in Goudy.
-     Equal to the essay's size, because Goudy (0.415) and Ysabeau (0.414) have
-     the same x-height ratio and therefore read at the same optical size when
-     set at the same px. Under Clarity City this had to be 22px against the
-     essay's 18 to look level; the correction is no longer needed.
-
-     Kept as its own token rather than deleted: the registers are entitled to
-     be set differently, and the next face change may make them so again. */
-  --type-body-note-size: var(--type-body-size);
-
-  /* Section headings — the DOCUMENT face, everywhere: in an essay, in a note,
-     in the index. Headings belong to the printed voice even when the prose
+  /* Section headings — the DOCUMENT face, everywhere: in an essay, in a
+     grounding, in a listing. Headings belong to the printed voice even when the prose
      under them does not.
 
      Set in --weight-regular, Goudy having no other. Headings step up in size
@@ -416,22 +390,6 @@
      The name is kept because the grid arithmetic still refers to this span. */
   --grid-figure-span: 46.875rem;
 
-  /* Notes are set narrower than essays on purpose. The narrowness is part of
-     what makes a note feel filed rather than published; it is not a rounding
-     of the essay measure.
-
-     MEASURED, in rem — it used to be 52ch, and `ch` is not a character count.
-     It is the advance width of the digit zero, which in this face is wider
-     than the average character, so 52ch rendered 57.2 characters per line.
-     The comment on that token claimed the constraint was "a character count,
-     not a distance", which was exactly the estimate-instead-of-measure error
-     that CN-014 sits six lines away warning about.
-
-     26rem, re-derived with the body size. Notes stay about eleven characters
-     narrower than an essay, which is the gap that makes a sheet read as a
-     sheet rather than as a short essay. */
-  --grid-note-measure: 26rem;
-
   /* Below this width the margin column collapses: sidenotes fall inline
      beneath the paragraph they annotate, figure numbers move into the
      caption, and the sources block moves to the foot of the post.
@@ -454,7 +412,6 @@
   --space-10: 8rem;    /* 128px */
 
   --rule-weight: 1px;
-  --rule-hairline: 0.5px; /* The note sheet edge. Deliberately sub-pixel. */
 
   /* --------------------------------------------------------------------------
      RULES — a doctrine, because a rule per section is how a page starts
@@ -465,31 +422,21 @@
      two things, then a line between them is separating something that was
      never joined. Space does that work here; rules are spent, not applied.
 
-     There are exactly three, and each has one job:
+     There are exactly two, and each has one job:
 
      1. THE STUB. A short oxide tick, --rule-stub-length long, set above a
         block. It MARKS rather than divides: this is an index entry, this is
-        the apparatus at the foot of a post, this is a note's filing line. It
+        the apparatus at the foot of a post, this is a filing line. It
         is the signature mark of the system and the only rule that recurs.
 
      2. THE CLOSE. One neutral full-width hairline per page, above the site
         footer, closing the document. One. If a second one is wanted somewhere
         the answer is space, not a line.
 
-     3. THE FOLD. The hairline under a note's document header. It is part of
-        the form the sheet is imitating, not a separator between sections, and
-        it appears nowhere outside NoteLayout.
-
      Anything else — a rule under a dateline, a rule between index entries, a
      rule above every heading — is scaffolding left in the build.
      ----------------------------------------------------------------------- */
   --rule-stub-length: 1.5rem; /* 24px */
-
-  /* Containers have a MINIMUM height and text is top-aligned within them.
-     When content is short, whitespace collects at the bottom and stays
-     empty. Containers are never shrink-wrapped to their content and text is
-     never vertically centred. */
-  --note-sheet-min-height: 23.75rem; /* 380px */
 
   /* ==========================================================================
      7. DIAGRAM HOUSE STYLE
