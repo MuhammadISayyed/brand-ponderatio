@@ -96,8 +96,19 @@ if (supersededBy) {
     display: flow-root;
   }
 
+  /* The note is set in the document face, end to end — this is the line that
+     makes a note read as a filed sheet rather than a short essay. It also
+     carries its own size: see --type-body-note-size for why 22 here reads the
+     same as 18 in an essay. */
   .note-prose {
     max-width: var(--grid-note-measure);
+    font-family: var(--font-doc);
+    font-size: var(--type-body-note-size);
+  }
+
+  .note-title {
+    font-family: var(--font-doc);
+    font-weight: var(--weight-regular);
   }
 
   /* A note's sections are closer together than an essay's. The global heading
@@ -167,7 +178,7 @@ if (supersededBy) {
     margin-block-end: var(--space-6);
     padding: var(--space-3) var(--space-4);
     background: var(--ground);
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-sidenote-size);
     line-height: var(--type-sidenote-leading);
     color: var(--ink-2);

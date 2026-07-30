@@ -65,7 +65,7 @@
   body {
     background: var(--paper);
     color: var(--ink);
-    font-family: var(--font-serif-body);
+    font-family: var(--font-text);
     font-size: var(--type-body-size);
     line-height: var(--type-body-leading);
     font-weight: var(--weight-regular);
@@ -93,7 +93,7 @@
      ====================================================================== */
 
   .label {
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
@@ -141,14 +141,14 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif-body);
+    font-family: var(--font-text);
     font-weight: var(--weight-semibold);
     letter-spacing: -0.005em;
     text-wrap: balance;
   }
 
   .display-title {
-    font-family: var(--font-serif-display);
+    font-family: var(--font-doc);
     font-weight: var(--type-title-weight);
     /* Black weight closes up the counters on its own; at 64px the default
        spacing then reads loose. */
@@ -212,7 +212,7 @@
   .prose--editorial > p:first-of-type::first-letter {
     -webkit-initial-letter: var(--dropcap-lines);
     initial-letter: var(--dropcap-lines);
-    font-family: var(--font-serif-display);
+    font-family: var(--font-doc);
     /* Regular, NOT the title's black. A drop cap sunk three lines is already
        the largest thing in the column; at 900 it stops being an initial and
        becomes a logo, and it drags the eye back to it on every line that
@@ -294,6 +294,50 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  /* ==========================================================================
+     DOCUMENT REGISTER — what Goudy costs, and what pays for it.
+
+     Goudy Bookletter 1911 ships one weight, no bold and no italic. In a note,
+     which is set in it end to end, that would silently destroy emphasis:
+     `font-synthesis-style: none` is set on this site, so <em> renders
+     byte-identical to roman. Not subtle-but-present. Absent.
+
+     Rather than turn synthesis back on and accept a mechanically slanted
+     roman, emphasis in the document register is LETTERSPACED — the convention
+     from typeset and typewritten documents that had no italic to reach for.
+     It suits the register: a note is a filed sheet, and this is how filed
+     sheets have always emphasised.
+
+     Word-spacing is pulled back because letterspacing adds a gap after the
+     final letter too, which otherwise opens a hole before the next word.
+     ====================================================================== */
+
+  .note-prose em,
+  .note-prose i {
+    font-style: normal;
+    letter-spacing: 0.08em;
+    word-spacing: -0.08em;
+  }
+
+  /* Bold is the one place synthesis is allowed to stand. Goudy has no bold
+     either, so <strong> is a faux weight — thickened strokes on a face that
+     never had them. It is crude, and it is legible, and the alternative is a
+     second emphasis level that looks identical to the first. If notes turn
+     out not to need <strong> at all, this rule should be deleted rather than
+     improved. */
+  .note-prose strong,
+  .note-prose b {
+    font-weight: var(--weight-semibold);
+  }
+
+  /* Section headings in a note cannot step up in weight, because there is no
+     heavier weight to step to. They step up in size alone. */
+  .note-prose h2,
+  .note-prose h3 {
+    font-family: var(--font-doc);
+    font-weight: var(--weight-regular);
   }
 
   /* ==========================================================================
@@ -418,7 +462,7 @@
   }
 
   .prose th {
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);

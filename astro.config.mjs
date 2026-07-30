@@ -39,76 +39,45 @@ export default defineConfig({
     }),
   },
 
-  // Self-hosted via Astro's built-in Fonts API. These are the free shipping
-  // faces; see the clearly-marked swap block in src/styles/tokens.css for
-  // where the paid Klim replacements would be substituted.
+  // Self-hosted via Astro's built-in Fonts API. Two faces, two voices — see
+  // the swap block in src/styles/tokens.css, which is the only other place a
+  // typeface is named.
   fonts: [
     {
-      // The serif. Body AND display — this is a superfamily, so the title is
-      // the same face as the prose at 900 rather than a second design.
-      // Registered once and pointed at twice; see --font-serif-display in
-      // tokens.css.
+      // The document face. Post titles and the whole body of a note — the
+      // printed voice.
       //
-      // Weights are exactly what the system asks for and no more:
-      //   400  running text, decks, the drop cap
-      //   600  --weight-semibold: H2, H3, note and index titles
-      //   900  the post title
-      // 600 in particular is not optional. A weight the CSS asks for but the
-      // config does not load does not fail — the browser silently snaps to the
-      // nearest one it has. Omitting 600 renders every H2 at 900.
-      provider: fontProviders.google(),
-      name: 'Alegreya',
-      cssVariable: '--font-body',
-      weights: [400, 600, 900],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
-    },
-    // ---- SPECIMEN ONLY -----------------------------------------------------
-    // Candidates under evaluation on /specimen. Delete these entries along
-    // with that page once the decision is made, or promote the winners.
-    {
-      // Title candidate. ONE weight, no bold, no italic — verified against
-      // the Google API, which 400s on any other request. Fine for a title;
-      // see the specimen page for what it costs a note.
+      // ONE WEIGHT, NO ITALIC, NO BOLD. That is the face, not an oversight:
+      // the Google API 400s on any other request. It costs the note register
+      // its italic, which global.css answers with letterspaced roman rather
+      // than a synthesised slant. See the DOCUMENT REGISTER block there.
       provider: fontProviders.google(),
       name: 'Goudy Bookletter 1911',
-      cssVariable: '--font-goudy',
+      cssVariable: '--font-document',
       weights: [400],
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
     {
-      // Body candidate — geometric, Futura lineage.
-      provider: fontProviders.google(),
-      name: 'Jost',
-      cssVariable: '--font-jost',
-      weights: [400, 500, 600],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      // Body candidate — humanist, drawn for extended text.
-      provider: fontProviders.google(),
-      name: 'Source Sans 3',
-      cssVariable: '--font-source-sans',
-      weights: [400, 600],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      // Body candidate — geometric, Metropolis lineage. Not on Google Fonts
-      // or Fontsource, so the files are vendored in src/assets/fonts under
-      // OFL, with the licence alongside them as that licence requires. The
-      // upstream repo is archived; the licence is what makes that survivable.
+      // The working face. Essay body, decks, section headings, and every
+      // piece of metadata on the site.
+      //
+      // Vendored, because Clarity City is on neither Google Fonts nor
+      // Fontsource. Four woff2 files come from the archived VMware repo under
+      // the SIL Open Font License, with that licence stored beside them as it
+      // requires. The repo being archived is why the licence matters: nothing
+      // upstream is coming, and OFL is what makes that survivable.
+      //
+      // Weights are exactly what the system asks for:
+      //   400  running text and decks (plus italic, for emphasis)
+      //   500  --weight-medium: labels, datelines, table headings
+      //   600  --weight-semibold: H2, H3, note and index titles, <strong>
       provider: fontProviders.local(),
       name: 'Clarity City',
-      cssVariable: '--font-clarity',
+      cssVariable: '--font-working',
       // Local families declare their files under `options.variants`, not as
-      // weights/styles like a remote provider.
+      // the weights/styles a remote provider takes.
       options: {
         variants: [
           {
@@ -124,26 +93,17 @@ export default defineConfig({
             ],
           },
           {
+            weight: 500,
+            style: 'normal',
+            src: ['./src/assets/fonts/clarity-city/ClarityCity-Medium.woff2'],
+          },
+          {
             weight: 600,
             style: 'normal',
             src: ['./src/assets/fonts/clarity-city/ClarityCity-SemiBold.woff2'],
           },
         ],
       },
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    // ---- END SPECIMEN ONLY -------------------------------------------------
-    {
-      // Metadata sans — datelines, labels, captions, sidenotes ONLY.
-      // Alegreya Sans is the companion drawn for this job by the same
-      // designer, which is why it replaced Inter: a neutral interface face
-      // was the one thing in the stack that had not been chosen.
-      provider: fontProviders.google(),
-      name: 'Alegreya Sans',
-      cssVariable: '--font-meta',
-      weights: [400, 500],
-      styles: ['normal'],
-      subsets: ['latin'],
       fallbacks: ['system-ui', 'sans-serif'],
     },
   ],

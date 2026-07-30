@@ -109,72 +109,83 @@
      ====================================================================== */
 
   /* ---- FONT SWAP POINT — the only block that changes on licensing ---------
-     These three custom properties are the entire seam between the free
-     shipping faces and the paid replacements. Nothing else in the codebase
-     names a typeface.
+     These three custom properties are the entire seam. Nothing else in the
+     codebase names a typeface.
 
-     To swap:
-       1. update the `fonts` array in astro.config.mjs (name + cssVariable)
-       2. repoint the three properties below
-       3. nothing else
+     Currently shipping (self-hosted via Astro's Fonts API):
+       document  Goudy Bookletter 1911   Barry Schwartz, OFL, after Goudy's
+                                         Kennerley Oldstyle
+       working   Clarity City            VMware, OFL, vendored
 
-     Currently shipping (free, self-hosted via Astro's Fonts API):
-       body    Alegreya 400       Huerta Tipográfica, OFL
-       display Alegreya 900       the same face, not a second design
-       meta    Alegreya Sans 400  the companion, by the same designer
+     TWO VOICES, and which carries what is the system:
 
-     This is a SUPERFAMILY, and that is the whole idea. One skeleton, three
-     registers, with the contrast coming from weight and size rather than from
-     putting two unrelated designers on one page. --font-serif-display is
-     therefore an alias rather than its own face: there is no second family to
-     load, and the title is the prose with the weight turned up.
+       THE DOCUMENT VOICE — post titles, and the entire body of a note.
+       The printed thing. A note is set in it end to end, which is why a note
+       reads as a filed sheet rather than a short essay.
 
-     If a display face with its own drawing is ever wanted, this is the line
-     that changes, and astro.config.mjs grows a third entry. Nothing else.
+       THE WORKING VOICE — essay body, decks, section headings, and every
+       piece of metadata on the site. The thing being worked on.
 
-     Intended paid replacements (Klim):
-       body    Tiempos Text
-       display Signifier
-       meta    Söhne
+     This inverts the arrangement the site had until now, which was a serif
+     for body and display with a sans reserved for small metadata. That rule
+     is gone: the serif no longer carries running text at all, and the sans is
+     no longer confined to captions. The contrast is now between REGISTERS —
+     printed versus working — rather than between serif and sans, and it lands
+     on the same boundary the schema already enforces between a note and an
+     essay.
+
+     Metadata takes the working voice rather than a third face. It is already
+     separated from body text by size, tracking, case and colour; a third
+     family would be saying it again in a fourth way.
+
+     Goudy has ONE WEIGHT, no bold and no italic. See the DOCUMENT REGISTER
+     block in global.css for what that costs and how emphasis is handled
+     instead — it is the one place this choice is not free.
      --------------------------------------------------------------------- */
-  --font-serif-body: var(--font-body);
-  --font-serif-display: var(--font-body);
-  --font-sans-meta: var(--font-meta);
+  --font-doc: var(--font-document);
+  --font-text: var(--font-working);
   /* ---- END FONT SWAP POINT --------------------------------------------- */
 
-  /* The serif/sans contrast IS the typographic idea. The serif carries body
-     AND display. The sans is for small metadata only — datelines, section
-     labels, source lines, figure numbers, sidenotes, captions, document
-     headers. Never headings. Never body. There is no third family. */
+  /* THE REGISTER CONTRAST IS THE TYPOGRAPHIC IDEA. Not serif against sans —
+     printed against working. --font-doc sets titles and the whole of a note;
+     --font-text sets essays and all apparatus. There is no third family, and
+     a role that seems to need one is a role that has not been assigned to a
+     register yet. */
 
   /* ==========================================================================
      4. TYPE SCALE
      Each role pairs a size with its line-height; they are not independent.
      ====================================================================== */
 
-  /* EVERY SIZE BELOW WAS RE-DERIVED WHEN THE BODY FACE BECAME ALEGREYA, and
-     the reason is one number: Alegreya sets 15% narrower than Literata with a
-     10% smaller x-height. Running text moved 20px -> 23px to keep the measure
-     at roughly 66 characters, and once the body moves, every size defined in
-     relation to it has to move or the relationship it encoded is gone. A 24px
-     deck over 23px body is not a deck. A 28px H2 over 23px body is barely a
-     heading.
+  /* RE-DERIVED AGAIN for Clarity City, and this time everything got SMALLER.
 
-     The sizes look large next to the old ones. They are not: 23px Alegreya
-     has about the x-height of 20.7px Literata, so the page reads at the size
-     it always did. A px value is only meaningful next to a face. */
+     Clarity City has a very large x-height — 0.517 of its em, against 0.456
+     for Alegreya — and sets wide. It reaches 66 characters on the 592px line
+     at 18px, where Alegreya needed 23px. Five pixels of difference between
+     two faces at the same measure, which is why a px value means nothing
+     without the face beside it.
+
+     18px will look small in this file and does not look small on the page:
+     18px Clarity City has a taller x-height than 20px Alegreya did.
+
+     The document face runs the other way. Goudy is small on the body, 0.415,
+     so a note needs MORE size than an essay to read at the same optical
+     weight — see --type-body-note-size. Two faces, opposite corrections,
+     which is exactly why the note register gets its own size token instead of
+     inheriting the essay's. */
 
   /* Post title, editorial register (essay, case). Spans the FIGURE width,
      breaking out of the body column. Alegreya at 900 — the only place the
      black weight is used.
 
-     Back to 64px from 80px. The 80px was compensation for Instrument Serif,
-     which had one light weight and could only assert itself through size.
-     Alegreya Black asserts itself through weight, so the size can come down
-     and the title stops shouting across the whole figure span. */
+     64px in Goudy Bookletter 1911, which has one weight and no bold. Unlike
+     Instrument Serif — the last single-weight face tried here, which needed
+     80px to stop being outshouted by its own deck — Goudy holds at 64 because
+     it sits on a much smaller body and the deck under it is now 22px rather
+     than 24. The title is the only place --font-doc appears outside a note. */
   --type-title-size: 4rem;          /* 64px */
   --type-title-leading: 1.0;
-  --type-title-weight: 900;
+  --type-title-weight: 400;
 
   /* Post title, document register (note). Stays within the body measure, and
      stays at --weight-semibold: a note is a filed sheet, and the black weight
@@ -183,13 +194,13 @@
   --type-title-note-leading: 1.15;
 
   /* Deck — the one-line standfirst under an editorial title. Body serif. */
-  --type-deck-size: 1.625rem;       /* 26px */
+  --type-deck-size: 1.375rem;       /* 22px */
   --type-deck-leading: 1.4;
 
   /* Deck as it appears in the index, where it is a summary line rather than a
      standfirst. Set below body size on purpose: an index that sets its decks
      at reading size competes with the posts it is pointing at. */
-  --type-index-deck-size: 1.125rem; /* 18px */
+  --type-index-deck-size: 1rem;     /* 16px */
   --type-index-deck-leading: 1.45;
 
   /* Running text. Body serif.
@@ -202,13 +213,22 @@
 
      So the column moved with it: 21px in a 592px column gives 66.9
      characters. Same measure, smaller type. See --grid-main-col. */
-  --type-body-size: 1.3125rem;      /* 21px */
+  --type-body-size: 1.125rem;       /* 18px */
   --type-body-leading: 1.6;
 
+  /* Running text in the DOCUMENT register — a note, set in Goudy.
+     22px, not the essay's 18. Goudy's x-height is 0.415 of its em against
+     Clarity City's 0.517, so matching the essay's px would set notes visibly
+     smaller than everything else on the site. 22 x 0.415 lands within a
+     rounding error of 18 x 0.517, which is the number that actually matters:
+     the two registers read at the same size even though they are set at
+     different ones. */
+  --type-body-note-size: 1.375rem;  /* 22px */
+
   /* Section headings. Body serif at --weight-semibold. */
-  --type-h2-size: 1.875rem;         /* 30px */
+  --type-h2-size: 1.625rem;         /* 26px */
   --type-h2-leading: 1.25;
-  --type-h3-size: 1.4375rem;        /* 23px */
+  --type-h3-size: 1.25rem;          /* 20px */
   --type-h3-leading: 1.3;
 
   /* Sans, small. Sidenotes and figure captions share a size deliberately —

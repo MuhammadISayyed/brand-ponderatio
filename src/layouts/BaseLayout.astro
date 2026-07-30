@@ -42,15 +42,12 @@ const currentPath = Astro.url.pathname;
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
 
-    {/* The serif is preloaded because it sets the first paint — it carries
-        the title and the prose both, now that they are one family. The
-        metadata sans is not: it carries datelines and captions, which can
-        afford one frame in the fallback. */}
-    <Font cssVariable="--font-body" preload />
-    <Font cssVariable="--font-meta" />
-
-    {/* For pages that bring their own faces — the specimen page. */}
-    <slot name="head" />
+    {/* Both are preloaded. Neither is optional on a first paint: the working
+        face carries the essay body and every label on the page, and the
+        document face carries the title above them — a title arriving a frame
+        late is the most visible reflow the page can have. */}
+    <Font cssVariable="--font-working" preload />
+    <Font cssVariable="--font-document" preload />
 
     {/* Cross-page fade. The animation itself is scoped to the main column
         below; ClientRouter is what makes the navigation client-side so the
@@ -128,7 +125,7 @@ const currentPath = Astro.url.pathname;
     padding: var(--space-2) var(--space-3);
     background: var(--paper);
     border: var(--rule-weight) solid var(--rule);
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
@@ -158,7 +155,7 @@ const currentPath = Astro.url.pathname;
   }
 
   .site-header__name {
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
@@ -175,7 +172,7 @@ const currentPath = Astro.url.pathname;
   }
 
   .site-header__nav a {
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
@@ -201,7 +198,7 @@ const currentPath = Astro.url.pathname;
     margin-block-start: var(--space-10);
     padding-block: var(--space-5) var(--space-8);
     border-block-start: var(--rule-weight) solid var(--rule);
-    font-family: var(--font-sans-meta);
+    font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
