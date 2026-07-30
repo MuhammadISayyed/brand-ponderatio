@@ -59,7 +59,17 @@ const postSchema = z
   .object({
     title: z.string().min(1, 'title must not be empty'),
     slug: slugSchema,
+
+    /** When it went up. */
     date: z.date(),
+
+    /**
+     * When it last changed materially. Optional, and it should stay optional:
+     * an "updated" date on a piece that has only had its typos fixed tells
+     * the reader something false. Set it when the ARGUMENT moved.
+     */
+    updated: z.date().optional(),
+
     kind: z.enum(KINDS),
 
     // OPTIONAL: a standfirst is a judgement about a particular piece, not a
@@ -85,6 +95,16 @@ const postSchema = z
           });
         }
         seen.add(source.key);
+      });
+    }
+
+    // An update that predates publication is a typo in one of the two dates,
+    // and it renders as a piece revised before it existed.
+    if (data.updated && data.updated < data.date) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['updated'],
+        message: `updated (${data.updated.toISOString().slice(0, 10)}) is before date (${data.date.toISOString().slice(0, 10)}).`,
       });
     }
   });
@@ -115,6 +135,14 @@ const groundingSchema = z.object({
   /** Position in the argument. 1-based, contiguous, unique — checked below. */
   part: z.number().int().positive(),
 
+  /** When it went up. A grounding publishes complete, so its parts normally
+   *  share one date; they are stored per part anyway, because a part is what
+   *  gets revised. */
+  date: z.date(),
+
+  /** When the argument in this part last moved. See the note on posts. */
+  updated: z.date().optional(),
+
   /**
    * One line of SUBSTANCE for the contents — what this part establishes, not
    * what it is about. A contents page of bare titles cannot show the shape of
@@ -129,6 +157,14 @@ const groundingSchema = z.object({
 
   sources: z.array(sourceSchema).optional(),
   draft: z.boolean().default(false),
+}).superRefine((data, ctx) => {
+  if (data.updated && data.updated < data.date) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['updated'],
+      message: `updated (${data.updated.toISOString().slice(0, 10)}) is before date (${data.date.toISOString().slice(0, 10)}).`,
+    });
+  }
 });
 
 const groundings = defineCollection({

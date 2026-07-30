@@ -14,8 +14,10 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import { formatDateline, kindLabel, machineDate } from '../lib/format';
+import { kindLabel } from '../lib/format';
 import Breadcrumb from '../components/Breadcrumb.astro';
+import ArticleMeta from '../components/ArticleMeta.astro';
+import Byline from '../components/Byline.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
 
 interface Props {
@@ -23,7 +25,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, deck, date, kind, tags, sources } = post.data;
+const { title, deck, date, updated, kind, tags, sources } = post.data;
 
 /**
  * Both directions are audited, because both are silent failures otherwise: a
@@ -64,16 +66,21 @@ const citedCounts = scanCitations(post.body ?? '');
     <header class="article__header">
       <div class="article__topline">
         <Breadcrumb trail={[{ href: '/essays/', label: 'Essays' }]} />
-        <p class="article__meta label">
-          <span>{kindLabel(kind)}</span>
-          <time datetime={machineDate(date)}>{formatDateline(date)}</time>
-        </p>
       </div>
+
       <h1 class="article__title display-title">{title}</h1>
-      {/* Optional. A standfirst is a judgement about a particular piece; a
-          piece that does not want one gets a title and then its first
-          sentence, which is how most good essays open anyway. */}
-      {deck && <p class="article__deck">{deck}</p>}
+
+      <div class="article__aside">
+        <ArticleMeta kind={kindLabel(kind)} published={date} updated={updated} />
+      </div>
+
+      <div class="article__lede">
+        {/* Optional. A standfirst is a judgement about a particular piece; a
+            piece that does not want one gets a title and then its first
+            sentence, which is how most good essays open anyway. */}
+        {deck && <p class="article__deck">{deck}</p>}
+        <Byline />
+      </div>
     </header>
 
     <div class="prose">

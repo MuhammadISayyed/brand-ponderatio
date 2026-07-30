@@ -16,8 +16,15 @@ interface Props {
   description?: string;
 }
 
-const SITE_TITLE = 'Muhammad Ibrahim';
-const SITE_DESCRIPTION = 'Essays, cases and working notes.';
+/**
+ * The site is PONDERATIO; the author is Muhammad Ibrahim. Keeping the two
+ * apart is what lets the header carry a mark and the articles carry a byline
+ * — the emblem says whose publication this is, the byline says who wrote the
+ * thing you are reading.
+ */
+const SITE_TITLE = 'Ponderatio';
+const SITE_DESCRIPTION =
+  'Essays and groundings — long arguments, published complete.';
 
 const { title, description = SITE_DESCRIPTION } = Astro.props;
 
@@ -43,7 +50,8 @@ const currentPath = Astro.url.pathname;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* The emblem is the favicon too — one mark, everywhere it appears. */}
+    <link rel="icon" type="image/svg+xml" href="/emblem.svg" />
     <link rel="icon" href="/favicon.ico" />
 
     <title>{documentTitle}</title>
@@ -70,7 +78,9 @@ const currentPath = Astro.url.pathname;
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header">
-      <a class="site-header__name" href="/">{SITE_TITLE}</a>
+      <a class="site-header__mark" href="/" aria-label={`${SITE_TITLE} — home`}>
+        <img src="/emblem.svg" alt="" width="24" height="29" />
+      </a>
       <nav aria-label="Sections">
         <ul class="site-header__nav">
           {
@@ -158,21 +168,28 @@ const currentPath = Astro.url.pathname;
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-4) var(--space-6);
-    align-items: baseline;
+    /* Centred rather than baseline-aligned: the mark is an image and has no
+       baseline to align to, so baseline alignment hung it above the nav. */
+    align-items: center;
     justify-content: space-between;
     padding-block: var(--space-6) var(--space-9);
   }
 
-  .site-header__name {
-    font-family: var(--font-text);
-    font-size: var(--type-label-size);
-    letter-spacing: var(--type-label-tracking);
-    text-transform: var(--type-label-transform);
-    font-weight: var(--weight-medium);
-    /* The site name is navigation, not a link in running text — no accent,
-       no underline until it is hovered. */
-    color: var(--ink);
-    text-decoration: none;
+  /* The emblem replaces the wordmark. It is the one place the accent appears
+     as IDENTITY rather than as a mark that carries information — recorded as
+     an exception in tokens.css rather than left to look like a slip. */
+  .site-header__mark {
+    display: block;
+    line-height: 0;
+  }
+
+  .site-header__mark img {
+    display: block;
+    /* Height-led, because the emblem is portrait and the header is a line of
+       text: matching its height to the nav's cap height is what makes them
+       sit as one row. */
+    height: 1.75rem;
+    width: auto;
   }
 
   .site-header__nav {
@@ -189,7 +206,10 @@ const currentPath = Astro.url.pathname;
     text-decoration: none;
   }
 
-  .site-header__name:hover,
+  .site-header__mark:hover {
+    opacity: 0.75;
+  }
+
   .site-header__nav a:hover {
     text-decoration: underline;
     text-underline-offset: 0.3em;

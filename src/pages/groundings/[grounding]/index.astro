@@ -27,12 +27,17 @@ const parts = await getParts(grounding!);
     <header class="article__header">
       <div class="article__topline">
         <Breadcrumb trail={[{ href: '/groundings/', label: 'Groundings' }]} />
-        <p class="article__meta label">
-          <span>{roman(parts.length)} parts</span>
-        </p>
       </div>
+
       <h1 class="article__title display-title">{work.title}</h1>
-      <p class="article__deck">{work.abstract}</p>
+
+      <div class="article__aside">
+        <p class="label spine__count">{roman(parts.length)} parts</p>
+      </div>
+
+      <div class="article__lede">
+        <p class="article__deck">{work.abstract}</p>
+      </div>
     </header>
 
     <ol class="contents">
@@ -58,6 +63,18 @@ const parts = await getParts(grounding!);
 </BaseLayout>
 
 <style>
+  .spine__count {
+    text-align: end;
+    color: var(--ink);
+  }
+
+  @media (max-width: 56.25em) {
+    .spine__count {
+      text-align: start;
+      margin-block-end: var(--space-5);
+    }
+  }
+
   /* The contents spans the whole grid so each entry can put its numeral in
      the margin column — the same edge the index metadata and figure numbers
      align to, so the page keeps one vertical line for apparatus. */

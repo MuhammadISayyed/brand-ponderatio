@@ -29,10 +29,33 @@
   margin-inline: auto;
 }
 
+/* A SUBGRID OF TWO ROWS. The title takes the full span in the first; the
+   second puts the metadata in the margin column and the deck in the main one.
+
+   This is what lets the apparatus sit in the margin WITHOUT being landed on:
+   sidenotes float out of the prose into that column, and anything the grid
+   places in the prose row can be collided with — which is exactly what
+   happened the first time the dateline lived there. The header row is above
+   the prose and cannot be reached. */
 .article__header {
+  display: grid;
   grid-column: 1 / -1;
   grid-row: 1;
+  grid-template-columns: subgrid;
   margin-block-end: var(--space-8);
+}
+
+.article__topline,
+.article__title {
+  grid-column: 1 / -1;
+}
+
+.article__aside {
+  grid-column: 1;
+}
+
+.article__lede {
+  grid-column: 3;
 }
 
 .prose {
@@ -113,6 +136,12 @@
 }
 
 @media (max-width: 56.25em) {
+  .article__header {
+    display: block;
+  }
+}
+
+@media (max-width: 56.25em) {
   /* Duplicated from --bp-margin-collapse; media conditions cannot read
      custom properties.
 
@@ -136,6 +165,7 @@
 }
 
 .article__deck {
+  margin-block: 0;
   font-family: var(--font-text);
   /* Italic. A deck is not a short first paragraph — it is the editor's
      voice rather than the author's, and the italic is what tells a reader

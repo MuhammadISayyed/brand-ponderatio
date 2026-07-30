@@ -1,0 +1,61 @@
+---
+/**
+ * Who wrote the thing you are reading.
+ *
+ * The site is Ponderatio and the header carries its emblem; this carries a
+ * person. Keeping the two apart is the whole reason both can be quiet — the
+ * mark says whose publication this is, the byline says who is talking.
+ *
+ * THE PORTRAIT IS OPTIONAL AND CURRENTLY ABSENT. Drop a square image at
+ * public/author.jpg (or .webp, and change the constant) and it appears. Until
+ * then the byline renders as a name alone rather than as an empty circle,
+ * because a placeholder ring is a promise the page cannot keep.
+ */
+const AUTHOR = 'Muhammad Ibrahim';
+
+/**
+ * Set to the file's path once a portrait exists. It is a constant rather than
+ * a prop because there is one author; when there are two this becomes a
+ * parameter and nothing else changes.
+ */
+const PORTRAIT: string | null = null;
+---
+
+<p class="byline">
+  {
+    PORTRAIT && (
+      <img class="byline__portrait" src={PORTRAIT} alt="" width="72" height="72" />
+    )
+  }
+  <span class="byline__name">{AUTHOR}</span>
+</p>
+
+<style>
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block: var(--space-5) 0;
+  }
+
+  .byline__portrait {
+    /* Fixed square, clipped to a circle — a portrait that is not square gets
+       cropped to centre rather than squashed. */
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+    /* The cream is light enough that a portrait can bleed into it; the
+       hairline gives the circle an edge without drawing one. */
+    box-shadow: 0 0 0 var(--rule-weight) var(--rule);
+  }
+
+  .byline__name {
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--ink);
+  }
+</style>

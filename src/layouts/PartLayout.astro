@@ -14,6 +14,8 @@ import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
 import Breadcrumb from '../components/Breadcrumb.astro';
+import ArticleMeta from '../components/ArticleMeta.astro';
+import Byline from '../components/Byline.astro';
 import {
   GROUNDINGS, groundingHref, partHref, roman, type Part,
 } from '../lib/groundings';
@@ -29,7 +31,7 @@ interface Props {
 
 const { grounding, part, total, previous, next } = Astro.props;
 const work = GROUNDINGS[grounding];
-const { title, deck, sources } = part.data;
+const { title, deck, date, updated, sources } = part.data;
 const n = part.data.part;
 
 // Same audit as an essay, same reasons — see lib/citations. Per part, because
@@ -77,10 +79,6 @@ const citedCounts = scanCitations(part.body ?? '');
 
   <article class="article">
     <header class="article__header">
-      {/* Breadcrumb left, position right — one line doing two jobs, separated
-          by position rather than by styling. The crumb carries the
-          grounding's FULL title, which is the whole reason `short` was
-          deleted. It ends at the parent; the h1 below says the rest. */}
       <div class="article__topline">
         <Breadcrumb
           trail={[
@@ -88,13 +86,22 @@ const citedCounts = scanCitations(part.body ?? '');
             { href: groundingHref(grounding), label: work.title },
           ]}
         />
-        <p class="article__meta label">
-          <span>Part {roman(n)} of {roman(total)}</span>
-        </p>
       </div>
 
       <h1 class="article__title display-title">{title}</h1>
-      {deck && <p class="article__deck">{deck}</p>}
+
+      <div class="article__aside">
+        <ArticleMeta
+          kind={`Part ${roman(n)} of ${roman(total)}`}
+          published={date}
+          updated={updated}
+        />
+      </div>
+
+      <div class="article__lede">
+        {deck && <p class="article__deck">{deck}</p>}
+        <Byline />
+      </div>
     </header>
 
     <div class="prose">
