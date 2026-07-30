@@ -52,8 +52,15 @@
 
   /* Cinnabar — seal red. The ONLY accent allowed in running text.
      Permitted: links, focus states, the single load-bearing element in a
-     diagram, the rule beside an index entry, the "filed under" line on a note.
+     diagram, the rule beside an index entry, the "filed under" line on a
+     note, and both numerals of a sidenote pair.
      Not permitted: decoration, backgrounds, borders that carry no meaning.
+
+     The sidenote numerals were added to that list rather than smuggled past
+     it. A marker exists to send the reader somewhere — it is a link in every
+     sense but the markup — and the note's numeral sends them back. In muted
+     grey they read as punctuation the eye learns to skip, which is precisely
+     what a pointer must not be.
 
      It is a stamp colour rather than an earth colour, and that is the point:
      everything this accent does in this system is MARK something. The oxide

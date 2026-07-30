@@ -4,15 +4,31 @@
  *
  *   Some claim in the text.<Sidenote>The qualification to it.</Sidenote>
  *
- * Renders two spans — the in-text marker and the note body — numbered by two
- * CSS counters that stay in step because the pair is always emitted together.
- * All positioning lives in EssayLayout; this component only marks up.
+ * Renders a linked pair — the in-text marker and the note body — each pointing
+ * at the other. All positioning lives in EssayLayout; this component owns the
+ * markup, the number and the anchors.
  *
  * Only meaningful inside the editorial register. A note has no margin column,
  * so a sidenote in one would render inline with nowhere to go.
  */
+import { nextSidenoteNumber } from '../lib/sidenote-counter';
+
+const n = nextSidenoteNumber(Astro.request);
+const noteId = `sn-${n}`;
+const refId = `snref-${n}`;
 ---
 
-<span class="sidenote-ref" aria-hidden="true"></span><span class="sidenote"
-  ><slot /></span
+{/* The marker is a real link, not a decorative superscript. On a wide screen
+    the note is already in view and the jump is a no-op — but once several
+    notes stack, a note can sit well below the sentence that introduced it, and
+    on a phone the reader may have scrolled past it entirely. The return link
+    on the note's own numeral is the half that actually earns its keep: it puts
+    you back at the word you left. */}<a
+  class="sidenote-ref"
+  id={refId}
+  href={`#${noteId}`}
+  aria-label={`Go to sidenote ${n}`}>{n}</a
+><span class="sidenote" id={noteId}
+  ><a class="sidenote__num" href={`#${refId}`} aria-label={`Back to sidenote ${n} in the text`}>{n}</a
+  ><span class="sidenote__body"><slot /></span></span
 >

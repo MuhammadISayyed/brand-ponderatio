@@ -223,30 +223,37 @@ const { title, deck, date, kind, tags, sources } = post.data;
      sits inside a `<p>`, where flow content is the only thing permitted.
      ====================================================================== */
 
-  .prose {
-    counter-reset: sidenote-ref sidenote-body;
-  }
+  /* ---- The marker ------------------------------------------------------ */
 
   .sidenote-ref {
-    counter-increment: sidenote-ref;
-  }
-
-  .sidenote-ref::after {
-    content: counter(sidenote-ref);
     font-family: var(--font-sans-meta);
     font-size: 0.6em;
+    font-variant-numeric: lining-nums tabular-nums;
     /* `super` rather than a shifted baseline: it keeps the marker out of the
        line box, so a marked line is not spaced differently from its
        neighbours. */
     vertical-align: super;
-    color: var(--muted);
-    /* A thin space before the marker, so it does not collide with the word
-       it follows. */
+    /* Cinnabar. The marker is a pointer — it exists to send the reader
+       somewhere — which is the same job a link does, and the same reason the
+       accent is allowed in running text at all. In muted grey it read as
+       punctuation the eye could skip. */
+    color: var(--accent);
+    text-decoration: none;
+    /* A thin space before the marker, so it does not collide with the word it
+       follows, and enough padding after it to be a credible tap target at
+       this size. */
     margin-inline-start: 0.15em;
+    padding-inline: 0.1em 0.2em;
   }
 
+  .sidenote-ref:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ---- The note -------------------------------------------------------- */
+
   .sidenote {
-    counter-increment: sidenote-body;
     display: block;
     float: inline-start;
     clear: inline-start;
@@ -264,13 +271,68 @@ const { title, deck, date, kind, tags, sources } = post.data;
     line-height: var(--type-sidenote-leading);
     color: var(--ink-2);
     text-align: start;
+    /* The numeral hangs in this padding rather than sitting inside the text,
+       so every line of the note starts on the same vertical edge. Inline, the
+       first line was indented by the width of the number and the rest were
+       not — a reverse hanging indent, which is the one arrangement nobody
+       chooses on purpose. */
+    position: relative;
+    padding-inline-start: 1.35rem;
   }
 
-  .sidenote::before {
-    /* Counter, then an en space — a literal space in `content` is not
-       collapsed, but an en space is the width this actually wants. */
-    content: counter(sidenote-body) '\2002';
-    color: var(--muted);
+  .sidenote__num {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .sidenote__num:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ---- Pairing ---------------------------------------------------------
+     With several notes stacked in the margin, the reader's real question is
+     which note belongs to which sentence. Matching numerals by eye across
+     200px of whitespace is work. Touching either end of a pair lights up
+     both, so the answer arrives without the reader having to ask it.
+
+     `:has()` is what makes the reverse direction possible — the note comes
+     after its marker in the DOM, so the marker can be selected by what
+     follows it.
+
+     No transition. The motion doctrine in tokens.css permits scroll-built
+     diagrams and nothing else; a highlight that fades is text moving. ---- */
+
+  .sidenote-ref:hover + .sidenote,
+  .sidenote-ref:focus-visible + .sidenote,
+  .sidenote:hover,
+  .sidenote:focus-within,
+  .sidenote:target {
+    background: var(--ground);
+    /* Bleeds the highlight past the text edge so it reads as a marked block
+       rather than as a background accidentally left on. */
+    box-shadow: 0 0 0 var(--space-2) var(--ground);
+    border-radius: 1px;
+  }
+
+  .sidenote-ref:hover,
+  .sidenote-ref:focus-visible,
+  .sidenote:hover .sidenote__num,
+  .sidenote:target .sidenote__num,
+  .prose:has(.sidenote:hover) .sidenote-ref:has(+ .sidenote:hover),
+  .prose:has(.sidenote:target) .sidenote-ref:has(+ .sidenote:target) {
+    font-weight: var(--weight-semibold);
+  }
+
+  /* Jumping to either end must not park it under the top edge of the
+     viewport, or the reader arrives at something they cannot see. */
+  .sidenote,
+  .sidenote-ref {
+    scroll-margin-block: var(--space-8);
   }
 
   /* ==========================================================================
@@ -312,10 +374,31 @@ const { title, deck, date, kind, tags, sources } = post.data;
       inline-size: auto;
       margin-inline-start: 0;
       margin-block: var(--space-4);
-      padding-inline-start: var(--space-4);
+      /* Room for the hanging numeral plus the rule that marks the aside. */
+      padding-inline-start: var(--space-6);
       border-inline-start: var(--rule-weight) solid var(--rule);
       font-size: var(--type-sidenote-inline-size);
     }
 
+    .sidenote__num {
+      inset-inline-start: var(--space-4);
+    }
+
+    /* Collapsed, the note sits directly beneath its own sentence and there is
+       no ambiguity about which marker it belongs to. The pairing highlight
+       would be answering a question nobody is asking, and the inset shadow
+       fights the rule, so it comes off. */
+    .sidenote-ref:hover + .sidenote,
+    .sidenote-ref:focus-visible + .sidenote,
+    .sidenote:hover,
+    .sidenote:focus-within,
+    .sidenote:target {
+      background: none;
+      box-shadow: none;
+    }
+
+    .sidenote:target {
+      border-inline-start-color: var(--accent);
+    }
   }
 </style>
