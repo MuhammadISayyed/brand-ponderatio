@@ -100,6 +100,23 @@ if (supersededBy) {
     max-width: var(--grid-note-measure);
   }
 
+  /* A note's sections are closer together than an essay's. The global heading
+     spacing is set for a 640px column in a long argument, where the break has
+     to survive a screen of text either side of it; on a 52-character sheet
+     four lines long it just punches a hole in the paper. */
+  .note-prose :global(h2) {
+    margin-block: var(--space-7) var(--space-3);
+  }
+
+  .note-prose :global(h3) {
+    margin-block: var(--space-5) var(--space-2);
+  }
+
+  /* The sheet opens with its first line, not with space. */
+  .note-prose :global(> :first-child) {
+    margin-block-start: 0;
+  }
+
   /* ==========================================================================
      DOCUMENT HEADER
      Sans, small, tracked — the sheet identifies itself before it says
