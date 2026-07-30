@@ -79,35 +79,38 @@ rule that holds to a rule that mostly holds.
   {/* Static, deliberately. The diagram house style and the GSAP build
       animation land in a later step; this exists to prove the figure breakout
       and the caption, and to be replaced by something that moves. */}
-  {/* viewBox is 640 wide to match --grid-main-col exactly, so the diagram
+  {/* viewBox matches --grid-main-col exactly, so the diagram
       renders 1:1 and its stroke weights and label sizes are the ones the
       house style specifies. A viewBox wider than the column would scale
-      1.25px strokes down to sub-pixel and 13px labels to about 9px. */}
-  <svg viewBox="0 0 640 220" role="img" aria-labelledby="fig-1-title">
+      1.25px strokes down to sub-pixel and 13px labels to about 9px.
+
+      Follows --grid-main-col: it was 640 and is now 592. A diagram drawn 1:1
+      is only 1:1 until the column moves. */}
+  <svg viewBox="0 0 592 220" role="img" aria-labelledby="fig-1-title">
     <title id="fig-1-title">
       Twelve unconnected nodes on the left; on the right, five nodes joined
       into a structure with one load-bearing node marked.
     </title>
 
     <g fill="var(--diagram-node-fill)" stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)">
-      <circle cx="30" cy="40" r="7" /><circle cx="100" cy="40" r="7" /><circle cx="170" cy="40" r="7" /><circle cx="240" cy="40" r="7" />
-      <circle cx="30" cy="100" r="7" /><circle cx="100" cy="100" r="7" /><circle cx="170" cy="100" r="7" /><circle cx="240" cy="100" r="7" />
-      <circle cx="30" cy="160" r="7" /><circle cx="100" cy="160" r="7" /><circle cx="170" cy="160" r="7" /><circle cx="240" cy="160" r="7" />
+      <circle cx="28" cy="40" r="7" /><circle cx="92" cy="40" r="7" /><circle cx="157" cy="40" r="7" /><circle cx="222" cy="40" r="7" />
+      <circle cx="28" cy="100" r="7" /><circle cx="92" cy="100" r="7" /><circle cx="157" cy="100" r="7" /><circle cx="222" cy="100" r="7" />
+      <circle cx="28" cy="160" r="7" /><circle cx="92" cy="160" r="7" /><circle cx="157" cy="160" r="7" /><circle cx="222" cy="160" r="7" />
     </g>
 
     <g stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)" fill="none">
-      <path d="M390 40 L470 100" /><path d="M550 40 L470 100" />
-      <path d="M470 100 L390 160" /><path d="M470 100 L550 160" />
+      <path d="M361 40 L435 100" /><path d="M509 40 L435 100" />
+      <path d="M435 100 L361 160" /><path d="M435 100 L509 160" />
     </g>
     <g fill="var(--diagram-node-fill)" stroke="var(--diagram-node-stroke)" stroke-width="var(--diagram-stroke-weight)">
-      <circle cx="390" cy="40" r="7" /><circle cx="550" cy="40" r="7" />
-      <circle cx="390" cy="160" r="7" /><circle cx="550" cy="160" r="7" />
+      <circle cx="361" cy="40" r="7" /><circle cx="509" cy="40" r="7" />
+      <circle cx="361" cy="160" r="7" /><circle cx="509" cy="160" r="7" />
     </g>
-    <circle cx="470" cy="100" r="7" fill="var(--diagram-accent)" stroke="var(--diagram-accent)" stroke-width="var(--diagram-stroke-weight)" />
+    <circle cx="435" cy="100" r="7" fill="var(--diagram-accent)" stroke="var(--diagram-accent)" stroke-width="var(--diagram-stroke-weight)" />
 
     <g fill="var(--diagram-label-color)" font-family="var(--font-sans-meta)" font-size="var(--diagram-label-size)">
-      <text x="30" y="205">Twelve options</text>
-      <text x="390" y="205">Five options that compose</text>
+      <text x="28" y="205">Twelve options</text>
+      <text x="361" y="205">Five options that compose</text>
     </g>
   </svg>
   <figcaption>

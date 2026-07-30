@@ -256,11 +256,34 @@
     text-decoration-thickness: 2px;
   }
 
-  /* A citation is an ordinary link — accent, underlined — because that is
-     what it is, and a link styled to hide is a link the reader will not use.
-     Four or five author names across a long essay is not a wall of colour. */
+  /* A citation is NOT styled as an ordinary link, and the distinction is the
+     point: a link takes you off the page, a citation points at the foot of
+     the one you are reading. Styling them alike promises a journey the
+     citation does not make.
+
+     So there are two treatments for two destinations:
+       solid underline, cinnabar   leaves the page
+       dotted underline, ink       points down the page
+
+     Dotted-for-reference is an old convention and it survives here because it
+     is legible without colour — the underline still marks it as interactive
+     for a reader who cannot see the hue. On hover and focus it resolves to
+     the ordinary link treatment, which is the moment the reader has committed
+     and the accent is doing real work. */
   .cite {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: var(--muted);
     text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  .cite:hover,
+  .cite:focus-visible {
+    color: var(--accent);
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
   }
 
   /* Visible only to screen readers. */

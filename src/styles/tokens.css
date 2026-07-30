@@ -179,29 +179,36 @@
   /* Post title, document register (note). Stays within the body measure, and
      stays at --weight-semibold: a note is a filed sheet, and the black weight
      would give it the authority of a published argument. */
-  --type-title-note-size: 2.125rem; /* 34px */
+  --type-title-note-size: 2rem;     /* 32px */
   --type-title-note-leading: 1.15;
 
   /* Deck — the one-line standfirst under an editorial title. Body serif. */
-  --type-deck-size: 1.75rem;        /* 28px */
+  --type-deck-size: 1.625rem;       /* 26px */
   --type-deck-leading: 1.4;
 
   /* Deck as it appears in the index, where it is a summary line rather than a
      standfirst. Set below body size on purpose: an index that sets its decks
      at reading size competes with the posts it is pointing at. */
-  --type-index-deck-size: 1.1875rem; /* 19px */
+  --type-index-deck-size: 1.125rem; /* 18px */
   --type-index-deck-leading: 1.45;
 
-  /* Running text. Body serif. See the note above on why this is 23 and not
-     20 — it is the size that holds the measure, not a decision about
-     largeness. */
-  --type-body-size: 1.4375rem;      /* 23px */
+  /* Running text. Body serif.
+     21px, down from the 23px this face first shipped at. 23 was arrived at by
+     holding the 640px column fixed and asking what size filled it to 66
+     characters — which answered the wrong question. The measure is the
+     constraint; the column is a free variable. Reading size was set by the
+     column instead of the other way round, and the type came out larger than
+     anyone wanted.
+
+     So the column moved with it: 21px in a 592px column gives 66.9
+     characters. Same measure, smaller type. See --grid-main-col. */
+  --type-body-size: 1.3125rem;      /* 21px */
   --type-body-leading: 1.6;
 
   /* Section headings. Body serif at --weight-semibold. */
-  --type-h2-size: 2rem;             /* 32px */
+  --type-h2-size: 1.875rem;         /* 30px */
   --type-h2-leading: 1.25;
-  --type-h3-size: 1.5625rem;        /* 25px */
+  --type-h3-size: 1.4375rem;        /* 23px */
   --type-h3-leading: 1.3;
 
   /* Sans, small. Sidenotes and figure captions share a size deliberately —
@@ -242,7 +249,7 @@
      5. GRID
      Content caps at 1080px. The margin column carries apparatus; the main
      column carries prose at roughly 66 characters.
-     Figure span = margin + gutter + main = 190 + 48 + 640 = 878px.
+     Figure span = margin + gutter + main = 190 + 48 + 592 = 830px.
      Post TITLES use the figure span. Figures do not — see below.
      ====================================================================== */
 
@@ -289,27 +296,31 @@
      ----------------------------------------------------------------------- */
   --grid-margin-col: 11.875rem; /* 190px — sidenotes and figure numbers */
   --grid-gutter: 3rem;          /* 48px */
-  /* 640px. Measured, not assumed: rendered in ALEGREYA at 23px this column
-     holds 66.4 characters per line, median 67 (counted from real line boxes
-     across 40 full lines of the sample essay, with each paragraph's ragged
-     last line and the drop-cap paragraph excluded). That is the essay target,
-     hit almost exactly.
+  /* 592px. Measured, not assumed: rendered in ALEGREYA at 21px this column
+     holds 66.9 characters per line (counted from real line boxes, with each
+     paragraph's ragged last line and the drop-cap paragraph excluded).
 
      The classic alphabet-advance estimate reads low — it ignores the space
      glyph, which is narrower than the mean lowercase letter — so the
      empirical count is the one to trust.
 
-     Measured three times now, once per body face:
-       Source Serif 4  20px   64.4
-       Literata        20px   64.9
-       Alegreya        20px   76.8   <- too long, which is why the size moved
-       Alegreya        23px   66.4   <- shipping
+     Every measurement taken so far:
+       Source Serif 4  20px  640px   64.4
+       Literata        20px  640px   64.9
+       Alegreya        20px  640px   76.8   too long
+       Alegreya        23px  640px   66.4   held the measure, type too big
+       Alegreya        21px  592px   66.9   shipping
 
-     Note what the third row shows: the column did not change, the face did,
-     and the measure went ten characters out. The number belongs to the face
-     and not to this token. Note CN-014 records the method. */
-  --grid-main-col: 40rem;
-  /* 878px. The title breaks out to this, and it is the width the whole grid
+     The last two rows are the useful pair. Both hit the target; only one is
+     comfortable to read. Holding the column fixed and solving for size makes
+     reading size a consequence of a number nobody chose — 640px was an
+     inherited grid, not a decision about type. Solving for BOTH gives the
+     same measure at a size a person would pick.
+
+     Two free variables, one constraint. Note CN-014 records the method but
+     not this trap, which is worth adding when it is superseded. */
+  --grid-main-col: 37rem;
+  /* 830px. The title breaks out to this, and it is the width the whole grid
      is centred at. Despite the name, a FIGURE DOES NOT USE IT.
 
      Diagrams are set to --grid-main-col, flush with the prose. A diagram is
@@ -320,7 +331,7 @@
      and is the point.
 
      The name is kept because the grid arithmetic still refers to this span. */
-  --grid-figure-span: 54.875rem;
+  --grid-figure-span: 51.875rem;
 
   /* Notes are set narrower than essays on purpose. The narrowness is part of
      what makes a note feel filed rather than published; it is not a rounding
