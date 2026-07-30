@@ -116,10 +116,7 @@
      recurs, and the reason nothing else needs a line under it.
      ====================================================================== */
 
-  .stub::before,
-  /* Sätteri generates the footnotes section, so it cannot be given the class
-     in markup and is named here instead. */
-  .prose .footnotes::before {
+  .stub::before {
     content: '';
     display: block;
     inline-size: var(--rule-stub-length);
@@ -403,37 +400,19 @@
   }
 
   /* ==========================================================================
-     FOOTNOTES (GFM)
-     Sätteri emits these as a `<section class="footnotes">`. They are set in
-     the metadata sans at sidenote size: same register as the margin column,
-     even though they land at the foot.
+     FOOTNOTES — deliberately unstyled. See the apparatus doctrine in
+     tokens.css.
+
+     GFM footnote syntax still parses; `gfm: true` also gives us tables, and
+     turning it off to kill footnotes would cost more than it saves. So this
+     is not disabled, it is undesigned. A `[^x]` that reaches a page will
+     render as a bare browser-default list at the foot, visibly unlike
+     everything around it.
+
+     That is the intended behaviour, not an oversight. It is the loud failure:
+     the aside is in the wrong channel and the page says so, rather than
+     quietly growing a second apparatus system with its own numbering.
      ====================================================================== */
-
-  /* Marked with the stub, not divided with a rule — the same treatment as the
-     sources block at the foot of a post, because it is the same thing:
-     apparatus following the argument. */
-  .prose .footnotes {
-    margin-block-start: var(--space-9);
-    font-family: var(--font-sans-meta);
-    font-size: var(--type-sidenote-size);
-    line-height: var(--type-sidenote-leading);
-    color: var(--ink-2);
-  }
-
-  .prose .footnotes h2 {
-    /* The generated "Footnotes" heading is scaffolding for screen readers.
-       It stays in the accessibility tree and out of the visual design. */
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .prose .footnotes ol {
-    list-style: decimal;
-  }
 
   /* ==========================================================================
      SELECTION

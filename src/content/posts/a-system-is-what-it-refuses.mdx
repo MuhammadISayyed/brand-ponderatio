@@ -174,7 +174,10 @@ moving prohibitions out of prose and into whatever fails the build. In this
 project a note that declares a `deck` does not render oddly; it does not
 render. The content schema rejects the frontmatter and the build stops, with
 a message that explains that notes are filed sheets rather than published
-arguments and carry a document header instead of a standfirst.[^enforcement]
+arguments and carry a document header instead of a
+standfirst.<Sidenote>The schema is also where the reason gets its best
+audience. Nobody reads a style guide at the moment of writing frontmatter;
+everybody reads the error that just stopped their build.</Sidenote>
 
 That is the same prohibition as the one in the prose, moved somewhere it does
 not depend on anyone remembering it. The prose version teaches; the schema
@@ -195,7 +198,3 @@ If nothing in the system pushes back — no build failure, no rule whose reason
 you would have to argue with, nothing that makes a wrong move feel wrong
 before it ships — then what you have is not a system. It is a mood board with
 a package name, and it will be replaced within the year by another one.
-
-[^enforcement]: The schema is also where the reason gets its best audience.
-    Nobody reads a style guide at the moment of writing frontmatter; everybody
-    reads the error that just stopped their build.

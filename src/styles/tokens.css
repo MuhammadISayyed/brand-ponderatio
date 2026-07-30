@@ -221,7 +221,34 @@
      ====================================================================== */
 
   --grid-content-max: 67.5rem;  /* 1080px — outer cap */
-  --grid-margin-col: 11.875rem; /* 190px — sources, sidenotes, Fig. N, dateline */
+
+  /* --------------------------------------------------------------------------
+     THE APPARATUS DOCTRINE — there are TWO channels, not three.
+
+       SIDENOTE   in the margin column, beside the sentence it belongs to.
+                  Carries a qualification the reader needs at that moment.
+       SOURCES    at the foot, unnumbered. Carries provenance, checked later,
+                  not pinned to any one sentence.
+
+     There are no footnotes. A footnote is a sidenote that lost its place: if
+     the aside belongs to a sentence it goes beside that sentence, and if it
+     belongs to the argument it goes in sources. Nothing was left over when
+     the two were separated this way — which is how we know the third channel
+     was never carrying anything.
+
+     It existed by accident. GFM footnotes arrived switched on with tables and
+     strikethrough, got styled because they were rendering, and were never
+     asked to justify themselves. The result was two numbering systems in one
+     document: a superscript 1 in the margin and a superscript 1 at the foot,
+     meaning different things, the second one louder because it inherited link
+     colour from being an anchor.
+
+     This column is also the reason the choice went this way rather than the
+     other. The grid is 190 + 48 + 640 BECAUSE the margin holds sidenotes.
+     Choose footnotes instead and this column holds nothing, and the measure
+     it produces is a number with no argument behind it.
+     ----------------------------------------------------------------------- */
+  --grid-margin-col: 11.875rem; /* 190px — sidenotes and figure numbers */
   --grid-gutter: 3rem;          /* 48px */
   /* 640px. Measured, not assumed: rendered in LITERATA at 20px this column
      holds 64.9 characters per line, median 67 (counted from real line boxes
