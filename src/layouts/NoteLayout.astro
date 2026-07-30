@@ -1,0 +1,183 @@
+---
+/**
+ * The document register: notes.
+ *
+ * A note is a filed sheet, not a published argument. It has no margin column,
+ * no deck, no sources block and no breakout figures — it has a document
+ * header, a narrow measure, and a sheet that sits on the ground colour.
+ *
+ * The sheet has a minimum height and its content is top-aligned. A short note
+ * leaves empty paper at the bottom of the sheet; it is never shrink-wrapped
+ * to its text and never vertically centred.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import { formatDateline, machineDate, postHref } from '../lib/format';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, date, ref, status, supersededBy, tags } = post.data;
+
+// The schema guarantees supersededBy names a valid reference code, but not
+// that a note with that code exists — nothing can enforce that at parse time.
+// Resolve it here so a dangling pointer fails the build rather than shipping
+// a note that claims a successor the reader cannot reach.
+let successor: CollectionEntry<'posts'> | undefined;
+if (supersededBy) {
+  const notes = await getCollection('posts', (p) => p.data.kind === 'note');
+  successor = notes.find((n) => n.data.ref === supersededBy);
+  if (!successor) {
+    throw new Error(
+      `${post.id}: supersededBy is "${supersededBy}" but no note carries that reference code.`,
+    );
+  }
+}
+---
+
+<BaseLayout title={title}>
+  <div class="note-ground">
+    <article class="note-sheet">
+      <header class="note-header">
+        <p class="note-header__row">
+          <span class="note-header__ref">{ref}</span>
+          <span class="note-header__status" data-status={status}>{status}</span>
+          <time datetime={machineDate(date)}>{formatDateline(date)}</time>
+        </p>
+        <h1 class="note-title">{title}</h1>
+      </header>
+
+      {
+        successor && (
+          <p class="note-superseded">
+            Superseded by <a href={postHref(successor.id)}>{supersededBy} · {successor.data.title}</a>
+          </p>
+        )
+      }
+
+      <div class="prose note-prose">
+        <slot />
+      </div>
+
+      {
+        tags.length > 0 && (
+          <p class="note-filed">Filed under {tags.join(' · ')}</p>
+        )
+      }
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ==========================================================================
+     SHEET
+     The ground colour appears here and nowhere else in the system: its only
+     job is to be the surface a note sheet sits on.
+     ====================================================================== */
+
+  .note-ground {
+    background: var(--ground);
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .note-sheet {
+    background: var(--paper);
+    border: var(--rule-hairline) solid var(--sheet-edge);
+    min-height: var(--note-sheet-min-height);
+    /* The measure is the constraint; the padding is added outside it, so the
+       sheet is as wide as 52 characters plus its own margins. */
+    max-width: calc(var(--grid-note-measure) + 2 * var(--space-7));
+    margin-inline: auto;
+    padding: var(--space-7);
+    /* Top-aligned, always. Short notes leave paper at the foot of the sheet
+       and that emptiness is the point. */
+    display: flow-root;
+  }
+
+  .note-prose {
+    max-width: var(--grid-note-measure);
+  }
+
+  /* ==========================================================================
+     DOCUMENT HEADER
+     Sans, small, tracked — the sheet identifies itself before it says
+     anything. The rule under it is the fold.
+     ====================================================================== */
+
+  .note-header {
+    padding-block-end: var(--space-4);
+    margin-block-end: var(--space-6);
+    border-block-end: var(--rule-weight) solid var(--rule);
+  }
+
+  .note-header__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: baseline;
+    margin-block-end: var(--space-4);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    color: var(--muted);
+  }
+
+  .note-header__ref {
+    /* The reference code is the sheet's identity — it is the one thing in the
+       header set in the reader's ink rather than in metadata grey. */
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+  }
+
+  .note-header__status[data-status='superseded'] {
+    /* A superseded note is still worth reading; the status is stated plainly
+       and struck, not hidden or greyed further. */
+    text-decoration: line-through;
+  }
+
+  .note-title {
+    /* The document title stays inside the measure. Breaking out to a display
+       size would make the sheet read as a publication. */
+    font-size: var(--type-title-note-size);
+    line-height: var(--type-title-note-leading);
+    max-width: var(--grid-note-measure);
+  }
+
+  /* ==========================================================================
+     SUPERSEDED
+     ====================================================================== */
+
+  .note-superseded {
+    margin-block-end: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--ground);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--ink-2);
+    max-width: var(--grid-note-measure);
+  }
+
+  /* ==========================================================================
+     FILED UNDER
+     One of the listed homes for the oxide accent: the rule that marks a note
+     as filed.
+     ====================================================================== */
+
+  .note-filed {
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--rule-weight) solid var(--accent);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    color: var(--muted);
+    /* Unlike the text on the sheet, this rule runs the sheet's full inner
+       width — it matches the rule under the document header, and the two
+       together are what bracket the note as a filed sheet. */
+  }
+</style>

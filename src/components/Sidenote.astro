@@ -1,0 +1,18 @@
+---
+/**
+ * A margin note. Authored inline in MDX at the point it annotates:
+ *
+ *   Some claim in the text.<Sidenote>The qualification to it.</Sidenote>
+ *
+ * Renders two spans — the in-text marker and the note body — numbered by two
+ * CSS counters that stay in step because the pair is always emitted together.
+ * All positioning lives in EssayLayout; this component only marks up.
+ *
+ * Only meaningful inside the editorial register. A note has no margin column,
+ * so a sidenote in one would render inline with nowhere to go.
+ */
+---
+
+<span class="sidenote-ref" aria-hidden="true"></span><span class="sidenote"
+  ><slot /></span
+>

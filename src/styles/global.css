@@ -1,0 +1,342 @@
+/* ============================================================================
+   GLOBAL
+   ----------------------------------------------------------------------------
+   Element defaults only. This file spends the tokens; it does not invent
+   values. Every number below is a var() — the two exceptions are `0` and
+   `100%`, which are structural rather than design decisions.
+
+   Layout lives in the layouts. This file answers "what does a paragraph, a
+   link, a list, a table look like" and nothing else.
+   ========================================================================= */
+
+@layer reset, base;
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd,
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  ol,
+  ul {
+    list-style: none;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@layer base {
+  html {
+    /* Tokens are sized against a 16px root. Setting a root font-size here
+       would break that and override the reader's browser setting, so it is
+       deliberately not set. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-serif-body);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-leading);
+    font-weight: var(--weight-regular);
+    /* Ligatures and proper kerning are the point of shipping a real serif. */
+    font-kerning: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ==========================================================================
+     HEADINGS
+     Display serif throughout. Sizes come from the scale; each is paired with
+     its own leading because the two are not independent.
+     ====================================================================== */
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif-display);
+    font-weight: var(--weight-regular);
+    /* Display sizes need the tracking pulled in; at 64px the default spacing
+       reads loose. */
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: var(--type-h2-size);
+    line-height: var(--type-h2-leading);
+    margin-block: var(--space-8) var(--space-4);
+  }
+
+  h3 {
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+    margin-block: var(--space-6) var(--space-3);
+  }
+
+  /* A heading immediately after another heading gets no stacked space. */
+  h2 + h3 {
+    margin-block-start: var(--space-4);
+  }
+
+  /* ==========================================================================
+     RUNNING TEXT
+     Paragraphs are separated by space, not indented. Both at once is a
+     double signal.
+     ====================================================================== */
+
+  p {
+    margin-block-end: var(--space-5);
+    /* Orphan control. `pretty` costs a little layout time and is worth it in
+       a column this narrow. */
+    text-wrap: pretty;
+  }
+
+  p:last-child {
+    margin-block-end: 0;
+  }
+
+  strong,
+  b {
+    font-weight: var(--weight-semibold);
+  }
+
+  em,
+  i {
+    /* The body serif ships a real italic; never let the browser synthesise. */
+    font-style: italic;
+    font-synthesis-style: none;
+  }
+
+  /* ==========================================================================
+     LINKS
+     The oxide accent is permitted here — this is one of its listed homes.
+     The underline is offset far enough to clear descenders, and thin enough
+     not to compete with the hairline rules.
+     ====================================================================== */
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+    /* Descenders break the rule rather than being struck through it. */
+    text-decoration-skip-ink: auto;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* ==========================================================================
+     FOCUS
+     Non-negotiable, always oxide. `:focus-visible` only — a mouse click on a
+     link should not draw a ring, but a keyboard tab must.
+     ====================================================================== */
+
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* ==========================================================================
+     LISTS
+     Markers hang outside the measure so the text edge stays flush with the
+     paragraphs above and below it.
+     ====================================================================== */
+
+  .prose ul,
+  .prose ol {
+    margin-block-end: var(--space-5);
+    padding-inline-start: var(--space-5);
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose li {
+    margin-block-end: var(--space-2);
+    padding-inline-start: var(--space-2);
+  }
+
+  .prose li::marker {
+    color: var(--muted);
+  }
+
+  /* GFM task lists. The checkbox is apparatus, not content. */
+  .prose li:has(> input[type='checkbox']) {
+    list-style: none;
+    padding-inline-start: 0;
+  }
+
+  .prose input[type='checkbox'] {
+    margin-inline-end: var(--space-2);
+    accent-color: var(--accent);
+  }
+
+  /* ==========================================================================
+     QUOTATIONS
+     No quotation marks, no italics, no indent-and-shrink. A hairline in the
+     margin and a colour step is enough to mark the change of voice.
+     ====================================================================== */
+
+  blockquote {
+    margin-block: var(--space-6);
+    padding-inline-start: var(--space-5);
+    border-inline-start: var(--rule-weight) solid var(--rule);
+    color: var(--ink-2);
+  }
+
+  /* ==========================================================================
+     CODE
+     There is no third family in this system, so code takes the browser's
+     monospace stack rather than importing one. It is rare enough on this site
+     that a shipped mono face would not earn its bytes.
+     ====================================================================== */
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* Mono x-heights run large next to a serif; step down to match. */
+    font-size: 0.85em;
+  }
+
+  :not(pre) > code {
+    padding: 0.1em 0.3em;
+    background: var(--ground);
+    border-radius: var(--diagram-node-radius);
+  }
+
+  pre {
+    margin-block: var(--space-6);
+    padding: var(--space-4);
+    background: var(--ground);
+    border: var(--rule-weight) solid var(--rule);
+    border-radius: var(--diagram-node-radius);
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+
+  /* ==========================================================================
+     RULES
+     ====================================================================== */
+
+  hr {
+    margin-block: var(--space-8);
+    border: 0;
+    border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  /* ==========================================================================
+     TABLES
+     A table is a document, not a card: hairlines, no zebra striping, no fills.
+     Wide tables scroll inside their own container rather than pushing the
+     page sideways — see `.table-scroll` in the layouts.
+     ====================================================================== */
+
+  .prose table {
+    width: 100%;
+    margin-block: var(--space-6);
+    border-collapse: collapse;
+    font-size: var(--type-sidenote-inline-size);
+    line-height: 1.45;
+  }
+
+  .prose th {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--muted);
+    text-align: start;
+  }
+
+  .prose th,
+  .prose td {
+    padding: var(--space-2) var(--space-3);
+    border-block-end: var(--rule-weight) solid var(--rule);
+    vertical-align: top;
+  }
+
+  .prose td:first-child,
+  .prose th:first-child {
+    padding-inline-start: 0;
+  }
+
+  /* ==========================================================================
+     FOOTNOTES (GFM)
+     Sätteri emits these as a `<section class="footnotes">`. They are set in
+     the metadata sans at sidenote size: same register as the margin column,
+     even though they land at the foot.
+     ====================================================================== */
+
+  .prose .footnotes {
+    margin-block-start: var(--space-8);
+    padding-block-start: var(--space-5);
+    border-block-start: var(--rule-weight) solid var(--rule);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--ink-2);
+  }
+
+  .prose .footnotes h2 {
+    /* The generated "Footnotes" heading is scaffolding for screen readers.
+       It stays in the accessibility tree and out of the visual design. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .prose .footnotes ol {
+    list-style: decimal;
+  }
+
+  /* ==========================================================================
+     SELECTION
+     ====================================================================== */
+
+  ::selection {
+    background: var(--ground);
+  }
+}

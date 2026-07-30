@@ -1,0 +1,336 @@
+---
+/**
+ * The editorial register: essays and cases.
+ *
+ * Three columns — margin, gutter, main — centred at the figure span. The
+ * title and any figure break out of the main column to that full span; the
+ * prose does not. The margin column carries the apparatus: dateline, sources,
+ * sidenotes, figure numbers.
+ *
+ * Below --bp-margin-collapse the grid becomes a single column and the
+ * apparatus falls into the flow. Because every region is placed explicitly by
+ * row and column, DOM order is already the collapsed order: dateline, prose,
+ * sources. The media query only has to switch the display mode.
+ */
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import { formatDateline, kindLabel, machineDate } from '../lib/format';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, deck, date, kind, tags, sources } = post.data;
+---
+
+<BaseLayout title={title} description={deck}>
+  <article class="essay">
+    <header class="essay__header">
+      <p class="essay__dateline label">
+        <span>{kindLabel(kind)}</span>
+        <time datetime={machineDate(date)}>{formatDateline(date)}</time>
+      </p>
+      <h1 class="essay__title">{title}</h1>
+      {/* The schema guarantees a deck on essay and case, so this is not a
+          conditional — a missing one is a build error, not an empty slot. */}
+      <p class="essay__deck">{deck}</p>
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <footer class="essay__foot">
+      {
+        sources && sources.length > 0 && (
+          <aside class="essay__sources" aria-labelledby="sources-heading">
+            <h2 id="sources-heading" class="label">
+              Sources
+            </h2>
+            <ul>
+              {sources.map((source) => (
+                <li>{source}</li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+
+      {
+        tags.length > 0 && (
+          <p class="essay__tags label">Filed under {tags.join(' · ')}</p>
+        )
+      }
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  /* ==========================================================================
+     GRID
+     ====================================================================== */
+
+  .essay {
+    display: grid;
+    grid-template-columns:
+      var(--grid-margin-col)
+      var(--grid-gutter)
+      var(--grid-main-col);
+    /* The grid is the figure span, not the content cap — the outer 1080px
+       lives on the page container in BaseLayout. */
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+  }
+
+  .essay__header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-block-end: var(--space-8);
+  }
+
+  .prose {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  /* The sources block sits at the foot of the post at every width, not only
+     below the collapse breakpoint.
+
+     This deviates from the token file, which lists sources as margin-column
+     apparatus. The two cannot share that column: sidenotes are floated out
+     of the prose and their vertical position is set by the paragraph that
+     introduces them, so nothing can stop one landing on top of a block that
+     was placed in the margin by the grid. Sidenotes have the stronger claim
+     — their position carries meaning — so the sources block moves out. */
+  .essay__foot {
+    grid-column: 3;
+    grid-row: 3;
+    margin-block-start: var(--space-9);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--rule-weight) solid var(--rule);
+  }
+
+  .essay__tags {
+    margin-block-start: var(--space-6);
+  }
+
+  /* ==========================================================================
+     HEADER
+     ====================================================================== */
+
+  /* The dateline sits above the title rather than in the margin column, for
+     the same reason the sources block moved: the margin column belongs to
+     the sidenotes, whose position is dictated by the prose. A sidenote in the
+     opening paragraph would land straight on top of it.
+
+     Above the title it still reads as a dateline, and it now runs the figure
+     span with the title instead of hanging beside the body text. */
+  .essay__dateline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    margin-block-end: var(--space-5);
+    padding-block-end: var(--space-3);
+    border-block-end: var(--rule-weight) solid var(--rule);
+  }
+
+  .essay__dateline span {
+    color: var(--ink);
+  }
+
+  .essay__title {
+    font-size: var(--type-title-size);
+    line-height: var(--type-title-leading);
+    margin-block-end: var(--space-5);
+  }
+
+  .essay__deck {
+    font-family: var(--font-serif-body);
+    font-size: var(--type-deck-size);
+    line-height: var(--type-deck-leading);
+    color: var(--ink-2);
+    /* The deck is a standfirst, not body text: it holds the main measure even
+       though the title above it runs the full figure span. */
+    max-width: var(--grid-main-col);
+    margin-block-end: 0;
+    text-wrap: pretty;
+  }
+
+  /* ==========================================================================
+     APPARATUS
+     Everything that is not the argument itself is metadata sans: dateline,
+     sources, tags. This is the register that separates them from the prose.
+     ====================================================================== */
+
+  .label {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--muted);
+    line-height: 1.4;
+    margin-block-end: 0;
+  }
+
+  .essay__sources ul {
+    margin-block-start: var(--space-4);
+    /* Two columns at the foot of the post: a source list set full-measure in
+       13px sans reads as an afterthought stretched thin. */
+    columns: 2;
+    column-gap: var(--grid-gutter);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--ink-2);
+  }
+
+  .essay__sources li {
+    /* Entries must not be split across the column break. */
+    break-inside: avoid;
+  }
+
+  .essay__sources li + li {
+    margin-block-start: var(--space-3);
+  }
+
+  /* ==========================================================================
+     COLLAPSE
+     ====================================================================== */
+
+  @media (max-width: 56.25em) {
+    /* Cannot be var(--bp-margin-collapse): media query conditions are
+       evaluated before custom properties resolve. The value is duplicated
+       from the token and must be changed in both places. */
+    .essay {
+      display: block;
+      max-width: var(--grid-main-col);
+    }
+
+    .essay__title {
+      /* At the collapsed width, 64px is no longer a title — it is a wall. */
+      font-size: clamp(2.25rem, 9vw, var(--type-title-size));
+    }
+
+    .essay__sources ul {
+      /* Two columns of 13px sans inside a phone-width measure is four words
+         a line. */
+      columns: 1;
+    }
+  }
+</style>
+
+<style is:global>
+  /* ==========================================================================
+     SIDENOTES
+     A sidenote is authored inline, at the point it annotates, and floats out
+     into the margin column from there — so it always lands beside its own
+     paragraph without any per-note positioning.
+
+     The float is on a `<span>` rather than an `<aside>` because the element
+     sits inside a `<p>`, where flow content is the only thing permitted.
+     ====================================================================== */
+
+  .prose {
+    counter-reset: sidenote-ref sidenote-body;
+  }
+
+  .sidenote-ref {
+    counter-increment: sidenote-ref;
+  }
+
+  .sidenote-ref::after {
+    content: counter(sidenote-ref);
+    font-family: var(--font-sans-meta);
+    font-size: 0.6em;
+    /* `super` rather than a shifted baseline: it keeps the marker out of the
+       line box, so a marked line is not spaced differently from its
+       neighbours. */
+    vertical-align: super;
+    color: var(--muted);
+    /* A thin space before the marker, so it does not collide with the word
+       it follows. */
+    margin-inline-start: 0.15em;
+  }
+
+  .sidenote {
+    counter-increment: sidenote-body;
+    display: block;
+    float: inline-start;
+    clear: inline-start;
+    inline-size: var(--grid-margin-col);
+    /* Pull the whole width of the gutter and the margin column leftward, out
+       of the main column and into the apparatus column. */
+    margin-inline-start: calc(
+      -1 * (var(--grid-margin-col) + var(--grid-gutter))
+    );
+    /* Nudged down to sit optically level with the line that introduced it,
+       rather than with the top of that line's ascenders. */
+    margin-block: 0.35rem var(--space-3);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--ink-2);
+    text-align: start;
+  }
+
+  .sidenote::before {
+    /* Counter, then an en space — a literal space in `content` is not
+       collapsed, but an en space is the width this actually wants. */
+    content: counter(sidenote-body) '\2002';
+    color: var(--muted);
+  }
+
+  /* ==========================================================================
+     FIGURES
+     Figures break out of the main column to the figure span, matching the
+     title. The caption stays under the figure at metadata size.
+     ====================================================================== */
+
+  .prose figure {
+    margin-block: var(--space-8);
+    margin-inline-start: calc(
+      -1 * (var(--grid-margin-col) + var(--grid-gutter))
+    );
+    inline-size: var(--grid-figure-span);
+    max-inline-size: none;
+  }
+
+  .prose figcaption {
+    margin-block-start: var(--space-3);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-leading);
+    color: var(--ink-2);
+    /* The caption is read, not scanned — it keeps a readable measure even
+       though the figure above it is nearly 900px wide. */
+    max-inline-size: var(--grid-main-col);
+  }
+
+  /* Wide content scrolls inside itself rather than pushing the page sideways.
+     Sätteri wraps GFM tables for us; this catches anything else. */
+  .prose .table-scroll {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 56.25em) {
+    /* See the note on the duplicated breakpoint above. */
+    .sidenote {
+      /* Inline, under the paragraph it annotates, and a step larger — at 13px
+         in the flow it would read as small print rather than as an aside. */
+      float: none;
+      inline-size: auto;
+      margin-inline-start: 0;
+      margin-block: var(--space-4);
+      padding-inline-start: var(--space-4);
+      border-inline-start: var(--rule-weight) solid var(--rule);
+      font-size: var(--type-sidenote-inline-size);
+    }
+
+    .prose figure {
+      margin-inline-start: 0;
+      inline-size: auto;
+    }
+  }
+</style>

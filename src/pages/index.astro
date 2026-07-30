@@ -1,17 +1,167 @@
 ---
+/**
+ * The index. Everything, in one reverse-chronological list — there are no
+ * separate archives per kind, because the filing system is the reference code
+ * and the tags, not the route.
+ *
+ * Entries reuse the essay grid: apparatus in the margin column, title and
+ * deck in the main column. The list reads as a continuation of the posts.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDateline, kindLabel, machineDate, postHref } from '../lib/format';
 
+const posts = await getCollection('posts', ({ data }) =>
+  import.meta.env.PROD ? !data.draft : true,
+);
+
+// Newest first. `date` is a Date by the time the schema is done with it, so
+// this is an arithmetic sort, not a string one.
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Muhammad Ibrahim">
+  <div class="index">
+    <h1 class="index__heading">Index</h1>
+
+    <ol class="index__list">
+      {
+        posts.map((post) => {
+          const { title, deck, date, kind, ref } = post.data;
+          return (
+            <li class="entry">
+              <div class="entry__meta">
+                <p class="label">
+                  {kind === 'note' && ref ? ref : kindLabel(kind)}
+                </p>
+                <p class="entry__date">
+                  <time datetime={machineDate(date)}>
+                    {formatDateline(date)}
+                  </time>
+                </p>
+              </div>
+
+              <div class="entry__body">
+                <h2 class="entry__title">
+                  <a href={postHref(post.id)}>{title}</a>
+                </h2>
+                {deck && <p class="entry__deck">{deck}</p>}
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    {posts.length === 0 && <p class="index__empty">Nothing filed yet.</p>}
+  </div>
+</BaseLayout>
+
+<style>
+  .index {
+    max-width: var(--grid-figure-span);
+    margin-inline: auto;
+  }
+
+  .index__heading {
+    font-size: var(--type-title-note-size);
+    line-height: var(--type-title-note-leading);
+    margin-block-end: var(--space-8);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns:
+      var(--grid-margin-col)
+      var(--grid-gutter)
+      var(--grid-main-col);
+    padding-block: var(--space-6);
+    /* The rule beside an index entry — one of the accent's listed homes. It
+       is load-bearing here: it is what makes the list read as a filing run
+       rather than as a stack of headlines. */
+    border-block-start: var(--rule-weight) solid var(--accent);
+  }
+
+  .entry:last-child {
+    border-block-end: var(--rule-weight) solid var(--accent);
+  }
+
+  .entry__meta {
+    grid-column: 1;
+  }
+
+  .entry__body {
+    grid-column: 3;
+  }
+
+  .label {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--ink);
+    line-height: 1.4;
+    margin-block-end: 0;
+  }
+
+  .entry__date {
+    margin-block: var(--space-2) 0;
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-sidenote-size);
+    line-height: var(--type-sidenote-leading);
+    color: var(--muted);
+  }
+
+  .entry__title {
+    font-size: var(--type-h2-size);
+    line-height: var(--type-h2-leading);
+    margin-block: 0;
+  }
+
+  .entry__title a {
+    /* Index titles are the page's content, not links inside running text.
+       The accent underline would turn the list into a wall of oxide. */
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .entry__title a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
+  .entry__deck {
+    margin-block: var(--space-3) 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .index__empty {
+    color: var(--muted);
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .index {
+      max-width: var(--grid-main-col);
+    }
+
+    .entry {
+      display: block;
+    }
+
+    .entry__meta {
+      display: flex;
+      gap: var(--space-4);
+      align-items: baseline;
+      margin-block-end: var(--space-3);
+    }
+
+    .entry__date {
+      margin-block: 0;
+    }
+  }
+</style>

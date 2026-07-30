@@ -1,0 +1,32 @@
+---
+/**
+ * The single post route. Its only job is to pick the register: the document
+ * layout for notes, the editorial layout for everything else. No post decides
+ * its own layout — `kind` does, and `kind` is schema-validated.
+ */
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import EssayLayout from '../../layouts/EssayLayout.astro';
+import NoteLayout from '../../layouts/NoteLayout.astro';
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('posts', ({ data }) =>
+    // Drafts are visible while writing and never built for production.
+    import.meta.env.PROD ? !data.draft : true,
+  );
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const Layout = post.data.kind === 'note' ? NoteLayout : EssayLayout;
+---
+
+<Layout post={post}>
+  <Content />
+</Layout>

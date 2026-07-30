@@ -1,0 +1,244 @@
+---
+/**
+ * The document shell. Everything on the site renders through this — it owns
+ * the <head>, the font links, the site header and footer, and nothing else.
+ * It knows nothing about posts.
+ */
+import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  /** Meta description. Falls back to the site line when a page has none. */
+  description?: string;
+}
+
+const SITE_TITLE = 'Muhammad Ibrahim';
+const SITE_DESCRIPTION = 'Essays, cases and working notes.';
+
+const { title, description = SITE_DESCRIPTION } = Astro.props;
+
+// The home page sets its title to the site name; every other page is
+// suffixed. Avoids the "Muhammad Ibrahim — Muhammad Ibrahim" case.
+const documentTitle = title === SITE_TITLE ? title : `${title} — ${SITE_TITLE}`;
+
+const nav = [
+  { href: '/', label: 'Index' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+
+    <title>{documentTitle}</title>
+    <meta name="description" content={description} />
+
+    {/* Body and display are preloaded because they set the first paint. The
+        metadata sans is not — it carries datelines and captions, which can
+        afford one frame in the fallback. */}
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-meta" />
+
+    {/* Cross-page fade. The animation itself is scoped to the main column
+        below; ClientRouter is what makes the navigation client-side so the
+        header and margin column can survive it.
+
+        NOTE for later: with the client router in place, any GSAP setup must
+        run on `astro:page-load`, not on a bare DOMContentLoaded — the second
+        navigation never fires the latter. */}
+    <ClientRouter />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <a class="site-header__name" href="/">{SITE_TITLE}</a>
+      <nav aria-label="Sections">
+        <ul class="site-header__nav">
+          {
+            nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={currentPath === item.href ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" transition:name="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p>© {new Date().getFullYear()}</p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  /* `main` gets the 1080px content cap so a full-bleed element — the ground
+     behind a note sheet — has room to run wider than the text.
+
+     The header and footer are capped at the figure span instead, which is
+     what the layouts actually centre their grids at. Capping them at 1080
+     too would leave the site name hanging 100px to the left of every title
+     on the page. */
+  .site-header,
+  .site-footer {
+    /* The padding is added outside the span so the header's *content* edge —
+       not its box edge — lands on the same line as the grid below it. */
+    max-width: calc(var(--grid-figure-span) + 2 * var(--space-5));
+  }
+
+  main {
+    max-width: var(--grid-content-max);
+  }
+
+  .site-header,
+  .site-footer,
+  main {
+    margin-inline: auto;
+    padding-inline: var(--space-5);
+  }
+
+  .skip-link {
+    position: absolute;
+    inset-inline-start: var(--space-5);
+    inset-block-start: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--paper);
+    border: var(--rule-weight) solid var(--rule);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    text-decoration: none;
+    /* Off-screen until focused, but never `display: none` — that would take
+       it out of the tab order, which defeats the point. */
+    transform: translateY(-200%);
+    z-index: 1;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* ==========================================================================
+     SITE HEADER
+     Sans throughout. It is chrome, not content, and reads as apparatus.
+     ====================================================================== */
+
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4) var(--space-6);
+    align-items: baseline;
+    justify-content: space-between;
+    padding-block: var(--space-6) var(--space-9);
+  }
+
+  .site-header__name {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    /* The site name is navigation, not a link in running text — no accent,
+       no underline until it is hovered. */
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .site-header__nav {
+    display: flex;
+    gap: var(--space-5);
+  }
+
+  .site-header__nav a {
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .site-header__name:hover,
+  .site-header__nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .site-header__nav a[aria-current='page'] {
+    color: var(--ink);
+  }
+
+  /* ==========================================================================
+     SITE FOOTER
+     ====================================================================== */
+
+  .site-footer {
+    margin-block-start: var(--space-10);
+    padding-block: var(--space-5) var(--space-8);
+    border-block-start: var(--rule-weight) solid var(--rule);
+    font-family: var(--font-sans-meta);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    color: var(--muted);
+  }
+</style>
+
+<style is:global>
+  /* The cross-page transition: a fade on the main column ONLY.
+
+     The default view transition animates `root`, which is the entire page —
+     header included. That is explicitly not what this design wants, so the
+     root animation is cancelled and the fade is re-applied to the named
+     `main` group instead. The header and footer stay in the root snapshot,
+     now un-animated, and so hold still across the navigation.
+
+     Astro's client router disables view-transition animations outright under
+     prefers-reduced-motion, so this needs no media query of its own. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  @keyframes main-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes main-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  ::view-transition-old(main) {
+    animation: main-fade-out var(--motion-page-fade) var(--motion-ease) both;
+  }
+
+  ::view-transition-new(main) {
+    animation: main-fade-in var(--motion-page-fade) var(--motion-ease) both;
+  }
+</style>
