@@ -113,17 +113,31 @@
      codebase names a typeface.
 
      Currently shipping (self-hosted via Astro's Fonts API):
-       document  Libertinus Serif   the maintained fork of Linux Libertine, OFL
-       working   Ysabeau            a sans cut from French Renaissance forms, OFL
+       document  Goudy Bookletter 1911   Barry Schwartz, OFL, after Goudy's
+                                         Kennerley Oldstyle
+       working   Ysabeau                 a sans cut from French Renaissance
+                                         forms, OFL
 
      TWO VOICES, and which carries what is the system:
 
-       THE DOCUMENT VOICE — post titles, and the entire body of a note.
-       The printed thing. A note is set in it end to end, which is why a note
-       reads as a filed sheet rather than a short essay.
+       THE DOCUMENT VOICE — titles and headings. Nothing else, ever.
+       It names things. It never sets running text.
 
-       THE WORKING VOICE — essay body, decks, section headings, and every
-       piece of metadata on the site. The thing being worked on.
+       THE WORKING VOICE — all body copy in both registers, decks, and every
+       piece of metadata. Everything that is read rather than scanned.
+
+     THE BOUNDARY IS RUNNING TEXT, and it is drawn there for a hard reason
+     rather than an aesthetic one. Goudy has one weight and no italic, which
+     costs nothing in a heading — one line, display size, distinguished by
+     size rather than weight — and is disqualifying in body copy, where <em>
+     renders byte-identical to roman and emphasis silently ceases to exist.
+     A face may only set text it can inflect.
+
+     Notes used to be set in the document face end to end, and that is what
+     made them look filed. That signal is gone and the register survives it:
+     a note still has the ground, the sheet edge, the fold beneath its
+     document header, its reference code, a narrower measure and a minimum
+     height. Six signals, none of which cost a reader their italics.
 
      This inverts the arrangement the site had until now, which was a serif
      for body and display with a sans reserved for small metadata. That rule
@@ -137,11 +151,9 @@
      separated from body text by size, tracking, case and colour; a third
      family would be saying it again in a fourth way.
 
-     Both faces ship real italics and a real 600. Nothing in this system is
-     synthesised, and no register is running on a workaround — which was not
-     true under Goudy Bookletter 1911, whose single weight forced notes to set
-     emphasis as letterspaced roman and headings to step up in size alone.
-     Both of those compromises are deleted rather than carried forward.
+     Nothing in this system is synthesised. The working face ships a real
+     italic and a real 600 for the text that needs them; the document face
+     needs neither for the job it has been left with.
      --------------------------------------------------------------------- */
   --font-doc: var(--font-document);
   --font-text: var(--font-working);
@@ -160,10 +172,11 @@
 
   /* RE-DERIVED for Ysabeau, and this time the two faces finally agree.
 
-     --type-body-note-size is an alias of the essay's size. It stays a named
-     token because the registers are entitled to diverge; whether they need to
-     depends entirely on the two faces' x-heights, which is measured on every
-     swap and recorded on --grid-main-col.
+     --type-body-note-size is an alias of the essay's size, and now trivially
+     so: both registers are set in the same face, so there is no x-height
+     difference left to correct for. The token stays named because the
+     registers are still entitled to diverge in size even when they agree on
+     face.
 
      The trade Ysabeau asks for is real and worth stating. It is narrow as
      well as small on the body, so the size that holds the measure — 21px for
@@ -181,12 +194,11 @@
      breaking out of the body column. Alegreya at 900 — the only place the
      black weight is used.
 
-     64px, and --type-title-weight decides whether it is set at 400 or 600.
-     Libertinus is a text face before it is a display one, so it wants the
-     heavier cut at this size where a true display face would not. */
+     64px at --weight-regular, Goudy having one weight. It holds at that size
+     without help: the deck beneath it is 26px italic, so nothing competes. */
   --type-title-size: 4rem;          /* 64px */
   --type-title-leading: 1.0;
-  --type-title-weight: 600;
+  --type-title-weight: 400;
 
   /* Post title, document register (note). Stays within the body measure, and
      stays at --weight-semibold: a note is a filed sheet, and the black weight
@@ -231,7 +243,8 @@
      in the index. Headings belong to the printed voice even when the prose
      under them does not.
 
-     Set in --weight-semibold, which Libertinus ships and Goudy did not. */
+     Set in --weight-regular, Goudy having no other. Headings step up in size
+     alone, which is sufficient at 30px and above. */
   --type-h2-size: 1.875rem;         /* 30px */
   --type-h2-leading: 1.25;
   --type-h3-size: 1.5rem;           /* 24px */

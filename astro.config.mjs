@@ -44,20 +44,22 @@ export default defineConfig({
   // typeface is named.
   fonts: [
     {
-      // The document face. Post titles, every heading, and the whole body of
-      // a note — the printed voice.
+      // The document face. TITLES AND HEADINGS ONLY.
       //
-      // Libertinus Serif is the maintained fork of Linux Libertine, and
-      // unlike the Goudy it replaces it ships 400, 600 and 700 WITH italics.
-      // That matters more than it sounds: the note register had been running
-      // on a workaround, setting emphasis as letterspaced roman because Goudy
-      // had no italic to reach for. Notes now emphasise the ordinary way, and
-      // that workaround is deleted rather than kept "just in case".
+      // Goudy Bookletter 1911 ships one weight, no bold and no italic, and
+      // that is survivable here precisely because its role is narrow. A
+      // heading is one line at a display size: it needs no italic, and it
+      // distinguishes itself by size rather than weight. The moment this face
+      // is asked to set running text — which it was, when notes were set in
+      // it — the missing italic becomes a hole, because <em> renders
+      // byte-identical to roman under this project's font-synthesis rules.
+      //
+      // So: no running text in this face, ever. Notes take the working face.
       provider: fontProviders.google(),
-      name: 'Libertinus Serif',
+      name: 'Goudy Bookletter 1911',
       cssVariable: '--font-document',
-      weights: [400, 600],
-      styles: ['normal', 'italic'],
+      weights: [400],
+      styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },

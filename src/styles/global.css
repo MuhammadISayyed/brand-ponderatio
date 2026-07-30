@@ -136,15 +136,16 @@
      the two faces divide by ROLE rather than by page: Goudy titles and names,
      Clarity City argues and annotates.
 
-     Semibold, which under Goudy was impossible — it had one weight, so
-     headings stepped up in size alone and asking for 600 would have
-     faux-bolded every heading on the site. Libertinus ships a real 600, so
-     the hierarchy is carried by weight and size together again. */
+     --weight-regular, because Goudy has exactly one. Headings step up in size
+     alone, and asking for 600 here would faux-bold every heading on the site
+     — thickened strokes on a face that never had them. This is the whole
+     reason the document face is confined to headings and titles: at 30px and
+     above, one weight is sufficient and nothing is missing. */
   h1,
   h2,
   h3 {
     font-family: var(--font-doc);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-regular);
     letter-spacing: -0.005em;
     text-wrap: balance;
   }

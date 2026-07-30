@@ -96,13 +96,16 @@ if (supersededBy) {
     display: flow-root;
   }
 
-  /* The note is set in the document face, end to end — this is the line that
-     makes a note read as a filed sheet rather than a short essay. It also
-     carries its own size: see --type-body-note-size for why 22 here reads the
-     same as 18 in an essay. */
+  /* The note body is set in the WORKING face, same as an essay.
+     It used to take the document face end to end, and that is what made a
+     note look like a filed sheet — but it also asked a single-weight face
+     with no italic to set running text, which silently destroyed emphasis.
+     What marks a note now is everything else it has and an essay does not:
+     the ground, the sheet edge, the fold under the document header, the
+     reference code, the narrow measure, the minimum height. That is a
+     sufficient number of signals; the face was the one that cost something. */
   .note-prose {
     max-width: var(--grid-note-measure);
-    font-family: var(--font-doc);
     font-size: var(--type-body-note-size);
   }
 
