@@ -60,50 +60,24 @@ export default defineConfig({
       fallbacks: ['Georgia', 'serif'],
     },
     {
-      // The working face. Essay body, decks, section headings, and every
-      // piece of metadata on the site.
+      // The working face. Essay body, decks, and every piece of metadata on
+      // the site.
       //
-      // Vendored, because Clarity City is on neither Google Fonts nor
-      // Fontsource. Four woff2 files come from the archived VMware repo under
-      // the SIL Open Font License, with that licence stored beside them as it
-      // requires. The repo being archived is why the licence matters: nothing
-      // upstream is coming, and OFL is what makes that survivable.
+      // Ysabeau is a sans cut from French Renaissance letterforms rather than
+      // from geometry, which is why it sits under a Goudy title without
+      // arguing with it — the two disagree about serifs and agree about
+      // everything else.
       //
       // Weights are exactly what the system asks for:
-      //   400  running text and decks (plus italic, for emphasis)
+      //   400  running text and decks (plus italic, for the deck and emphasis)
       //   500  --weight-medium: labels, datelines, table headings
-      //   600  --weight-semibold: H2, H3, note and index titles, <strong>
-      provider: fontProviders.local(),
-      name: 'Clarity City',
+      //   600  --weight-semibold: <strong>
+      provider: fontProviders.google(),
+      name: 'Ysabeau',
       cssVariable: '--font-working',
-      // Local families declare their files under `options.variants`, not as
-      // the weights/styles a remote provider takes.
-      options: {
-        variants: [
-          {
-            weight: 400,
-            style: 'normal',
-            src: ['./src/assets/fonts/clarity-city/ClarityCity-Regular.woff2'],
-          },
-          {
-            weight: 400,
-            style: 'italic',
-            src: [
-              './src/assets/fonts/clarity-city/ClarityCity-RegularItalic.woff2',
-            ],
-          },
-          {
-            weight: 500,
-            style: 'normal',
-            src: ['./src/assets/fonts/clarity-city/ClarityCity-Medium.woff2'],
-          },
-          {
-            weight: 600,
-            style: 'normal',
-            src: ['./src/assets/fonts/clarity-city/ClarityCity-SemiBold.woff2'],
-          },
-        ],
-      },
+      weights: [400, 500, 600],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
       fallbacks: ['system-ui', 'sans-serif'],
     },
   ],
