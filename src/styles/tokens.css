@@ -24,24 +24,52 @@
      a cool gray next to the oxide accent makes the accent read dirty.
      ====================================================================== */
 
-  --paper: #faf8f3;      /* Page background; the note sheet itself */
-  --ground: #efe9de;     /* ONLY as the ground behind a note sheet */
-  --ink: #1c1a17;        /* Body text */
-  --ink-2: #55504a;      /* Decks, secondary text */
-  --muted: #8a837a;      /* Metadata, captions, diagram node strokes */
-  --rule: #e0dad0;       /* Hairlines */
-  --sheet-edge: #dcd4c6; /* Note sheet border */
+  /* Cream, not off-white. The substrate is the period reference in this
+     system — it is the only element carrying the vintage, which is why the
+     letterforms are allowed to be contemporary. Cream paper plus cream-era
+     type plus a cream-era accent would be pastiche.
+
+     Contrast ratios below are against --paper and were computed, not judged.
+     Anything used at 11–13px must clear 4.5:1; large text may sit at 3:1. */
+
+  --paper: #f7f1e3;      /* Page background; the note sheet itself */
+  --ground: #ece4d3;     /* ONLY as the ground behind a note sheet */
+  --ink: #211d17;        /* Body text.                        14.9:1 AAA */
+  --ink-2: #4f483f;      /* Decks, secondary text.             8.0:1 AAA */
+  --muted: #6d6455;      /* Metadata, captions, node strokes.  5.2:1 AA  */
+  --rule: #dfd6c2;       /* Hairlines */
+  --sheet-edge: #d5c9b2; /* Note sheet border */
+
+  /* --muted was #8a837a and measured 3.3:1 on the old background — below AA
+     at the 11px and 13px sizes it is actually used for. It was not a casualty
+     of the cream move; the cream move is what caught it. Do not lighten it
+     back for the sake of the texture. */
 
   /* ==========================================================================
      2. ACCENTS — exactly three, and where each may appear is a hard rule,
      not a guideline. Colour is permitted ONLY where it carries information.
      ====================================================================== */
 
-  /* Oxide. The ONLY accent allowed in running text.
+  /* Cinnabar — seal red. The ONLY accent allowed in running text.
      Permitted: links, focus states, the single load-bearing element in a
      diagram, the rule beside an index entry, the "filed under" line on a note.
-     Not permitted: decoration, backgrounds, borders that carry no meaning. */
-  --accent: #a8552e;
+     Not permitted: decoration, backgrounds, borders that carry no meaning.
+
+     It is a stamp colour rather than an earth colour, and that is the point:
+     everything this accent does in this system is MARK something. The oxide
+     it replaced (#a8552e) read as a material — terracotta, rust, a surface
+     that happened to be that colour. Cinnabar reads as ink put there on
+     purpose.
+
+     The choice of family was not free. --diagram-2 and --diagram-3 already
+     own indigo and olive and both carry meaning inside diagrams, so an accent
+     in either family would collide with a category. Warm red was the only
+     direction that did not force the diagram trio to be re-derived.
+
+     6.0:1 on --paper. The old oxide fell to 4.35:1 against cream, below AA
+     for body-size links, so the cream substrate required this change whether
+     or not it was wanted. */
+  --accent: #a5341f;
 
   /* Indigo. INSIDE DIAGRAMS ONLY, marking a second category of element.
      Must never appear in prose, navigation, links, buttons or page chrome. */
@@ -54,6 +82,20 @@
   /* There is no fourth accent, and adding one is not the fix.
      If a diagram needs a fourth category, THE DIAGRAM IS WRONG —
      split it into two diagrams. This rule is enforced, not advisory. */
+
+  /* UNRESOLVED, and it should be resolved before the first real diagram.
+     These three are separated by hue and almost nothing else — the luminance
+     ratios between them are 1.13 to 1.29, which is to say they are the same
+     value in three colours. A reader with red-green colour blindness cannot
+     tell a cinnabar node from an olive one, and the house style above
+     forbids stroke weight, dashes and fill patterns, so there is no second
+     channel to fall back on.
+
+     Two ways out, and they are mutually exclusive:
+       a. re-derive the trio so it separates by value as well as hue
+          (e.g. cinnabar as-is, indigo lighter, olive darker), or
+       b. permit exactly one non-colour channel and say which.
+     Picking neither means shipping diagrams that some readers cannot read. */
 
   /* ==========================================================================
      3. TYPEFACES
@@ -70,9 +112,17 @@
        3. nothing else
 
      Currently shipping (free, self-hosted via Astro's Fonts API):
-       body    Source Serif 4
-       display Newsreader
+       body    Literata          TypeTogether, OFL
+       display Instrument Serif  OFL — TITLES ONLY, see below
        meta    Inter
+
+     Instrument Serif ships a single 400 weight and no bold. At a 64px title
+     that is exactly right; at the 28px H2 it goes thin and stops reading as a
+     heading. So the display serif is scoped to titles, and H2/H3 take the
+     body face at a heavier weight instead. That is a deviation from the
+     original rule that the display serif carries all headings, and it is a
+     property of this face — a display family with a text weight could take
+     the headings back.
 
      Intended paid replacements (Klim):
        body    Tiempos Text
@@ -95,8 +145,15 @@
      ====================================================================== */
 
   /* Post title, editorial register (essay, case). Spans the FIGURE width,
-     breaking out of the body column. Display serif. */
-  --type-title-size: 4rem;          /* 64px */
+     breaking out of the body column. Display serif — the only place it is
+     used.
+
+     80px rather than the 64px this started at. Instrument Serif is a light,
+     high-contrast face with one weight, and at 64px the title carried less
+     visual weight than the 24px deck beneath it — the hierarchy read
+     backwards. Size is the only lever this face gives you, so size is what
+     restores it. A heavier display family would not need the extra 16px. */
+  --type-title-size: 5rem;          /* 80px */
   --type-title-leading: 1.05;
 
   /* Post title, document register (note). Stays within the body measure. */
@@ -160,21 +217,38 @@
      Content caps at 1080px. The margin column carries apparatus; the main
      column carries prose at roughly 66 characters.
      Figure span = margin + gutter + main = 190 + 48 + 640 = 878px.
-     Post titles and figures use the figure span, not the body measure.
+     Post TITLES use the figure span. Figures do not — see below.
      ====================================================================== */
 
   --grid-content-max: 67.5rem;  /* 1080px — outer cap */
   --grid-margin-col: 11.875rem; /* 190px — sources, sidenotes, Fig. N, dateline */
   --grid-gutter: 3rem;          /* 48px */
-  /* 640px. Measured, not assumed: rendered in Source Serif 4 at 20px this
-     column holds 64.4 characters per line (counted from real line boxes, with
-     the ragged last line scaled out). That is the essay target. The classic
-     alphabet-advance estimate puts it at 58.4, but that method ignores the
-     space glyph, which is narrower than the mean lowercase letter, so it
-     always reads low — the empirical count is the one to trust. If the body
-     face is swapped, this number changes and must be re-measured. */
+  /* 640px. Measured, not assumed: rendered in LITERATA at 20px this column
+     holds 64.9 characters per line, median 67 (counted from real line boxes
+     across 41 full lines of the sample essay, with each paragraph's ragged
+     last line and the drop-cap paragraph excluded). That is the essay target.
+
+     The classic alphabet-advance estimate reads low — it ignores the space
+     glyph, which is narrower than the mean lowercase letter — so the
+     empirical count is the one to trust.
+
+     Re-measured when the body face changed from Source Serif 4, which gave
+     64.4 here. The two faces landing half a character apart is luck, not a
+     law: the next swap must be measured again, and note CN-014 records the
+     method. */
   --grid-main-col: 40rem;
-  --grid-figure-span: 54.875rem;/* 878px — titles and figures break out to this */
+  /* 878px. The title breaks out to this, and it is the width the whole grid
+     is centred at. Despite the name, a FIGURE DOES NOT USE IT.
+
+     Diagrams are set to --grid-main-col, flush with the prose. A diagram is
+     read in sequence with the sentences around it, not looked at beside them,
+     and a diagram wider than the column it argues inside asks the reader to
+     re-anchor their eye twice — once out, once back. The breakout is reserved
+     for the title, where the re-anchoring happens only at the top of the page
+     and is the point.
+
+     The name is kept because the grid arithmetic still refers to this span. */
+  --grid-figure-span: 54.875rem;
 
   /* Notes are set narrower than essays on purpose. The narrowness is part of
      what makes a note feel filed rather than published; it is not a rounding

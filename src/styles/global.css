@@ -133,15 +133,30 @@
      its own leading because the two are not independent.
      ====================================================================== */
 
+  /* The display serif is scoped by SIZE, not by tag. Instrument Serif has a
+     single 400 weight and no bold: at 80px that delicacy is the whole point,
+     and anywhere below about 40px it stops reading as a heading at all. A
+     note title and the index heading are both `h1` at 30px, so tying the
+     display face to the tag would have put it exactly where it fails.
+
+     So headings default to the body serif at its heavier weight — same voice
+     as the prose, louder — and only `.display-title` opts into the display
+     face. There is exactly one of those per page. */
   h1,
   h2,
   h3 {
+    font-family: var(--font-serif-body);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  .display-title {
     font-family: var(--font-serif-display);
     font-weight: var(--weight-regular);
-    /* Display sizes need the tracking pulled in; at 64px the default spacing
+    /* Display sizes need the tracking pulled in; at 80px the default spacing
        reads loose. */
     letter-spacing: -0.01em;
-    text-wrap: balance;
   }
 
   /* The space above a heading is what marks the section break — it is doing
@@ -202,7 +217,10 @@
     -webkit-initial-letter: var(--dropcap-lines);
     initial-letter: var(--dropcap-lines);
     font-family: var(--font-serif-display);
-    font-weight: var(--weight-medium);
+    /* Regular, not medium: Instrument Serif ships only a 400, and asking for
+       500 makes the browser synthesise a fake bold — which on a letter this
+       large is unmissable. */
+    font-weight: var(--weight-regular);
     /* Space between the sunken letter and the lines wrapping around it.
        In em of the drop cap, so it scales with it. */
     margin-inline-end: 0.08em;

@@ -31,7 +31,7 @@ const { title, deck, date, kind, tags, sources } = post.data;
         <span>{kindLabel(kind)}</span>
         <time datetime={machineDate(date)}>{formatDateline(date)}</time>
       </p>
-      <h1 class="essay__title">{title}</h1>
+      <h1 class="essay__title display-title">{title}</h1>
       {/* The schema guarantees a deck on essay and case, so this is not a
           conditional — a missing one is a build error, not an empty slot. */}
       <p class="essay__deck">{deck}</p>
@@ -275,17 +275,15 @@ const { title, deck, date, kind, tags, sources } = post.data;
 
   /* ==========================================================================
      FIGURES
-     Figures break out of the main column to the figure span, matching the
-     title. The caption stays under the figure at metadata size.
+     Flush with the prose, never wider. A diagram is read in sequence with the
+     sentences around it; one that breaks out of the column asks the reader to
+     re-anchor twice, out and back, for no argumentative gain. The breakout is
+     the title's alone.
      ====================================================================== */
 
   .prose figure {
     margin-block: var(--space-8);
-    margin-inline-start: calc(
-      -1 * (var(--grid-margin-col) + var(--grid-gutter))
-    );
-    inline-size: var(--grid-figure-span);
-    max-inline-size: none;
+    inline-size: 100%;
   }
 
   .prose figcaption {
@@ -319,9 +317,5 @@ const { title, deck, date, kind, tags, sources } = post.data;
       font-size: var(--type-sidenote-inline-size);
     }
 
-    .prose figure {
-      margin-inline-start: 0;
-      inline-size: auto;
-    }
   }
 </style>

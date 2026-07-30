@@ -44,9 +44,11 @@ export default defineConfig({
   // where the paid Klim replacements would be substituted.
   fonts: [
     {
-      // Body serif — running text, decks.
+      // Body serif — running text, decks. Drawn by TypeTogether for extended
+      // reading: generous x-height, warm, and it holds authority at 20px
+      // without turning stern.
       provider: fontProviders.google(),
-      name: 'Source Serif 4',
+      name: 'Literata',
       cssVariable: '--font-body',
       weights: [400, 600],
       styles: ['normal', 'italic'],
@@ -54,11 +56,13 @@ export default defineConfig({
       fallbacks: ['Georgia', 'serif'],
     },
     {
-      // Display serif — titles, H2, H3.
+      // Display serif — titles only. High contrast and tight; it carries a
+      // 64px title and is deliberately NOT used at H2 size, where its single
+      // 400 weight goes thin. See the note on --font-serif-display.
       provider: fontProviders.google(),
-      name: 'Newsreader',
+      name: 'Instrument Serif',
       cssVariable: '--font-display',
-      weights: [400, 500],
+      weights: [400],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
