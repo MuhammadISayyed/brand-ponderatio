@@ -112,17 +112,12 @@ const currentPath = Astro.url.pathname;
 </html>
 
 <style>
-  /* `main` gets the 1080px content cap so a full-bleed element — the ground
-     behind a note sheet — has room to run wider than the text.
-
-     The header and footer are capped at the figure span instead, which is
-     what the layouts actually centre their grids at. Capping them at 1080
-     too would leave the site name hanging 100px to the left of every title
-     on the page. */
+  /* Header and footer share the grid's width, so the mark sits on the same
+     outer edge the margin column starts at and the nav ends where the title
+     ends. The padding is added outside the span so their CONTENT edge — not
+     their box edge — lands on the grid's line. */
   .site-header,
   .site-footer {
-    /* The padding is added outside the span so the header's *content* edge —
-       not its box edge — lands on the same line as the grid below it. */
     max-width: calc(var(--grid-figure-span) + 2 * var(--space-5));
   }
 

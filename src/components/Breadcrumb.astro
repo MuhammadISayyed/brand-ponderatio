@@ -17,12 +17,12 @@
  * Demand" makes the reader reconstruct the title from a fragment, which is
  * the opposite of what a breadcrumb is for.
  *
- * STYLED AS CHROME, NOT AS A PROSE LINK. The link doctrine in global.css
- * gives accent and a solid underline to anything leaving the page, which
- * applied literally would put a line of cinnabar above every title. The site
- * header nav already sets the precedent for the other treatment: the accent
- * marks links inside SENTENCES, and navigation furniture stays quiet.
- * Otherwise the accent stops meaning "this sentence points somewhere".
+ * STYLED AS LINKS, which is what they are. They were chrome — ink, no
+ * underline until hover — on the argument that the accent should be reserved
+ * for links inside sentences. That reasoning protected a rule at the reader's
+ * expense: a breadcrumb that does not look clickable is a way back that has
+ * to be guessed at. The doctrine's own terms settle it, since a crumb leaves
+ * the page: solid underline, accent.
  */
 interface Crumb {
   href: string;
@@ -75,13 +75,14 @@ const { trail } = Astro.props;
     letter-spacing: var(--type-label-tracking);
     text-transform: var(--type-label-transform);
     font-weight: var(--weight-medium);
-    color: var(--ink);
-    text-decoration: none;
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
   }
 
   .crumbs a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.3em;
+    text-decoration-thickness: 2px;
   }
 
   .crumbs__sep {

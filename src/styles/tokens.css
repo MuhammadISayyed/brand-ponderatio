@@ -312,7 +312,14 @@
      5. GRID
      Content caps at 1080px. The margin column carries apparatus; the main
      column carries prose at roughly 66 characters.
-     Figure span = margin + gutter + main = 190 + 48 + 512 = 750px.
+     Grid = margin + gutter + main + gutter + margin
+          = 190 + 48 + 512 + 48 + 190 = 988px.
+
+     THE RIGHT MARGIN IS EMPTY ON PURPOSE. It is what centres the reading
+     column. With only three columns the grid centred but the TEXT did not —
+     it sat 119px right of centre, with all the whitespace on the left, which
+     read as the page leaning. Mirroring the margin puts the main column on
+     the page's centre line and gives the title somewhere to breathe.
      Post TITLES use the figure span. Figures do not — see below.
      ====================================================================== */
 
@@ -383,7 +390,7 @@
      Two free variables, one constraint. Note CN-014 records the method but
      not this trap, which is worth adding when it is superseded. */
   --grid-main-col: 32rem;
-  /* 750px. The title breaks out to this, and it is the width the whole grid
+  /* 988px. The title breaks out to this, and it is the width the whole grid
      is centred at. Despite the name, a FIGURE DOES NOT USE IT.
 
      Diagrams are set to --grid-main-col, flush with the prose. A diagram is
@@ -394,7 +401,7 @@
      and is the point.
 
      The name is kept because the grid arithmetic still refers to this span. */
-  --grid-figure-span: 46.875rem;
+  --grid-figure-span: 61.75rem;
 
   /* Below this width the margin column collapses: sidenotes fall inline
      beneath the paragraph they annotate, figure numbers move into the

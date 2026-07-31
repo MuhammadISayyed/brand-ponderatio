@@ -17,12 +17,17 @@
    GRID
    ====================================================================== */
 
+/* Five columns, the outer two mirrored. Apparatus lives in column 1, reading
+   lives in column 3, and column 5 is deliberately empty — it exists so that
+   column 3 lands on the centre of the page instead of 119px right of it. */
 .article {
   display: grid;
   grid-template-columns:
     var(--grid-margin-col)
     var(--grid-gutter)
-    var(--grid-main-col);
+    var(--grid-main-col)
+    var(--grid-gutter)
+    var(--grid-margin-col);
   /* The grid is the figure span, not the content cap — the outer 1080px
      lives on the page container in BaseLayout. */
   max-width: var(--grid-figure-span);
@@ -80,8 +85,12 @@
   grid-row: 1;
 }
 
+/* The title runs from the reading rail into the empty right margin. It keeps
+   the left edge every other line of content shares, and gains 238px of room
+   — enough that a six-word title stops breaking over three lines, without
+   breaking out to a width that no other element uses. */
 .article__title {
-  grid-column: 3;
+  grid-column: 3 / -1;
   grid-row: 2;
   /* No bottom margin. The deck owns the gap below the title, and the band
      owns the gap above itself — so a piece with no deck gets exactly the
@@ -97,21 +106,20 @@
   margin-block: var(--space-5) 0;
 }
 
-/* Centred on the READING COLUMN, not on the full span — so the one centred
-   thing on the page is centred over something, rather than floating on a
-   third rail of its own. */
+/* ONE LEFT-ALIGNED LINE, on the same rail as everything else.
+
+   It was centred, which forced it to wrap into two centred lines — a name
+   stacked over a row of dates, aligned to nothing. Centring only works for an
+   element short enough never to wrap; this one is not, and it belongs on the
+   text rail with the prose it introduces. */
 .article__band {
-  grid-column: 3;
+  grid-column: 3 / -1;
   grid-row: 4;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  /* Row gap is generous because at this measure the band wraps: the byline
-     takes one line and the dates the next. Two centred lines with air between
-     them read as a plate; two crowded ones read as a wrapping accident. */
-  gap: var(--space-4) var(--space-6);
-  margin-block-start: var(--space-9);
+  gap: var(--space-3) var(--space-5);
+  margin-block-start: var(--space-7);
 }
 
 
