@@ -195,9 +195,15 @@
      breaking out of the body column. Alegreya at 900 — the only place the
      black weight is used.
 
-     64px at --weight-regular, Goudy having one weight. It holds at that size
-     without help: the deck beneath it is 26px italic, so nothing competes. */
-  --type-title-size: 3.5rem;        /* 56px */
+     48px at --weight-regular, Goudy having one weight.
+
+     Sized against the column it now sits in rather than against the page. In
+     512px almost any real title wraps to two lines whatever the size, so the
+     choice is about weight, not line count: 56px made that two-line block the
+     heaviest thing on the page by a distance. 48px keeps a clear step above
+     the 25px H2 — 1.9x against 2.2x — while letting the title sit in the
+     column instead of dominating it. */
+  --type-title-size: 3rem;          /* 48px */
   --type-title-leading: 1.0;
   --type-title-weight: 400;
 
@@ -320,7 +326,7 @@
      it sat 119px right of centre, with all the whitespace on the left, which
      read as the page leaning. Mirroring the margin puts the main column on
      the page's centre line and gives the title somewhere to breathe.
-     Post TITLES use the figure span. Figures do not — see below.
+     Figures use the main column; nothing breaks out of it. See below.
      ====================================================================== */
 
   --grid-content-max: 67.5rem;  /* 1080px — outer cap */
@@ -364,7 +370,7 @@
      Choose footnotes instead and this column holds nothing, and the measure
      it produces is a number with no argument behind it.
      ----------------------------------------------------------------------- */
-  --grid-margin-col: 11.875rem; /* 190px — sidenotes and figure numbers */
+  --grid-margin-col: 11.875rem; /* 190px — sidenotes */
   --grid-gutter: 3rem;          /* 48px */
   /* 592px. Measured, not assumed: rendered in ALEGREYA at 21px this column
      holds 66.9 characters per line (counted from real line boxes, with each
@@ -404,8 +410,9 @@
   --grid-figure-span: 61.75rem;
 
   /* Below this width the margin column collapses: sidenotes fall inline
-     beneath the paragraph they annotate, figure numbers move into the
-     caption, and the sources block moves to the foot of the post.
+     beneath the paragraph they annotate. Figure numbers need no rule here —
+     they live in the caption at every width, because "Fig. 1 —" is the start
+     of the caption's sentence rather than apparatus about the page.
      In em so the collapse tracks the reader's font size. */
   --bp-margin-collapse: 56.25em; /* 900px */
 

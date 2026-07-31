@@ -85,12 +85,13 @@
   grid-row: 1;
 }
 
-/* The title runs from the reading rail into the empty right margin. It keeps
-   the left edge every other line of content shares, and gains 238px of room
-   — enough that a six-word title stops breaking over three lines, without
-   breaking out to a width that no other element uses. */
+/* The title sits in the reading column like everything else. It briefly ran
+   into the empty right margin for breathing room, which gave it a measure no
+   other element on the page used — a second width to explain. It reads as a
+   title because of its size, not because it is wider than the text it
+   introduces. */
 .article__title {
-  grid-column: 3 / -1;
+  grid-column: 3;
   grid-row: 2;
   /* No bottom margin. The deck owns the gap below the title, and the band
      owns the gap above itself — so a piece with no deck gets exactly the
@@ -113,7 +114,7 @@
    element short enough never to wrap; this one is not, and it belongs on the
    text rail with the prose it introduces. */
 .article__band {
-  grid-column: 3 / -1;
+  grid-column: 3;
   grid-row: 4;
   display: flex;
   flex-wrap: wrap;
