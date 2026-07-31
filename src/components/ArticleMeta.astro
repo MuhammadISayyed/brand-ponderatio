@@ -13,8 +13,15 @@
 import { formatDateline, machineDate } from '../lib/format';
 
 interface Props {
-  /** "Essay", "Part II of III" — what this thing is. */
-  kind: string;
+  /**
+   * What this thing is — "Part II of III".
+   *
+   * OPTIONAL, and an essay passes nothing. The breadcrumb above already says
+   * "Essays"; repeating "Essay" here labels the page with a word it has
+   * already been given, two lines apart. A part is different: "Part II of
+   * III" is a position, which the breadcrumb cannot express.
+   */
+  kind?: string;
   published: Date;
   updated?: Date;
 }
@@ -23,7 +30,7 @@ const { kind, published, updated } = Astro.props;
 ---
 
 <div class="meta label">
-  <span class="meta__item meta__kind">{kind}</span>
+  {kind && <span class="meta__item meta__kind">{kind}</span>}
 
   <span class="meta__item">
     <span class="meta__term">Published</span>

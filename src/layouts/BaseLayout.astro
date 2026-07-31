@@ -194,7 +194,19 @@ const currentPath = Astro.url.pathname;
 
   .site-header__nav {
     display: flex;
+    /* Centred, so the links' own boxes centre inside the row rather than
+       stretching to it — without this the emblem's centre and the caps'
+       centre sat 3.5px apart, which is small and visible. */
+    align-items: center;
     gap: var(--space-5);
+  }
+
+  .site-header__nav a {
+    /* Block with a tight line box, so the box the flexbox centres is the
+       height of the capitals rather than the height of a line of text with
+       its leading. */
+    display: block;
+    line-height: 1;
   }
 
   .site-header__nav a {

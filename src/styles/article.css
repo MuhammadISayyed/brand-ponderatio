@@ -47,12 +47,22 @@
   margin-block-end: var(--space-9);
 }
 
-/* Four rows, explicitly placed.
+/* Four rows, and EVERYTHING A READER READS SHARES ONE LEFT EDGE.
                     col 1              col 3
-     row 1   ┌──── breadcrumb ──────────────────┐
-     row 2   ┌──── title ───────────────────────┐
+     row 1                       │  breadcrumb  │
+     row 2                       │  title       │
      row 3                       │  deck        │
-     row 4   ┌──── byline + metadata, centred ──┐
+     row 4                       │  band        │
+
+   The title and breadcrumb used to break out to the margin column while the
+   deck and prose started at the main one — two left edges for one column of
+   reading, which is what made the header feel unglued from the text under
+   it. The margin column is now apparatus and nothing else: sidenotes, figure
+   numbers, part numbers.
+
+   Two rails, and only two:
+     the margin column's left edge   all apparatus
+     the main column's left edge     breadcrumb, title, deck, band, prose
 
    THE BAND SITS BETWEEN THE DECK AND THE FIRST PARAGRAPH, centred across the
    full span. Byline and metadata are grouped because they are one thought —
@@ -66,12 +76,12 @@
    the title. Putting the gap on the deck's bottom margin would have made a
    deckless piece close up. */
 .article__topline {
-  grid-column: 1 / -1;
+  grid-column: 3;
   grid-row: 1;
 }
 
 .article__title {
-  grid-column: 1 / -1;
+  grid-column: 3;
   grid-row: 2;
   /* No bottom margin. The deck owns the gap below the title, and the band
      owns the gap above itself — so a piece with no deck gets exactly the
@@ -87,14 +97,20 @@
   margin-block: var(--space-5) 0;
 }
 
+/* Centred on the READING COLUMN, not on the full span — so the one centred
+   thing on the page is centred over something, rather than floating on a
+   third rail of its own. */
 .article__band {
-  grid-column: 1 / -1;
+  grid-column: 3;
   grid-row: 4;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: var(--space-3) var(--space-6);
+  /* Row gap is generous because at this measure the band wraps: the byline
+     takes one line and the dates the next. Two centred lines with air between
+     them read as a plate; two crowded ones read as a wrapping accident. */
+  gap: var(--space-4) var(--space-6);
   margin-block-start: var(--space-9);
 }
 

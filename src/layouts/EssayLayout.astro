@@ -14,7 +14,6 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import { kindLabel } from '../lib/format';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import ArticleMeta from '../components/ArticleMeta.astro';
 import Byline from '../components/Byline.astro';
@@ -25,7 +24,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, deck, date, updated, kind, tags, sources } = post.data;
+const { title, deck, date, updated, tags, sources } = post.data;
 
 /**
  * Both directions are audited, because both are silent failures otherwise: a
@@ -77,7 +76,7 @@ const citedCounts = scanCitations(post.body ?? '');
 
       <div class="article__band">
         <Byline />
-        <ArticleMeta kind={kindLabel(kind)} published={date} updated={updated} />
+        <ArticleMeta published={date} updated={updated} />
       </div>
     </header>
 

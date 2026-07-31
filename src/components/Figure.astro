@@ -50,7 +50,9 @@ const { id = `fig-${n}` } = Astro.props;
       -1 * (var(--grid-margin-col) + var(--grid-gutter))
     );
     inline-size: var(--grid-margin-col);
-    text-align: end;
+    /* Left, like every other thing in the margin column. Right-aligned it
+       hugged the gutter and put a second rail inside one column. */
+    text-align: start;
     font-family: var(--font-text);
     font-size: var(--type-label-size);
     letter-spacing: var(--type-label-tracking);

@@ -69,14 +69,9 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
 
   .entry__meta {
     grid-column: 1;
-    /* Right-aligned against the gutter. The metadata column ends on one
-       straight edge instead of ragging, and that edge does the dividing. */
-    text-align: end;
   }
 
-  /* The stub aligns with the column's right edge, not its left. */
   .entry__meta.stub::before {
-    margin-inline-start: auto;
     margin-block-end: var(--space-3);
   }
 
@@ -143,11 +138,9 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
     }
 
     .entry__meta {
-      /* No margin column to align against, so the metadata reads left to
-         right. The two paragraphs run inline on one line rather than the
-         column becoming a flex row — as flex items the stub would stretch to
-         full width and stop being a stub. */
-      text-align: start;
+      /* The two paragraphs run inline on one line rather than the column
+         becoming a flex row — as flex items the stub would stretch to full
+         width and stop being a stub. */
       margin-block-end: var(--space-3);
     }
 
@@ -161,7 +154,6 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
     }
 
     .entry__meta.stub::before {
-      margin-inline-start: 0;
       margin-block-end: var(--space-3);
     }
   }

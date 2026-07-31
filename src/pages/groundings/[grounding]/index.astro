@@ -32,7 +32,11 @@ const parts = await getParts(grounding!);
       <h1 class="article__title display-title">{work.title}</h1>
 
       <div class="article__band">
-        <p class="label spine__count">{roman(parts.length)} parts</p>
+        {/* Guarded: roman() rejects zero, and a grounding with no parts yet
+            is an empty state rather than an error. */}
+        <p class="label spine__count">
+          {parts.length > 0 ? `${roman(parts.length)} parts` : 'No parts yet'}
+        </p>
       </div>
 
       <p class="article__deck">{work.abstract}</p>
@@ -79,12 +83,15 @@ const parts = await getParts(grounding!);
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
-    padding-block: var(--space-6);
+    padding-block: var(--space-7);
   }
 
   .contents__number {
     grid-column: 1;
-    text-align: end;
+    /* Same rail as every other thing in the margin column, and level with
+       the first line of the title beside it rather than with the top of its
+       box. */
+    margin-block-start: 0.15em;
   }
 
   .contents__body {
@@ -129,8 +136,7 @@ const parts = await getParts(grounding!);
     }
 
     .contents__number {
-      text-align: start;
-      margin-block-end: var(--space-2);
+      margin-block: 0 var(--space-2);
     }
   }
 </style>
