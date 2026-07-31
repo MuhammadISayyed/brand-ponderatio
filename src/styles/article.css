@@ -42,7 +42,9 @@
   grid-column: 1 / -1;
   grid-row: 1;
   grid-template-columns: subgrid;
-  margin-block-end: var(--space-8);
+  /* Matches the band's own top margin, so the band sits in a symmetrical
+     clearing between the title block and the prose. */
+  margin-block-end: var(--space-9);
 }
 
 /* Four rows, explicitly placed.
@@ -50,16 +52,19 @@
      row 1   ┌──── breadcrumb ──────────────────┐
      row 2   ┌──── title ───────────────────────┐
      row 3                       │  deck        │
-     row 4   │  metadata         │  byline      │
+     row 4   ┌──── byline + metadata, centred ──┐
 
-   THE METADATA LINES UP WITH THE BYLINE, NOT THE DECK, and that is the whole
-   reason for the extra row. Both are apparatus — facts about the piece and
-   about who wrote it — so putting them level across the gutter lets them read
-   as one band. The deck is not apparatus; it is the last content before the
-   prose, and a block of dates sitting beside it reads as a caption to it,
-   which it is not.
+   THE BAND SITS BETWEEN THE DECK AND THE FIRST PARAGRAPH, centred across the
+   full span. Byline and metadata are grouped because they are one thought —
+   who wrote this, what it is, when it happened — and centring separates that
+   from the left-aligned reading column above and below it, so the eye takes
+   it in once and moves on.
 
-   With no deck, row 3 collapses and the band sits directly under the title. */
+   THE BAND OWNS THE SPACE ABOVE IT, not the deck. That is what keeps the
+   spacing identical whether or not a piece has a standfirst: with no deck,
+   row 3 collapses to nothing and the band still sits the same distance below
+   the title. Putting the gap on the deck's bottom margin would have made a
+   deckless piece close up. */
 .article__topline {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -68,23 +73,31 @@
 .article__title {
   grid-column: 1 / -1;
   grid-row: 2;
+  /* No bottom margin. The deck owns the gap below the title, and the band
+     owns the gap above itself — so a piece with no deck gets exactly the
+     same clearing before the band as a piece with one. Left on the title,
+     this margin leaked into that gap and made the deckless case 24px
+     looser. */
+  margin-block-end: 0;
 }
 
 .article__deck {
   grid-column: 3;
   grid-row: 3;
-  margin-block-end: var(--space-5);
+  margin-block: var(--space-5) 0;
 }
 
-.article__aside {
-  grid-column: 1;
+.article__band {
+  grid-column: 1 / -1;
   grid-row: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3) var(--space-6);
+  margin-block-start: var(--space-9);
 }
 
-.article__credit {
-  grid-column: 3;
-  grid-row: 4;
-}
 
 .prose {
   grid-column: 3;
@@ -186,14 +199,15 @@
   }
 }
 
+/* Type only. Spacing for the header rows is set once, in the placement block
+   above — declaring it again here silently overrode it by source order, and
+   cost the deckless case 24px it was not supposed to have. */
 .article__title {
   font-size: var(--type-title-size);
   line-height: var(--type-title-leading);
-  margin-block-end: var(--space-5);
 }
 
 .article__deck {
-  margin-block: 0;
   font-family: var(--font-text);
   /* Italic. A deck is not a short first paragraph — it is the editor's
      voice rather than the author's, and the italic is what tells a reader

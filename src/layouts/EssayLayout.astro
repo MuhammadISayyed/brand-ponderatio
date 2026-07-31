@@ -70,17 +70,14 @@ const citedCounts = scanCitations(post.body ?? '');
 
       <h1 class="article__title display-title">{title}</h1>
 
-      <div class="article__aside">
-        <ArticleMeta kind={kindLabel(kind)} published={date} updated={updated} />
-      </div>
-
       {/* Optional. A standfirst is a judgement about a particular piece; a
           piece that does not want one gets a title and then its first
           sentence, which is how most good essays open anyway. */}
       {deck && <p class="article__deck">{deck}</p>}
 
-      <div class="article__credit">
+      <div class="article__band">
         <Byline />
+        <ArticleMeta kind={kindLabel(kind)} published={date} updated={updated} />
       </div>
     </header>
 

@@ -90,18 +90,15 @@ const citedCounts = scanCitations(part.body ?? '');
 
       <h1 class="article__title display-title">{title}</h1>
 
-      <div class="article__aside">
+      {deck && <p class="article__deck">{deck}</p>}
+
+      <div class="article__band">
+        <Byline />
         <ArticleMeta
           kind={`Part ${roman(n)} of ${roman(total)}`}
           published={date}
           updated={updated}
         />
-      </div>
-
-      {deck && <p class="article__deck">{deck}</p>}
-
-      <div class="article__credit">
-        <Byline />
       </div>
     </header>
 

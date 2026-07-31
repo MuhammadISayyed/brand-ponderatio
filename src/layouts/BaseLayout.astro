@@ -106,7 +106,7 @@ const currentPath = Astro.url.pathname;
     </main>
 
     <footer class="site-footer">
-      <p>© {new Date().getFullYear()}</p>
+      <p>© {new Date().getFullYear()} {SITE_TITLE}</p>
     </footer>
   </body>
 </html>
@@ -188,7 +188,7 @@ const currentPath = Astro.url.pathname;
     /* Height-led, because the emblem is portrait and the header is a line of
        text: matching its height to the nav's cap height is what makes them
        sit as one row. */
-    height: 1.75rem;
+    height: 2.5rem;
     width: auto;
   }
 

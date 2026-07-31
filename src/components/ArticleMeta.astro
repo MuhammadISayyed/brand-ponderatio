@@ -1,19 +1,14 @@
 ---
 /**
- * The stack of apparatus beside a title: what this is, when it went up, when
- * it last moved.
+ * What this is, when it went up, when it last moved.
  *
- * IT SITS IN THE MARGIN COLUMN, SET VERTICALLY, and that is the point. It was
- * a horizontal run on the right of the topline, which put four unrelated
- * facts in a row and made the eye read them as a sentence. Stacked in the
- * margin they read as a record — and they land on the same right edge as the
- * figure numbers and the listing metadata, so the page keeps ONE vertical
- * line of apparatus instead of two habits.
+ * It runs INLINE, because it now sits in the centred band beside the byline
+ * rather than stacked in the margin column. Grouped with the byline it reads
+ * as one line of provenance — who wrote this, what it is, when it happened —
+ * which is a sentence the reader can take in at a glance and then leave.
  *
- * It sits in the header's second row, beside the deck, rather than in the
- * prose row. That matters: sidenotes float out of the prose into this same
- * column, and anything the grid places there can be landed on. The header row
- * is above them and cannot be.
+ * The dot separators are drawn in CSS rather than typed, so no item has to
+ * know whether it is last.
  */
 import { formatDateline, machineDate } from '../lib/format';
 
@@ -28,45 +23,53 @@ const { kind, published, updated } = Astro.props;
 ---
 
 <div class="meta label">
-  <p class="meta__kind">{kind}</p>
+  <span class="meta__item meta__kind">{kind}</span>
 
-  <p class="meta__date">
+  <span class="meta__item">
     <span class="meta__term">Published</span>
     <time datetime={machineDate(published)}>{formatDateline(published)}</time>
-  </p>
+  </span>
 
   {
     updated && (
-      <p class="meta__date">
+      <span class="meta__item">
         <span class="meta__term">Updated</span>
         <time datetime={machineDate(updated)}>{formatDateline(updated)}</time>
-      </p>
+      </span>
     )
   }
 </div>
 
 <style>
   .meta {
-    /* Right-aligned against the gutter — the same edge the figure numbers and
-       the listing metadata align to. */
-    text-align: end;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .meta__item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    color: var(--muted);
+  }
+
+  /* Separators are drawn, not typed, so nothing has to know it is last. */
+  .meta__item + .meta__item::before {
+    content: '·';
+    color: var(--rule);
+    margin-inline-end: var(--space-2);
   }
 
   .meta__kind {
     color: var(--ink);
-    margin-block-end: var(--space-3);
-  }
-
-  .meta__date {
-    margin-block-start: var(--space-2);
-    color: var(--muted);
   }
 
   /* The word is the quiet half and the date is the answer, so the term drops
      out of the label register into plain lowercase — otherwise "PUBLISHED"
      shouts louder than the date it introduces. */
   .meta__term {
-    display: block;
     text-transform: none;
     letter-spacing: normal;
     font-weight: var(--weight-regular);
@@ -76,27 +79,5 @@ const { kind, published, updated } = Astro.props;
   .meta time {
     color: var(--ink-2);
     font-variant-numeric: lining-nums tabular-nums;
-  }
-
-  @media (max-width: 56.25em) {
-    /* Duplicated from --bp-margin-collapse; media conditions cannot read
-       custom properties. No margin column to align against, so the stack
-       reads left to right like everything else that collapses. */
-    .meta {
-      text-align: start;
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2) var(--space-5);
-      margin-block-end: var(--space-5);
-    }
-
-    .meta__kind,
-    .meta__date {
-      margin-block: 0;
-    }
-
-    .meta__term {
-      display: inline;
-    }
   }
 </style>
