@@ -2,31 +2,35 @@
 /**
  * Who wrote the thing you are reading.
  *
- * The site is Ponderatio and the header carries its emblem; this carries a
- * person. Keeping the two apart is the whole reason both can be quiet — the
- * mark says whose publication this is, the byline says who is talking.
+ * The site is Brand Ponderatio and the header carries its emblem; this
+ * carries a person. Keeping the two apart is the whole reason both can be
+ * quiet — the mark says whose publication this is, the byline says who is
+ * talking.
  *
- * THE PORTRAIT IS OPTIONAL AND CURRENTLY ABSENT. Drop a square image at
- * public/author.jpg (or .webp, and change the constant) and it appears. Until
- * then the byline renders as a name alone rather than as an empty circle,
- * because a placeholder ring is a promise the page cannot keep.
+ * THE PORTRAIT IS SQUARE-CROPPED AT BUILD TIME. The camera original is
+ * 4160x6240 and 8.9MB, which is four hundred times the pixels this needs; it
+ * lives in originals/ and is gitignored. src/assets/portrait.jpg is a 512px
+ * square cropped around the FACE rather than around the frame — a centred
+ * crop of a portrait puts the chin in the middle of the circle.
+ *
+ * <Image> takes it from there: Astro emits the sizes and formats, so the
+ * circle costs a few kilobytes rather than the megabytes it started at.
  */
-const AUTHOR = 'Muhammad Ibrahim';
+import { Image } from 'astro:assets';
+import portrait from '../assets/portrait.jpg';
 
-/**
- * Set to the file's path once a portrait exists. It is a constant rather than
- * a prop because there is one author; when there are two this becomes a
- * parameter and nothing else changes.
- */
-const PORTRAIT: string | null = null;
+const AUTHOR = 'Muhammad Ibrahim';
 ---
 
 <p class="byline">
-  {
-    PORTRAIT && (
-      <img class="byline__portrait" src={PORTRAIT} alt="" width="72" height="72" />
-    )
-  }
+  <Image
+    class="byline__portrait"
+    src={portrait}
+    alt=""
+    width={108}
+    height={108}
+    densities={[1, 2, 3]}
+  />
   <span class="byline__name">{AUTHOR}</span>
 </p>
 
@@ -35,7 +39,7 @@ const PORTRAIT: string | null = null;
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    margin-block: var(--space-5) 0;
+    margin-block: 0;
   }
 
   .byline__portrait {

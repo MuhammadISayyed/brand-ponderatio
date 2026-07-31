@@ -45,17 +45,45 @@
   margin-block-end: var(--space-8);
 }
 
-.article__topline,
+/* Four rows, explicitly placed.
+                    col 1              col 3
+     row 1   ┌──── breadcrumb ──────────────────┐
+     row 2   ┌──── title ───────────────────────┐
+     row 3                       │  deck        │
+     row 4   │  metadata         │  byline      │
+
+   THE METADATA LINES UP WITH THE BYLINE, NOT THE DECK, and that is the whole
+   reason for the extra row. Both are apparatus — facts about the piece and
+   about who wrote it — so putting them level across the gutter lets them read
+   as one band. The deck is not apparatus; it is the last content before the
+   prose, and a block of dates sitting beside it reads as a caption to it,
+   which it is not.
+
+   With no deck, row 3 collapses and the band sits directly under the title. */
+.article__topline {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
 .article__title {
   grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.article__deck {
+  grid-column: 3;
+  grid-row: 3;
+  margin-block-end: var(--space-5);
 }
 
 .article__aside {
   grid-column: 1;
+  grid-row: 4;
 }
 
-.article__lede {
+.article__credit {
   grid-column: 3;
+  grid-row: 4;
 }
 
 .prose {

@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Astro dev server (background mode)
 .astro-dev.lock
+
+# Camera originals. The shipped crop lives in src/assets/portrait.jpg.
+originals/

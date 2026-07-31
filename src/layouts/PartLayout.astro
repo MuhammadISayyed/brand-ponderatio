@@ -98,8 +98,9 @@ const citedCounts = scanCitations(part.body ?? '');
         />
       </div>
 
-      <div class="article__lede">
-        {deck && <p class="article__deck">{deck}</p>}
+      {deck && <p class="article__deck">{deck}</p>}
+
+      <div class="article__credit">
         <Byline />
       </div>
     </header>
