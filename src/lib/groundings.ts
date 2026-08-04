@@ -26,13 +26,25 @@ export interface Grounding {
  * "Contents". Never a truncation.
  */
 
-export const GROUNDINGS: Record<string, Grounding> = {
-  demand: {
-    title: 'The Dispositional Basis of Demand',
-    abstract:
-      'Demand is treated in economics as a quantity — something read off a schedule, revealed by what was bought. This grounding argues that it is a disposition: a causal power that exists whether or not it is exercised, that composes with other powers rather than summing with them, and that a curve fitted to transactions records only where it has already been manifested.',
-  },
-};
+/**
+ * THE REGISTRY. A grounding exists when it appears here AND has a folder of
+ * parts under src/content/groundings/ named with the same key.
+ *
+ * Why the title and abstract live in code rather than in frontmatter: they
+ * belong to the WORK, not to any one part of it, and there is no file that is
+ * the work. Putting them in Part I's frontmatter would make Part I special,
+ * and deleting Part I would delete the work's name.
+ *
+ * To add one — see PUBLISHING.md:
+ *
+ *   export const GROUNDINGS: Record<string, Grounding> = {
+ *     demand: {
+ *       title: 'The Dispositional Basis of Demand',
+ *       abstract: 'One paragraph. What the whole work argues.',
+ *     },
+ *   };
+ */
+export const GROUNDINGS: Record<string, Grounding> = {};
 
 export type Part = CollectionEntry<'groundings'>;
 
