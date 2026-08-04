@@ -58,7 +58,11 @@ const citedCounts = scanCitations(part.body ?? '');
 }
 ---
 
-<BaseLayout title={`${title} — ${work.title}`} description={deck}>
+<BaseLayout
+  title={`${title} — ${work.title}`}
+  description={deck}
+  ogType="article"
+>
   {/* Sticky, and empty until the header has scrolled away. Answers "where am
       I in this part", which is the question that only appears once a part
       runs long. Position in the WORK is answered statically below. */}

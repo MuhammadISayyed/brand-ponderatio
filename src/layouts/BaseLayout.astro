@@ -14,6 +14,13 @@ interface Props {
   title: string;
   /** Meta description. Falls back to the site line when a page has none. */
   description?: string;
+  /**
+   * Open Graph type. `article` for a thing someone wrote — an essay or a
+   * part; `website` for the listings, the spine, and the 404. Defaults to
+   * `website` because most pages here are not articles and the ones that are
+   * go through a layout that can say so.
+   */
+  ogType?: 'website' | 'article';
 }
 
 /**
@@ -26,7 +33,11 @@ const SITE_TITLE = 'Brand Ponderatio';
 const SITE_DESCRIPTION =
   'Essays and groundings — long arguments, published complete.';
 
-const { title, description = SITE_DESCRIPTION } = Astro.props;
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  ogType = 'website',
+} = Astro.props;
 
 // The home page sets its title to the site name; every other page is
 // suffixed. Avoids the "Muhammad Ibrahim — Muhammad Ibrahim" case.
@@ -43,6 +54,26 @@ const nav = [
 ];
 
 const currentPath = Astro.url.pathname;
+
+/**
+ * ABSOLUTE URLS ONLY EXIST ONCE `site` IS SET in astro.config.mjs.
+ *
+ * A canonical link or an og:image has to be absolute — a crawler or an
+ * unfurler resolves them against nothing. Until the domain is decided,
+ * `Astro.site` is undefined and `Astro.url` carries the dev server's origin,
+ * so emitting these tags would ship `http://localhost:4321` into production
+ * HTML. Wrong beats absent here: a missing canonical is a shrug, a canonical
+ * pointing at localhost is an instruction to de-index.
+ *
+ * So the tags below are gated on `site`. Set it and they appear, correct,
+ * with no further edit to this file.
+ */
+const canonical = Astro.site
+  ? new URL(currentPath, Astro.site).href
+  : undefined;
+const socialImage = Astro.site
+  ? new URL('/og.png', Astro.site).href
+  : undefined;
 ---
 
 <html lang="en">
@@ -56,6 +87,39 @@ const currentPath = Astro.url.pathname;
 
     <title>{documentTitle}</title>
     <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    {/* HOW THE SITE LOOKS WHEN IT IS NOT THE SITE — pasted into a message, a
+        feed, a chat. The card is the only typography most people will ever
+        see of a link they did not follow, so it is not an afterthought.
+
+        og:title is the BARE title, not documentTitle: the card renders the
+        site name on its own line from og:site_name, and "X — Brand
+        Ponderatio" under a byline reading "Brand Ponderatio" says it twice.
+
+        The type is `article` only for things that are articles; the listings
+        and the 404 are `website`. Unfurlers use it to decide whether to look
+        for a published date. */}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE_TITLE} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {
+      socialImage && (
+        <>
+          <meta property="og:image" content={socialImage} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={`${SITE_TITLE} — the emblem`} />
+        </>
+      )
+    }
+
+    {/* summary_large_image, not summary: the card is a wide mark on paper,
+        and the small square variant crops it to a thumbnail that reads as a
+        smudge. Falls back to the og: tags for everything else. */}
+    <meta name="twitter:card" content="summary_large_image" />
 
     {/* Both are preloaded. Neither is optional on a first paint: the working
         face carries the essay body and every label on the page, and the
@@ -181,9 +245,13 @@ const currentPath = Astro.url.pathname;
   .site-header__mark img {
     display: block;
     /* Height-led, because the emblem is portrait and the header is a line of
-       text: matching its height to the nav's cap height is what makes them
-       sit as one row. */
-    height: 2.5rem;
+       text: setting the height and letting the width follow is what makes the
+       mark and the nav sit as one row. It stands taller than the nav's cap
+       height on purpose — it is the identity, not a third link — and the row
+       is centred, so growing it moves nothing else: the left edge stays on
+       the grid line and the extra height falls evenly above and below the
+       centre the nav is already aligned to. */
+    height: 2.75rem;
     width: auto;
   }
 

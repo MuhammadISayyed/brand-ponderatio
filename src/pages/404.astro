@@ -1,0 +1,77 @@
+---
+/**
+ * Not found.
+ *
+ * A 404 is still a page of this site, so it renders through the same shell
+ * and the same header grid as everything else — the reader keeps the emblem,
+ * the nav, and the type they arrived expecting. What it must NOT do is
+ * pretend to be an article: no byline, no deck, no apparatus in the margin.
+ * A title, a line of prose, and the two ways out.
+ *
+ * The status code itself sits in the margin column, on the rail that carries
+ * part numerals and figure numbers. It is apparatus — a fact about the
+ * request, not a thing to read — and this is where apparatus lives.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Not found"
+  description="That page is not here."
+>
+  <div class="article">
+    <header class="article__header">
+      <p class="label notfound__code">404</p>
+
+      <h1 class="article__title display-title">Not found</h1>
+
+      <p class="article__deck">
+        That address does not name anything on this site. It may have been
+        mistyped, or it may have pointed at something that never existed here.
+      </p>
+    </header>
+
+    <nav class="notfound__ways" aria-label="Ways on">
+      <ul>
+        <li><a href="/">Everything, newest first</a></li>
+        <li><a href="/essays/">Essays</a></li>
+        <li><a href="/groundings/">Groundings</a></li>
+      </ul>
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Column 1, row 1 — the same cell the grounding spine's breadcrumb row
+     occupies, so the code lands on the apparatus rail rather than heading the
+     text. The title beside it is what the reader reads first; the numeral is
+     for the reader who wants to know what happened. */
+  .notfound__code {
+    grid-column: 1;
+    grid-row: 1;
+    color: var(--ink);
+  }
+
+  .notfound__ways {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .notfound__ways ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .notfound__ways li + li {
+    margin-block-start: var(--space-3);
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .notfound__code {
+      margin-block-end: var(--space-2);
+    }
+  }
+</style>

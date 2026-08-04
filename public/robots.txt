@@ -1,0 +1,7 @@
+# Everything here is meant to be read, and meant to be found.
+User-agent: *
+Allow: /
+
+# The Sitemap line goes here once `site` is set in astro.config.mjs and the
+# sitemap integration is added. A sitemap directive has to be an absolute
+# URL, so it cannot be written before the domain exists.
