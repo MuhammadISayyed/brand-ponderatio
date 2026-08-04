@@ -95,19 +95,42 @@
      If a diagram needs a fourth category, THE DIAGRAM IS WRONG —
      split it into two diagrams. This rule is enforced, not advisory. */
 
-  /* UNRESOLVED, and it should be resolved before the first real diagram.
-     These three are separated by hue and almost nothing else — the luminance
-     ratios between them are 1.13 to 1.29, which is to say they are the same
-     value in three colours. A reader with red-green colour blindness cannot
-     tell a cinnabar node from an olive one, and the house style above
-     forbids stroke weight, dashes and fill patterns, so there is no second
-     channel to fall back on.
+  /* RESOLVED — 4 August 2026. The permitted non-colour channel is DIRECT
+     LABELLING, and colour is never the sole carrier of a category.
 
-     Two ways out, and they are mutually exclusive:
-       a. re-derive the trio so it separates by value as well as hue
-          (e.g. cinnabar as-is, indigo lighter, olive darker), or
-       b. permit exactly one non-colour channel and say which.
-     Picking neither means shipping diagrams that some readers cannot read. */
+     THE PROBLEM. These three separate by hue and almost nothing else. Measured
+     against each other: cinnabar-to-olive is 1.07:1, cinnabar-to-indigo
+     1.29:1, indigo-to-olive 1.38:1 — the same value in three colours. Under
+     simulated deuteranopia cinnabar and olive stay at 1.07:1, which is to say
+     a reader with red-green colour blindness sees one colour where the diagram
+     means two.
+
+     WHY THE PALETTE IS NOT THE FIX. Re-deriving the trio to separate by value
+     was the obvious repair and it cannot carry the weight. The paper is light,
+     so every diagram colour has to stay dark enough to clear 3:1 against it;
+     that caps the light end near L=0.24, and with cinnabar fixed in the middle
+     the best achievable steps are about 1.9:1. A 1.9:1 step is visible, not
+     decisive — it would leave the appearance of a fix and a diagram still
+     leaning on colour to say something load-bearing.
+
+     THE RULE. Any distinction a colour makes must ALSO be made by a label in
+     the drawing, next to the thing it names. Not a legend keyed by swatch —
+     the reader must never have to hold a colour-to-meaning mapping in memory
+     and carry it back into the figure. Colour then does what it does
+     everywhere else in this system: it marks something already legible, and
+     removing it costs emphasis rather than meaning.
+
+     This is also the reason the three-colour ceiling above is not merely a
+     palette limit. Three categories is roughly the most a diagram can name
+     directly before the labels themselves become the clutter — the ceiling and
+     this rule are the same constraint seen from two sides.
+
+     WHAT HOLDS IT. Nothing in the build can check that a label names the right
+     node, so this one is held by review rather than by a thrown error — the
+     weaker of the two kinds of enforcement this project uses, recorded as such
+     rather than dressed up. The test at review: cover the diagram's colour and
+     ask whether it still argues what the caption says it argues. If it does
+     not, the labelling is missing, not the contrast. */
 
   /* ==========================================================================
      3. TYPEFACES
@@ -465,7 +488,10 @@
      ====================================================================== */
 
   /* Uniform throughout. Category distinction comes from the three-colour rule
-     ONLY — never from stroke weight, dashes, or fill patterns. */
+     and from DIRECT LABELLING — never from stroke weight, dashes, or fill
+     patterns. Labelling is the one permitted non-colour channel; see the note
+     under the accents above for why it is the channel and not a lighter
+     palette. */
   --diagram-stroke-weight: 1.25px;
   --diagram-node-radius: 4px;
 
