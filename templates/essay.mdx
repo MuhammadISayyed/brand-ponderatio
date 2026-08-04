@@ -1,0 +1,123 @@
+---
+# ESSAY TEMPLATE — a standalone argument.
+#
+# Copy to: src/content/posts/<slug>.mdx
+# Or run:  npm run new -- essay "Your title here"
+#
+# The filename becomes the URL: /essays/<filename>/
+# Delete every line you do not use. An empty optional field is not the same as
+# an absent one — some of them render.
+
+# REQUIRED. Sentence case, no full stop.
+title: Replace this title
+
+# REQUIRED. YYYY-MM-DD, UNQUOTED — quoting makes it a string and the build
+# rejects it. This is when it went up.
+date: 2026-01-01
+
+# REQUIRED. `essay` or `case`. Sets the label in the listing margin.
+kind: essay
+
+# OPTIONAL. The standfirst: large italic under the title, and the meta/OG
+# description for this page. A judgement about this piece, not a slot to fill —
+# delete it if the piece does not want one.
+deck: >
+  One or two sentences that state what the piece argues. Not a summary of the
+  subject — the claim.
+
+# OPTIONAL. Set the URL when it should differ from the filename: a long title,
+# a renamed file, a URL that must stay put. Lowercase words, single hyphens.
+# slug: a-shorter-url
+
+# OPTIONAL. Set only when the ARGUMENT moved — not for typo fixes. Must not be
+# earlier than `date`.
+# updated: 2026-01-02
+
+# OPTIONAL. Stored, but there are no tag pages yet.
+# tags:
+#   - constraint
+#   - method
+
+# OPTIONAL. Every entry must be cited with <Cite source="key"> in the prose, or
+# marked `background: true`. The build FAILS on an uncited source and on a
+# <Cite> whose key matches nothing — so this block and the <Cite> in the demo
+# prose below are a matched pair. DELETE THEM TOGETHER, or replace both.
+# Keys: lowercase letters, digits, hyphens, starting with a letter.
+sources:
+  - key: alexander
+    text: 'Alexander, C. (1964). Notes on the Synthesis of Form. Harvard University Press.'
+  # A work that informed the piece without supporting a particular sentence.
+  # This is the ONLY way to declare a source you do not cite.
+  - key: brand
+    text: 'Brand, S. (1994). How Buildings Learn. Viking.'
+    background: true
+
+# Starts true on purpose: a duplicated template must never publish itself.
+# Drafts render in `dev` and vanish from production builds. Set false to ship.
+draft: true
+---
+
+{/* Import only what you use. Paths are relative to this file's home in
+    src/content/posts/. Delete the unused lines. */}
+import Sidenote from '../../components/Sidenote.astro';
+import Cite from '../../components/Cite.astro';
+import Figure from '../../components/Figure.astro';
+
+Open on the claim, not on the throat-clearing. The first paragraph should be
+the argument in miniature — a reader who stops here should still have been told
+something.
+
+## Sections use two hashes
+
+Never `#` — the page title is already the only `<h1>`. `###` exists if a
+section genuinely needs a subdivision.
+
+A sidenote attaches to the end of the sentence it qualifies, with no space
+before the tag.<Sidenote>This is the qualification. Numbered automatically,
+restarting at 1 on every page; the marker and the note link to each other. On a
+phone it drops inline.</Sidenote> Sidenotes carry the asides that would
+otherwise bloat a paragraph.
+
+Citations name the author in the prose and connect that name to the entry at
+the foot — there is no superscript number. <Cite source="alexander">Alexander</Cite>
+made this point sixty years ago.
+
+> A blockquote sets as a pull quote. Use it for the passage you are about to
+> take apart, not for emphasis.
+
+| | Governing | Enabling |
+| :--- | :--- | :--- |
+| Removes options | yes | yes |
+| Creates relations | no | yes |
+
+<Figure>
+  {/* viewBox MUST be 512 wide — that is --grid-main-col, so the diagram
+      renders 1:1 and its 1.25px strokes and 13px labels are the real sizes.
+      Height is whatever the drawing needs.
+
+      Colours come only from --diagram-* tokens, never literal hex. The accent
+      marks the ONE load-bearing element. Three categories maximum: a fourth
+      means the diagram is doing two jobs and should be split.
+
+      And every category a colour distinguishes is ALSO named by a label in the
+      drawing — never colour alone, never a legend keyed by swatch. Cover the
+      colour: if the diagram stops arguing, the labelling is missing.
+
+      Ask for a diagram in prose rather than drawing it yourself — see
+      PUBLISHING.md §7.1 for the six things to include in the request. */}
+  <svg viewBox="0 0 512 190" role="img" aria-labelledby="fig-1-title">
+    <title id="fig-1-title">
+      Plain-language description of what is drawn, for a reader who cannot see
+      it. Same claim as the picture makes.
+    </title>
+  </svg>
+  <Fragment slot="caption">
+    What the diagram argues — not what it depicts. Never type "Fig. 1"; the
+    number is written for you and renumbers itself.
+  </Fragment>
+</Figure>
+
+## Close on the test
+
+End with what would have to be true for the argument to be wrong, or with the
+test a reader can apply themselves. Not a summary — they have just read it.

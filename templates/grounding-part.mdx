@@ -1,0 +1,83 @@
+---
+# GROUNDING PART TEMPLATE — one move in a long argument.
+#
+# Copy to: src/content/groundings/<work>/NN-<slug>.mdx
+# Or run:  npm run new -- part <work> "Your part title"
+#
+# The NN- prefix is ONLY for sorting in your editor. It is stripped from the
+# URL, and it is not what orders the argument — `part` below is.
+#
+# The work itself must already exist: a folder here AND an entry in GROUNDINGS
+# in src/lib/groundings.ts. See templates/grounding.md.
+
+# REQUIRED. Sentence case, no full stop.
+title: Replace this part title
+
+# REQUIRED. Position in the argument. 1-based, contiguous, unique across the
+# work — the build fails on a gap or a duplicate, because part numbers are
+# permanent citable identifiers.
+part: 1
+
+# REQUIRED. YYYY-MM-DD, unquoted. A grounding publishes complete, so parts
+# normally share one date; it is stored per part because a part is what gets
+# revised.
+date: 2026-01-01
+
+# OPTIONAL, but wanted more here than anywhere else on the site.
+#
+# One line of SUBSTANCE for the contents page: what this part ESTABLISHES, not
+# what it is about. The contents page is the argument in outline — these lines
+# are what let a reader see why Part III has to follow Part II before reading a
+# word. Leave it off and the contents falls back to a bare title.
+deck: >
+  Establishes that — one sentence naming what this part puts beyond dispute,
+  in terms the next part can build on.
+
+# OPTIONAL. Set when the URL should differ from the filename.
+# slug: a-shorter-url
+
+# OPTIONAL. Only when the argument in THIS part moved.
+# updated: 2026-01-02
+
+# OPTIONAL. Same rules as an essay: cite it in the prose with <Cite source="…">
+# or mark it `background: true`, or the build fails. This entry and the <Cite>
+# in the demo prose below are a matched pair — delete them together.
+sources:
+  - key: cartwright
+    text: "Cartwright, N. (1989). Nature's Capacities and Their Measurement. Oxford University Press."
+
+# NOTE: a part has no `kind` and no `tags`.
+
+# Starts true so a duplicated template cannot publish itself. But mind this:
+# drafting ONE part of a finished work removes it from the sequence and breaks
+# the contiguous-numbering check in a production build. Draft the whole work or
+# none of it — which is what "published complete" means anyway.
+draft: true
+---
+
+{/* One level deeper than an essay: this file lives in
+    src/content/groundings/<work>/. Delete the unused imports. */}
+import Sidenote from '../../../components/Sidenote.astro';
+import Cite from '../../../components/Cite.astro';
+import Figure from '../../../components/Figure.astro';
+
+Open by naming the move. A part is read in sequence, so the first paragraph can
+assume what came before — and should say which part it is assuming, so a reader
+arriving from a search engine knows where they are.
+
+## Sections use two hashes
+
+The part title is the `<h1>`; `##` is the top level here as everywhere.
+
+State the claim, then the objection to it, then what survives.<Sidenote>Sidenotes
+work exactly as they do in an essay — numbered per page, marker and note linked
+both ways.</Sidenote>
+
+<Cite source="cartwright">Cartwright</Cite> is cited by naming her in the
+sentence, never with a superscript number.
+
+## Close by handing over
+
+The last paragraph of a part should leave the reader holding exactly what the
+next part needs — and should say so. That sentence is usually a near-restatement
+of the next part's `deck`, which is a good check that the sequence is real.
