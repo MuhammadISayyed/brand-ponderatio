@@ -653,28 +653,38 @@ Once, and it takes about five minutes.
    already on Cloudflare DNS this is two clicks; if not, you will be given
    nameservers to point at.
 
-### 9.4 The one config change that must follow the domain
+### 9.4 `site`, and everything that hangs off it
 
-As soon as you know the final URL, set it in `astro.config.mjs`:
+Set, as of 5 August 2026:
 
 ```js
 export default defineConfig({
-  site: 'https://example.com',   // ← the real domain, with protocol, no trailing path
+  site: 'https://brandponderatio.com',   // no trailing slash, no www
   output: 'static',
   …
 });
 ```
 
-This is load-bearing. Until it is set, `BaseLayout.astro` **deliberately
-suppresses** the canonical link and the `og:url` / `og:image` tags rather than
-emit them pointing at `localhost` — a canonical pointing at localhost is an
-instruction to de-index. Set `site` and all of them appear, correct, with no
-other edit.
+**If the domain ever moves, this is the only line that has to change** — plus
+the `Sitemap:` line in `public/robots.txt`, which cannot be relative.
 
-It is also the prerequisite for a sitemap and an RSS feed, neither of which
-exists yet; both need absolute URLs.
+It is load-bearing. `BaseLayout.astro` gates the canonical link and the
+`og:url` / `og:image` tags on it, and emits nothing rather than emit them
+pointing at `localhost` — a canonical naming localhost is not a shrug, it is an
+instruction to de-index.
 
-`public/robots.txt` has a comment marking where the `Sitemap:` line goes.
+It is also what makes the sitemap and the feed possible — both are generated
+on every build and both need absolute URLs:
+
+- **`/sitemap-index.xml`** — from `@astrojs/sitemap`, built from the routes, no
+  maintenance. `public/robots.txt` points at it.
+- **`/rss.xml`** — `src/pages/rss.xml.ts`. Essays are one item each; each
+  **grounding is one item pointing at its spine**, not one per part. A work
+  that publishes complete should reach a subscriber once, at the front door
+  where the argument's shape is visible — five items for one work would
+  announce it five times and land the reader in Part I with no outline. A
+  grounding has no date of its own, so it is dated by its most recently dated
+  part. Drafts are excluded by the same `PROD` filter as everywhere else.
 
 ### 9.5 The share card
 
@@ -723,7 +733,7 @@ wrong on the live site; do the git revert afterwards, calmly.
 - [ ] Cloudflare Pages project created, `NODE_VERSION` set
 - [ ] `site` set in `astro.config.mjs`
 - [ ] Custom domain added and resolving
-- [ ] `Sitemap:` line added to `robots.txt` once a sitemap exists
+- [ ] `/sitemap-index.xml` and `/rss.xml` load on the deployed site
 - [ ] Paste a link into a chat app and confirm the card renders
 
 ---
@@ -794,8 +804,6 @@ changed anything in the `fonts` block of `astro.config.mjs`, delete
 Things that look like gaps and are choices. Each can be changed — but change it
 knowingly.
 
-- **No sitemap, no RSS feed.** Both need `site` set first (§9.4). Worth adding
-  once the site has content; a feed in particular suits work published complete.
 - **No tag pages**, though posts carry `tags`.
 - **No comments, no analytics, no cookie banner.** Nothing on the site collects
   anything, which is why there is nothing to consent to.

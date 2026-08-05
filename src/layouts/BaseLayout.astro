@@ -89,6 +89,15 @@ const socialImage = Astro.site
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
 
+    {/* Relative on purpose: a feed autodiscovery link is resolved against the
+        page it sits on, so this needs no origin and cannot go stale. */}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${SITE_TITLE} — essays and groundings`}
+      href="/rss.xml"
+    />
+
     {/* HOW THE SITE LOOKS WHEN IT IS NOT THE SITE — pasted into a message, a
         feed, a chat. The card is the only typography most people will ever
         see of a link they did not follow, so it is not an afterthought.

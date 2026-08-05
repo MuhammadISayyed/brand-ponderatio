@@ -92,8 +92,14 @@ Static output, no adapter. Cloudflare Pages serves `dist/` directly:
 | Output dir    | `dist`            |
 | Node version  | `22.12` or newer  |
 
-**Not yet done:** `site` is not set in `astro.config.mjs`. Until it is, the
-canonical link and the Open Graph URL/image tags are deliberately suppressed
-(see the comment in `src/layouts/BaseLayout.astro`) rather than emitted
-pointing at localhost, and there is no sitemap or feed. Setting `site` to the
-real domain turns those meta tags on with no further edit.
+Live at **https://brandponderatio.com**, set as `site` in `astro.config.mjs`.
+That one line is what makes the canonical link, the Open Graph URL and image,
+the sitemap and the feed possible — all four need an absolute origin. If the
+domain ever moves, it is the only line that has to change.
+
+Generated automatically on every build:
+
+| Path | What |
+| :--- | :--- |
+| `/sitemap-index.xml` | Built from the routes; referenced by `robots.txt` |
+| `/rss.xml` | Essays, plus one item per grounding pointing at its spine |

@@ -1,15 +1,30 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 
 // https://astro.build/config
 export default defineConfig({
+  /**
+   * The canonical origin. Load-bearing well beyond the sitemap: BaseLayout
+   * gates the canonical link and the og:url / og:image tags on this being set,
+   * because an absolute URL is the only kind a crawler or an unfurler can
+   * resolve, and one pointing at localhost is an instruction to de-index.
+   *
+   * No trailing slash, no www — this is the origin the site is written about
+   * and the one the canonical should name. If the domain ever moves, this is
+   * the single line that has to change.
+   */
+  site: 'https://brandponderatio.com',
+
   // Static output. Deploy target is Cloudflare Pages, which serves the
   // built `dist/` directly — no adapter required.
   output: 'static',
 
-  integrations: [mdx()],
+  // Sitemap is generated from the built routes, so it needs no maintenance —
+  // but it can only exist because `site` above gives it an origin.
+  integrations: [mdx(), sitemap()],
 
   markdown: {
     // Sätteri is Astro 7's default Markdown/MDX processor. We configure it
