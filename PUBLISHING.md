@@ -705,7 +705,31 @@ byte-identical files every time. The script's header explains why the card is se
 in Georgia rather than Goudy (fontconfig cannot see Astro's `.woff2` files) and
 what to change if you ever install the real face.
 
-### 9.6 Rolling back
+### 9.6 The three hostnames
+
+The site answers on three, and only one of them is its name.
+
+| Host | What happens | Where it is configured |
+| :--- | :--- | :--- |
+| `brandponderatio.com` | serves the site | Pages custom domain |
+| `www.brandponderatio.com` | **301** to the apex, path preserved | Cloudflare dashboard rule |
+| `brand-ponderatio.pages.dev` | **301** to the apex, path preserved | `functions/_middleware.js` |
+
+The split is not arbitrary. Dashboard redirect rules only match hostnames in
+zones you control; `pages.dev` is Cloudflare's zone, so the rule that fixes
+`www` cannot touch it. A Pages Function is the supported mechanism for
+host-level logic on a Pages project, and it runs on the same edge.
+
+**Preview deployments are deliberately exempt.** The middleware matches the
+production Pages host exactly, so `<hash>.brand-ponderatio.pages.dev` still
+serves — otherwise checking a branch on a real device would redirect you to
+production, which is the page you were trying not to look at.
+
+If the domain ever changes, three places name it: `site` in
+`astro.config.mjs`, the `Sitemap:` line in `public/robots.txt`, and
+`CANONICAL_ORIGIN` in `functions/_middleware.js`.
+
+### 9.7 Rolling back
 
 Cloudflare keeps every deployment. Project → **Deployments** → find the good one
 → **Rollback**. That is faster and safer than a revert commit when something is

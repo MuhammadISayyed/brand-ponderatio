@@ -58,6 +58,8 @@ scripts/
   new.mjs            `npm run new -- essay "Title"` — copies a template into place
   make-og.mjs        `npm run og` — regenerates public/og.png, output committed
   make-icons.mjs     `npm run icons` — favicons from the emblem, output committed
+functions/
+  _middleware.js     the only server-side code: redirects the pages.dev host
 ```
 
 `tokens.css` is the design system: every colour, size, and space is named
