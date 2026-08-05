@@ -56,7 +56,8 @@ templates/
   grounding.md       walkthrough for starting a new grounding
 scripts/
   new.mjs            `npm run new -- essay "Title"` — copies a template into place
-  make-og.mjs        regenerates public/og.png; run by hand, output committed
+  make-og.mjs        `npm run og` — regenerates public/og.png, output committed
+  make-icons.mjs     `npm run icons` — favicons from the emblem, output committed
 ```
 
 `tokens.css` is the design system: every colour, size, and space is named

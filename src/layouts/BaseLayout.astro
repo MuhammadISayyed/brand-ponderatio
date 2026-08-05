@@ -81,9 +81,20 @@ const socialImage = Astro.site
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    {/* The emblem is the favicon too — one mark, everywhere it appears. */}
+    {/* The emblem is the favicon too — one mark, everywhere it appears.
+
+        The SVG is what any current browser renders: one file, every size,
+        sharp on any display. The rest are for things that do not read it.
+
+        /favicon.ico is not merely a fallback for old browsers — it is the path
+        browsers, crawlers and feed readers request ON THEIR OWN, whatever the
+        markup says. It held Astro's starter logo until 5 August 2026, which
+        meant anything taking that route was served someone else's mark. The
+        raster set is generated from the emblem by scripts/make-icons.mjs. */}
     <link rel="icon" type="image/svg+xml" href="/emblem.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <title>{documentTitle}</title>
     <meta name="description" content={description} />

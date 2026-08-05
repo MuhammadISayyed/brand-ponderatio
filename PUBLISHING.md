@@ -695,9 +695,13 @@ to the repo. Regenerate it only when the identity changes:
 node scripts/make-og.mjs
 ```
 
-It is a hand-run script rather than a build step on purpose: it would otherwise
-put a rasteriser on the critical path of a 2-second build to produce a
-byte-identical file every time. The script's header explains why the card is set
+The favicons come from the same mark, via `npm run icons`
+(`scripts/make-icons.mjs`) — `favicon.ico` at 16/32/48, `favicon-32.png`, and
+`apple-touch-icon.png` at 180. Run it if the emblem ever changes.
+
+Both are hand-run scripts rather than build steps on purpose: they would
+otherwise put a rasteriser on the critical path of a 2-second build to produce
+byte-identical files every time. The script's header explains why the card is set
 in Georgia rather than Goudy (fontconfig cannot see Astro's `.woff2` files) and
 what to change if you ever install the real face.
 
