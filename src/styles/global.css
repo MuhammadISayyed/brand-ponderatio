@@ -74,6 +74,25 @@
   }
 
   body {
+    /* THE FOOTER SITS AT THE FOOT, on a short page as much as a long one.
+       Without this the rule and the copyright line follow the content
+       wherever it ends — which on an empty listing is the middle of the
+       screen, where a closing rule reads as a divider between two things
+       rather than as the end of the page.
+
+       dvh, not vh: on a phone, 100vh is the viewport with the browser chrome
+       hidden, so a vh-based page is always taller than what you can see and
+       the footer hides just below the fold. dvh tracks the chrome as it comes
+       and goes. The vh line before it is the fallback for anything that does
+       not know dvh, where being slightly too tall is the safer failure.
+
+       min-height, never height: the page must still grow past the viewport
+       when there is more content than fits. */
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+
     overflow-x: clip; /* see the note on html above — both are required */
     background: var(--paper);
     color: var(--ink);

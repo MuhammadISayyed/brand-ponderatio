@@ -207,6 +207,11 @@ const socialImage = Astro.site
 
   main {
     max-width: var(--grid-content-max);
+    /* Takes up whatever height is left over, which is what pushes the footer
+       to the bottom of a short page. Grow, but do not shrink below the
+       content: `1 0 auto` rather than `1`, whose `flex-basis: 0` would let a
+       long page's main be squeezed by its own siblings. */
+    flex: 1 0 auto;
   }
 
   .site-header,
@@ -214,6 +219,13 @@ const socialImage = Astro.site
   main {
     margin-inline: auto;
     padding-inline: var(--space-5);
+    /* Explicit, and required now that body is a flex column. A flex item with
+       auto margins on the cross axis does NOT stretch — the auto margins win,
+       and the item shrinks to fit its content. Without this the header
+       collapsed around the emblem and the nav, and the footer rule shortened
+       to the width of the copyright line. The max-widths above still do the
+       constraining; this only stops the shrink. */
+    width: 100%;
   }
 
   .skip-link {
