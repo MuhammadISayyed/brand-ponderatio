@@ -1,0 +1,259 @@
+---
+/**
+ * FIGURE — the concessions, and where they end.
+ *
+ * The claim is the essay's sharpest: obedience is not what saves the role.
+ * Each concession is locally sensible and buys a clearer story, and the last
+ * step is not another concession — it is the boundary being redrawn without
+ * the role in it. The marketer makes three moves; the fourth is made about
+ * them.
+ *
+ * WHY INTERACTIVE, AND WHY A SEQUENCE RATHER THAN A DIAL. These are discrete
+ * decisions, each with a sentence a marketer actually says. The reader agrees
+ * to them one at a time — every one reasonable on its own — and arrives
+ * somewhere they would not have agreed to at the start. That is the argument
+ * about incrementalism, and it cannot be made by a picture of the end.
+ *
+ * WHAT THE DRAWING DOES NOT DO: it does not shrink the shape to nothing. At
+ * the last step the shape is still there and still perfectly legible — it is
+ * the boundary that moves. Being made small is not what happens to the role;
+ * being made external is.
+ */
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'trap' } = Astro.props;
+const titleId = `${id}-title`;
+const descId = `${id}-desc`;
+const inputId = `${id}-input`;
+const statusId = `${id}-status`;
+
+/* Words and geometry live in lib/figures/obedience.ts, imported here and by
+   the script below — one copy, so the served state and every state after it
+   say the same thing. */
+import { STEPS } from '../../lib/figures/obedience';
+
+const first = STEPS[0];
+---
+
+<div class="fig" data-trap>
+  <svg viewBox="0 0 512 196" role="img" aria-labelledby={titleId} aria-describedby={descId}>
+    <title id={titleId}>
+      A box labelled the company, with marketing drawn as a wide block filling
+      most of the space inside it.
+    </title>
+    <desc id={descId} data-reading>{first.said}</desc>
+
+    <rect
+      data-company
+      x={first.company.x}
+      y={first.company.y}
+      width={first.company.w}
+      height={first.company.h}
+    />
+    <text
+      data-company-label
+      x={first.company.x + 12}
+      y={first.company.y - 8}
+      font-family="var(--font-text)"
+      font-size="var(--diagram-label-size)">the company</text
+    >
+
+    <rect
+      data-mark
+      x={first.mark.x}
+      y={first.mark.y}
+      width={first.mark.w}
+      height={first.mark.h}
+      rx="2"
+    />
+    <text
+      data-mark-label
+      x={first.mark.x + first.mark.w / 2}
+      y={first.mark.y + first.mark.h / 2 + 5}
+      text-anchor="middle"
+      font-family="var(--font-text)"
+      font-size="var(--diagram-label-size)">marketing</text
+    >
+  </svg>
+
+  <div class="fig__control" data-control hidden>
+    <label class="label" for={inputId}>Concessions made</label>
+    <input
+      id={inputId}
+      type="range"
+      min="0"
+      max={STEPS.length - 1}
+      value="0"
+      step="1"
+      list={`${id}-steps`}
+      aria-describedby={statusId}
+    />
+    <datalist id={`${id}-steps`}>
+      {STEPS.map((step, i) => <option value={i} label={step.name} />)}
+    </datalist>
+
+    <div class="fig__status" id={statusId} role="status">
+      <p class="fig__reading"><strong data-name>{first.name}</strong></p>
+      <p class="fig__line" data-said>{first.said}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { STEPS } from '../../lib/figures/obedience';
+
+  const setup = (root: HTMLElement) => {
+    if (root.dataset.ready) return;
+    root.dataset.ready = 'true';
+
+    const control = root.querySelector<HTMLElement>('[data-control]');
+    const input = root.querySelector<HTMLInputElement>('input[type="range"]');
+    const company = root.querySelector<SVGRectElement>('[data-company]');
+    const companyLabel = root.querySelector<SVGTextElement>('[data-company-label]');
+    const mark = root.querySelector<SVGRectElement>('[data-mark]');
+    const markLabel = root.querySelector<SVGTextElement>('[data-mark-label]');
+    const nameOut = root.querySelector<HTMLElement>('[data-name]');
+    const saidOut = root.querySelector<HTMLElement>('[data-said]');
+    const desc = root.querySelector<SVGDescElement>('[data-reading]');
+    if (!control || !input || !company || !mark) return;
+
+    control.hidden = false;
+
+    const draw = () => {
+      const step = STEPS[Math.min(Number(input.value), STEPS.length - 1)];
+
+      company.setAttribute('x', String(step.company.x));
+      company.setAttribute('width', String(step.company.w));
+      companyLabel?.setAttribute('x', String(step.company.x + 12));
+
+      mark.setAttribute('x', String(step.mark.x));
+      mark.setAttribute('y', String(step.mark.y));
+      mark.setAttribute('width', String(step.mark.w));
+      mark.setAttribute('height', String(step.mark.h));
+      /* The accent arrives only at the end, on the thing that is now outside.
+         It is the single load-bearing element in the figure: the whole
+         argument is that this shape ends up there. */
+      mark.dataset.state = step.outside ? 'outside' : 'inside';
+
+      markLabel?.setAttribute('x', String(step.mark.x + step.mark.w / 2));
+      markLabel?.setAttribute('y', String(step.mark.y + step.mark.h / 2 + 5));
+      if (markLabel) markLabel.dataset.state = step.outside ? 'outside' : 'inside';
+
+      if (nameOut) nameOut.textContent = step.name;
+      if (saidOut) saidOut.textContent = step.said;
+      if (desc) desc.textContent = step.said;
+    };
+
+    input.addEventListener('input', draw);
+    draw();
+  };
+
+  const init = () => {
+    document.querySelectorAll<HTMLElement>('[data-trap]').forEach(setup);
+  };
+
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>
+
+<style>
+  .fig svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  [data-company] {
+    fill: none;
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  [data-company-label] {
+    fill: var(--muted);
+  }
+
+  [data-mark] {
+    fill: var(--diagram-node-fill);
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  [data-mark][data-state='outside'] {
+    stroke: var(--diagram-accent);
+  }
+
+  [data-mark-label] {
+    fill: var(--diagram-label-color);
+  }
+
+  [data-mark-label][data-state='outside'] {
+    fill: var(--diagram-accent);
+  }
+
+  /* Geometry transitions, so the shape the reader is watching stays the same
+     shape across a step instead of being replaced by a new one. Under the
+     150ms the doctrine allows, and dropped entirely below. */
+  [data-company],
+  [data-mark],
+  [data-company-label],
+  [data-mark-label] {
+    transition:
+      x 140ms var(--motion-ease),
+      y 140ms var(--motion-ease),
+      width 140ms var(--motion-ease),
+      height 140ms var(--motion-ease),
+      stroke 140ms var(--motion-ease),
+      fill 140ms var(--motion-ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-company],
+    [data-mark],
+    [data-company-label],
+    [data-mark-label] {
+      transition: none;
+    }
+  }
+
+  .fig__control {
+    margin-block-start: var(--space-4);
+  }
+
+  .fig__control label {
+    display: block;
+    margin-block-end: var(--space-2);
+  }
+
+  .fig__control input[type='range'] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .fig__status {
+    margin-block-start: var(--space-3);
+  }
+
+  .fig__reading {
+    margin: 0;
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+  }
+
+  .fig__reading strong {
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+  }
+
+  .fig__line {
+    margin-block: var(--space-2) 0;
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+    color: var(--ink-2);
+    min-height: calc(var(--type-apparatus-size) * var(--type-apparatus-leading) * 3);
+  }
+</style>

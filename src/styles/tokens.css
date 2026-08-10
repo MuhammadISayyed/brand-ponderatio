@@ -534,6 +534,40 @@
      A floating bar, a corner circle, or anything with an easing curve would
      fail all three and should not be added on the strength of this. */
 
+  /* SECOND AMENDMENT: A DIAGRAM MAY ANSWER THE READER.
+     Made deliberately, in the same spirit as the one above.
+
+     The rule at the head of this section governs AUTONOMOUS motion — things
+     that move at the reader, on the page's initiative, while they are trying
+     to read. A figure that changes because the reader moved a control is a
+     different category: it does not compete for attention, it responds to
+     attention already given. Nothing happens until they act, and nothing
+     keeps happening after they stop.
+
+     Granted on four conditions. A figure that cannot meet all four should be
+     a static diagram instead:
+
+       1. THE STATE CHANGE IS THE ARGUMENT. The reader must discover the claim
+          by moving the control, not merely see it revealed more slowly. If a
+          static diagram says the same thing, draw the static diagram.
+       2. IT IS COMPLETE UNTOUCHED. The SVG is rendered at build time in a
+          meaningful state and the caption states the claim in words. The
+          control is progressive enhancement — revealed by script, so a dead
+          control can never be served — and no argument is reachable only by
+          interacting.
+       3. IT IS OPERABLE WITHOUT A MOUSE. Native form controls, so keyboard
+          and touch work without being implemented. The current state is
+          published as text in a live region and in the SVG's own <desc>, so
+          the figure says the same thing to someone who cannot see it.
+       4. NO TRANSITION THE READER CAN OUTRUN. Any easing exists to preserve
+          object constancy across a change — never to perform. It stays under
+          150ms and is dropped entirely under prefers-reduced-motion.
+
+     What this does NOT license: hover-to-reveal, which is a lookup table
+     wearing a diagram's clothes and is invisible on touch; autoplaying
+     figures; and anything that moves while the reader is reading the prose
+     beside it. */
+
   /* Cross-page transition: a fade on the MAIN COLUMN ONLY.
      The margin column and the header stay put. */
   --motion-page-fade: 180ms;

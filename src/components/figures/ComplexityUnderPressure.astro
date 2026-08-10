@@ -1,0 +1,223 @@
+---
+/**
+ * FIGURE — what the pressures actually take.
+ *
+ * The claim, and it is the essay's: complexity is not how MANY things there
+ * are, it is how they relate. So the drawing is a field of work with the
+ * relations drawn in, and each pressure takes the relations faster than it
+ * takes the work. The end state still looks busy — the work is all still
+ * there, none of it touching — which is what "boring marketing" means and why
+ * it is not the same thing as "less marketing".
+ *
+ * WHY INTERACTIVE. The pressures are cumulative and the essay says so. A
+ * slider is the honest control for a cumulative claim: the reader adds one
+ * pressure at a time and sees what each one costs, which no single picture of
+ * the end state can show.
+ *
+ * NO COUNTS. An earlier version printed how many nodes and edges survived
+ * each step. It read as measurement — as though the figure were reporting a
+ * finding — when the drawing is schematic and the difference between the
+ * states is the entire point. The eye can see the relations go. A number
+ * beside it only invites the question of where the number came from.
+ *
+ * Words and geometry both live in lib/figures/pressure.ts, imported here and
+ * by the script below, so the served state and every state after it cannot
+ * disagree.
+ */
+import { STOPS, NODES, EDGES } from '../../lib/figures/pressure';
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'pressure' } = Astro.props;
+const titleId = `${id}-title`;
+const descId = `${id}-desc`;
+const inputId = `${id}-input`;
+const statusId = `${id}-status`;
+---
+
+<div class="fig" data-pressure>
+  <svg viewBox="0 0 512 182" role="img" aria-labelledby={titleId} aria-describedby={descId}>
+    <title id={titleId}>
+      A field of marketing work with the connections between the parts drawn
+      in, whole and unpressured.
+    </title>
+    <desc id={descId} data-reading>{`${STOPS[0].name}. ${STOPS[0].line}`}</desc>
+
+    {/* Edges first so the nodes sit on top of them. */}
+    {
+      EDGES.map(([a, b], i) => (
+        <line
+          data-edge
+          data-index={i}
+          x1={NODES[a].x}
+          y1={NODES[a].y}
+          x2={NODES[b].x}
+          y2={NODES[b].y}
+        />
+      ))
+    }
+
+    {
+      NODES.map((node, i) => (
+        <circle data-node data-index={i} cx={node.x} cy={node.y} r="7" />
+      ))
+    }
+  </svg>
+
+  <div class="fig__control" data-control hidden>
+    <label class="label" for={inputId}>Pressure applied</label>
+    <input
+      id={inputId}
+      type="range"
+      min="0"
+      max={STOPS.length - 1}
+      value="0"
+      step="1"
+      list={`${id}-stops`}
+      aria-describedby={statusId}
+    />
+    <datalist id={`${id}-stops`}>
+      {STOPS.map((stop, i) => <option value={i} label={stop.name} />)}
+    </datalist>
+
+    <div class="fig__status" id={statusId} role="status">
+      <p class="fig__reading"><strong data-name>{STOPS[0].name}</strong></p>
+      <p class="fig__line" data-line>{STOPS[0].line}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { STOPS, EDGES, nodeAlive, edgeAlive } from '../../lib/figures/pressure';
+
+  const setup = (root: HTMLElement) => {
+    if (root.dataset.ready) return;
+    root.dataset.ready = 'true';
+
+    const control = root.querySelector<HTMLElement>('[data-control]');
+    const input = root.querySelector<HTMLInputElement>('input[type="range"]');
+    const nodes = root.querySelectorAll<SVGCircleElement>('[data-node]');
+    const edges = root.querySelectorAll<SVGLineElement>('[data-edge]');
+    const nameOut = root.querySelector<HTMLElement>('[data-name]');
+    const lineOut = root.querySelector<HTMLElement>('[data-line]');
+    const desc = root.querySelector<SVGDescElement>('[data-reading]');
+    if (!control || !input) return;
+
+    control.hidden = false;
+
+    const draw = () => {
+      const index = Math.min(Number(input.value), STOPS.length - 1);
+      const stop = STOPS[index];
+
+      nodes.forEach((node, i) => {
+        node.dataset.state = nodeAlive(i, index) ? 'alive' : 'gone';
+      });
+
+      edges.forEach((edge, i) => {
+        /* A severed connection is REMOVED, not faded: the work stays on the
+           page because it still exists, but a relation that no longer holds
+           is not a fainter relation. It is not there. */
+        edge.dataset.state = edgeAlive(EDGES[i], index) ? 'alive' : 'gone';
+      });
+
+      if (nameOut) nameOut.textContent = stop.name;
+      if (lineOut) lineOut.textContent = stop.line;
+      if (desc) desc.textContent = `${stop.name}. ${stop.line}`;
+    };
+
+    input.addEventListener('input', draw);
+    draw();
+  };
+
+  const init = () => {
+    document.querySelectorAll<HTMLElement>('[data-pressure]').forEach(setup);
+  };
+
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>
+
+<style>
+  .fig svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  [data-node] {
+    fill: var(--diagram-node-fill);
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  /* Work that no longer counts is still work. It recedes to the hairline
+     rather than leaving, because the essay's point is that it did not stop
+     existing — it stopped being anyone's business. */
+  [data-node][data-state='gone'] {
+    stroke: var(--rule);
+  }
+
+  [data-edge] {
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  [data-edge][data-state='gone'] {
+    opacity: 0;
+  }
+
+  [data-node],
+  [data-edge] {
+    transition:
+      stroke 120ms var(--motion-ease),
+      opacity 120ms var(--motion-ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-node],
+    [data-edge] {
+      transition: none;
+    }
+  }
+
+  .fig__control {
+    margin-block-start: var(--space-4);
+  }
+
+  .fig__control label {
+    display: block;
+    margin-block-end: var(--space-2);
+  }
+
+  .fig__control input[type='range'] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .fig__status {
+    margin-block-start: var(--space-3);
+  }
+
+  .fig__reading {
+    margin: 0;
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+  }
+
+  .fig__reading strong {
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+  }
+
+  .fig__line {
+    margin-block: var(--space-2) 0;
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+    color: var(--ink-2);
+    /* Holds the tallest line's height so nothing below hops as the reader
+       drags. */
+    min-height: calc(var(--type-apparatus-size) * var(--type-apparatus-leading) * 3);
+  }
+</style>
