@@ -7,11 +7,15 @@
  * quiet — the mark says whose publication this is, the byline says who is
  * talking.
  *
- * THE PORTRAIT IS SQUARE-CROPPED AT BUILD TIME. The camera original is
- * 4160x6240 and 8.9MB, which is four hundred times the pixels this needs; it
- * lives in originals/ and is gitignored. src/assets/portrait.jpg is a 512px
- * square cropped around the FACE rather than around the frame — a centred
- * crop of a portrait puts the chin in the middle of the circle.
+ * THE PORTRAIT IS SQUARE-CROPPED BY HAND, NOT BY CSS. The camera original is
+ * 3998x5996 and 5MB, hundreds of times the pixels this needs; it lives in
+ * originals/ and is gitignored. src/assets/portrait.jpg is a 512px square cut
+ * around the FACE rather than around the frame — a centred crop of a standing
+ * portrait puts the chin in the middle of the circle, and object-fit: cover
+ * would do exactly that no matter how the file is sized.
+ *
+ * The crop places the eyes about two fifths down, which is what stops the
+ * head floating in the lower half once the square is clipped to a circle.
  *
  * <Image> takes it from there: Astro emits the sizes and formats, so the
  * circle costs a few kilobytes rather than the megabytes it started at.
