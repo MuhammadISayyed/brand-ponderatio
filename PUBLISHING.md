@@ -144,7 +144,7 @@ field; the required ones are marked.
 
 ```mdx
 ---
-title: A system is what it refuses          # REQUIRED. Sentence case, no full stop.
+title: A System Is What It Refuses          # REQUIRED. Title case, no full stop.
 slug: what-a-system-refuses                 # optional — see below
 date: 2026-07-30                            # REQUIRED. YYYY-MM-DD, unquoted.
 updated: 2026-07-31                         # optional
@@ -204,7 +204,8 @@ Import only what you use.
 ### Step 4 — write
 
 Prose is ordinary Markdown. `##` for section headings — **not `#`**, the page
-title is already the `<h1>`.
+title is already the `<h1>`. Section headings are **sentence case**, in
+deliberate contrast to the title above them, which is title case.
 
 ### Step 5 — check it
 
