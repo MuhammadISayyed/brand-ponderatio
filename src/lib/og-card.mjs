@@ -52,7 +52,7 @@ const H = 630;
 const MARGIN = 96;
 const MEASURE = W - MARGIN * 2;
 
-const EMBLEM_TOP = 80;
+const EMBLEM_TOP = 72;
 const EMBLEM_H = 84;
 
 const emblemSvg = (y) =>
@@ -106,12 +106,16 @@ function wrap(text, fontSize, maxWidth, maxLines) {
   return lines;
 }
 
+const FOOTER_SIZE = 30;
+const FOOTER_LEADING = 40;
+
 /**
  * @param {object} card
  * @param {string} card.title    The headline. A piece's title, or the site's.
  * @param {string} [card.kicker] Small line above the title — what kind of
  *                               thing this is. Omitted on the site card.
- * @param {string} card.footer   The line under the rule.
+ * @param {string} card.footer   The line under the rule. A piece's own deck
+ *                               where it has one; the site line otherwise.
  * @returns {Promise<Buffer>} PNG
  */
 export async function renderCard({ title, kicker, footer }) {
@@ -128,8 +132,14 @@ export async function renderCard({ title, kicker, footer }) {
      bottom of the card — and the card is a fixed 1200x630, so anything that
      overflows is simply not there. Anchoring the footer and stacking upward
      means the title grows into the space it has. */
-  const footerY = H - 110;
-  const ruleY = footerY - 62;
+  /* The footer wraps now that it can carry a deck rather than one fixed
+     sentence. Two lines: a third would crowd the title above it, and a deck
+     that cannot be said in two lines at this size is being asked to do the
+     title's job. */
+  const footerLines = wrap(footer, FOOTER_SIZE, MEASURE, 2);
+  const lastFooterY = H - 88;
+  const footerY = lastFooterY - (footerLines.length - 1) * FOOTER_LEADING;
+  const ruleY = footerY - 56;
   const lastLineY = ruleY - 56;
   const firstLineY = lastLineY - (lines.length - 1) * leading;
 
@@ -155,7 +165,12 @@ export async function renderCard({ title, kicker, footer }) {
   }
   <text fill="${INK}" font-family="Georgia, serif" font-size="${fontSize}" letter-spacing="-1">${titleTspans}</text>
   <rect x="${MARGIN}" y="${ruleY}" width="${MEASURE}" height="1" fill="${RULE}"/>
-  <text x="${MARGIN}" y="${footerY}" fill="${INK_2}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30">${escape(footer)}</text>
+  <text fill="${INK_2}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${FOOTER_SIZE}">${footerLines
+    .map(
+      (line, i) =>
+        `<tspan x="${MARGIN}" y="${footerY + i * FOOTER_LEADING}">${escape(line)}</tspan>`,
+    )
+    .join('')}</text>
 </svg>`;
 
   return sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();

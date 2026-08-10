@@ -22,7 +22,14 @@ export const getStaticPaths = (async () => {
 
   return posts.map((post) => ({
     params: { slug: postSlug(post) },
-    props: { title: post.data.title, kind: post.data.kind },
+    props: {
+      title: post.data.title,
+      kind: post.data.kind,
+      /* The piece's own line where it has one. A deck is already the sentence
+         the author wrote to introduce this piece; the site line is what to
+         say when there is nothing better. */
+      deck: post.data.deck,
+    },
   }));
 }) satisfies GetStaticPaths;
 
@@ -30,7 +37,7 @@ export const GET: APIRoute = async ({ props }) => {
   const png = await renderCard({
     title: props.title as string,
     kicker: props.kind === 'case' ? 'Case' : 'Essay',
-    footer: SITE_DESCRIPTION,
+    footer: (props.deck as string | undefined) ?? SITE_DESCRIPTION,
   });
 
   return new Response(png, {

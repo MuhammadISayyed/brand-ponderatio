@@ -28,6 +28,7 @@ export const getStaticPaths = (async () => {
         props: {
           title: part.data.title,
           kicker: `Part ${roman(part.data.part)} · ${GROUNDINGS[grounding].title}`,
+          deck: part.data.deck,
         },
       });
     }
@@ -40,7 +41,7 @@ export const GET: APIRoute = async ({ props }) => {
   const png = await renderCard({
     title: props.title as string,
     kicker: props.kicker as string,
-    footer: SITE_DESCRIPTION,
+    footer: (props.deck as string | undefined) ?? SITE_DESCRIPTION,
   });
 
   return new Response(png, {
