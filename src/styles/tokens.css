@@ -51,8 +51,8 @@
 
   /* Cinnabar — seal red. The ONLY accent allowed in running text.
      Permitted: links, focus states, the single load-bearing element in a
-     diagram, the rule beside an index entry, the "filed under" line at the
-     foot of a post, and both numerals of a sidenote pair.
+     diagram, the rule beside an index entry, and both numerals of a
+     sidenote pair.
      Not permitted: decoration, backgrounds, borders that carry no meaning.
 
      ONE NAMED EXCEPTION: the emblem in the site header. It is the accent used
@@ -279,14 +279,14 @@
   --type-h3-size: 1.3125rem;        /* 21px */
   --type-h3-leading: 1.3;
 
-  /* ONE SIZE FOR ALL APPARATUS. Datelines, tags, sidenotes, sources, figure
+  /* ONE SIZE FOR ALL APPARATUS. Datelines, sidenotes, sources, figure
      captions and document headers are all the same register — everything on
      the page that is not the argument — so they are all one size. Setting
      them at 12, 13 and 14 was three decisions where there is only one
      distinction.
 
      Note the optical cost, since it is real: the uppercase tracked roles
-     (dateline, tags, "filed under") read LARGER than the sentence-case ones
+     (dateline, kind label, breadcrumb) read LARGER than the sentence-case ones
      at the same px, because caps fill the em. They are the same size by
      measurement and slightly unequal by eye. That is the honest trade for
      having one number instead of three, and it is the direction to correct
@@ -307,7 +307,7 @@
   --type-sidenote-inline-size: var(--type-apparatus-size);
 
   /* Metadata label — sans, uppercase, tracked. Datelines, kind labels,
-     document headers, "filed under", Fig. N. */
+     document headers, breadcrumbs, Fig. N. */
   /* SMALLER THAN THE APPARATUS SIZE ON PURPOSE, and this is the third
      attempt at it — the first two set it equal and both looked wrong.
 

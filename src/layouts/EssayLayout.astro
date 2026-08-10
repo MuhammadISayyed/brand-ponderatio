@@ -24,7 +24,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, deck, date, updated, tags, sources } = post.data;
+const { title, deck, date, updated, sources } = post.data;
 
 /**
  * Both directions are audited, because both are silent failures otherwise: a
@@ -119,12 +119,6 @@ const citedCounts = scanCitations(post.body ?? '');
               })}
             </ul>
           </aside>
-        )
-      }
-
-      {
-        tags.length > 0 && (
-          <p class="article__tags label">Filed under {tags.join(' · ')}</p>
         )
       }
 

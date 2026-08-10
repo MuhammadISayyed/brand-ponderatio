@@ -147,10 +147,6 @@
   margin-block-start: var(--space-10);
 }
 
-.article__tags {
-  margin-block-start: var(--space-6);
-}
-
 .article__up {
   margin-block-start: var(--space-6);
   padding-block-start: var(--space-4);
@@ -251,8 +247,8 @@
 
 /* ==========================================================================
    APPARATUS
-   `.label` itself lives in global.css — dateline, sources heading and tags
-   all use it, as does the index. Only the arrangement is local.
+   `.label` itself lives in global.css — dateline and sources heading both use
+   it, as does the index. Only the arrangement is local.
    ====================================================================== */
 
 .article__sources ul {

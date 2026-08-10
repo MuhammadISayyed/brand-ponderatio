@@ -77,7 +77,6 @@ const postSchema = z
     deck: z.string().min(1).optional(),
     sources: z.array(sourceSchema).optional(),
 
-    tags: z.array(z.string().min(1)).default([]),
     draft: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
