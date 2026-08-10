@@ -694,11 +694,19 @@ The favicons come from the same mark, via `npm run icons`
 (`scripts/make-icons.mjs`) — `favicon.ico` at 16/32/48, `favicon-32.png`, and
 `apple-touch-icon.png` at 180. Run it if the emblem ever changes.
 
-Both are hand-run scripts rather than build steps on purpose: they would
-otherwise put a rasteriser on the critical path of a 2-second build to produce
-byte-identical files every time. The script's header explains why the card is set
-in Georgia rather than Goudy (fontconfig cannot see Astro's `.woff2` files) and
-what to change if you ever install the real face.
+Those two are hand-run rather than build steps on purpose: the identity
+changes close to never, so putting a rasteriser on the critical path of every
+build to produce byte-identical files would be waste. The per-piece cards are
+the opposite case — the set changes whenever the writing does, and a hand-run
+generator would be a step to forget, failing silently with the wrong card on a
+live link.
+
+Every card draws through `src/lib/og-card.mjs`, so they are all the same card.
+It is `.mjs` rather than `.ts` so the plain Node script and the Astro build can
+share it with no compile step between them. Its header explains why the type is
+Georgia rather than Goudy: fontconfig cannot see Astro's `.woff2` files, and a
+card whose face depends on whose machine built it is worse than one that never
+claimed the face.
 
 ### 9.6 The three hostnames
 

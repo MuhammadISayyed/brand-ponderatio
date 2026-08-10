@@ -18,6 +18,7 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import ArticleMeta from '../components/ArticleMeta.astro';
 import Byline from '../components/Byline.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
+import { postSlug } from '../lib/format';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -60,7 +61,12 @@ const citedCounts = scanCitations(post.body ?? '');
 }
 ---
 
-<BaseLayout title={title} description={deck} ogType="article">
+<BaseLayout
+  title={title}
+  description={deck}
+  ogType="article"
+  ogImage={`/og/essays/${postSlug(post)}.png`}
+>
   <article class="article">
     <header class="article__header">
       <div class="article__topline">

@@ -21,22 +21,28 @@ interface Props {
    * go through a layout that can say so.
    */
   ogType?: 'website' | 'article';
+  /**
+   * Absolute path to this page's share card. Every piece has its own, built
+   * by the endpoints under src/pages/og/ and carrying its title; the pages
+   * that are not a piece — the listings, the 404 — fall back to the site
+   * card, which is the only one that can be a fixed file.
+   */
+  ogImage?: string;
 }
 
 /**
  * The site is BRAND PONDERATIO; the author is Muhammad Ibrahim. Keeping the two
  * apart is what lets the header carry a mark and the articles carry a byline
  * — the emblem says whose publication this is, the byline says who wrote the
- * thing you are reading.
+ * thing you are reading. Both strings live in lib/site.
  */
-const SITE_TITLE = 'Brand Ponderatio';
-const SITE_DESCRIPTION =
-  'Essays and groundings — long arguments, published complete.';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 
 const {
   title,
   description = SITE_DESCRIPTION,
   ogType = 'website',
+  ogImage = '/og.png',
 } = Astro.props;
 
 // The home page sets its title to the site name; every other page is
@@ -72,7 +78,7 @@ const canonical = Astro.site
   ? new URL(currentPath, Astro.site).href
   : undefined;
 const socialImage = Astro.site
-  ? new URL('/og.png', Astro.site).href
+  ? new URL(ogImage, Astro.site).href
   : undefined;
 ---
 
@@ -131,7 +137,7 @@ const socialImage = Astro.site
           <meta property="og:image" content={socialImage} />
           <meta property="og:image:width" content="1200" />
           <meta property="og:image:height" content="630" />
-          <meta property="og:image:alt" content={`${SITE_TITLE} — the emblem`} />
+          <meta property="og:image:alt" content={`${title} — ${SITE_TITLE}`} />
         </>
       )
     }

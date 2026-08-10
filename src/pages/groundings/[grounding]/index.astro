@@ -22,7 +22,11 @@ const work = GROUNDINGS[grounding!];
 const parts = await getParts(grounding!);
 ---
 
-<BaseLayout title={work.title} description={work.abstract}>
+<BaseLayout
+  title={work.title}
+  description={work.abstract}
+  ogImage={`/og/groundings/${grounding}.png`}
+>
   <div class="article">
     <header class="article__header">
       <div class="article__topline">

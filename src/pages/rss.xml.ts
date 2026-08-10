@@ -28,10 +28,8 @@ import {
   getParts,
   groundingHref,
 } from '../lib/groundings';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 
-const SITE_TITLE = 'Brand Ponderatio';
-const SITE_DESCRIPTION =
-  'Essays and groundings — long arguments, published complete.';
 
 export async function GET(context: APIContext) {
   const posts = await getCollection('posts', ({ data }) =>

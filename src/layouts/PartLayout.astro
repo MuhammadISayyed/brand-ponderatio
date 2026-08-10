@@ -17,7 +17,7 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import ArticleMeta from '../components/ArticleMeta.astro';
 import Byline from '../components/Byline.astro';
 import {
-  GROUNDINGS, groundingHref, partHref, roman, type Part,
+  GROUNDINGS, groundingHref, partHref, partSlug, roman, type Part,
 } from '../lib/groundings';
 
 interface Props {
@@ -62,6 +62,7 @@ const citedCounts = scanCitations(part.body ?? '');
   title={`${title} — ${work.title}`}
   description={deck}
   ogType="article"
+  ogImage={`/og/groundings/${grounding}/${partSlug(part)}.png`}
 >
   {/* Sticky, and empty until the header has scrolled away. Answers "where am
       I in this part", which is the question that only appears once a part
