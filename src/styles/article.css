@@ -488,14 +488,26 @@
 
 .prose figcaption,
 .prose .figure__caption {
+  /* Above the artwork now — see the note in Figure.astro — so the space
+     goes underneath. A bare figcaption in prose keeps the old order and the
+     old spacing. */
   margin-block-start: var(--space-3);
   font-family: var(--font-text);
   font-size: var(--type-caption-size);
   line-height: var(--type-caption-leading);
   color: var(--ink-2);
+  /* MDX wraps a <Fragment slot="caption"> in a paragraph, which pushed the
+     "Fig. N —" span onto a line of its own and left it stranded above the
+     sentence it begins. The number is the first two words of the caption, so
+     the paragraph runs inline and the sentence starts where it should. */
   /* The caption is read, not scanned — it keeps a readable measure even
-     though the figure above it is nearly 900px wide. */
+     though the figure beside it may run wider. */
   max-inline-size: var(--grid-main-col);
+}
+
+.prose .figure__caption > p {
+  display: inline;
+  margin: 0;
 }
 
 /* Wide content scrolls inside itself rather than pushing the page sideways.

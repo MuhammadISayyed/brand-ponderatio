@@ -17,6 +17,14 @@
  * sat level with the top of the artwork, a column away from the text that
  * completes it.
  *
+ * AND THE CAPTION LEADS, above the artwork rather than under it. Under it,
+ * the caption was the last thing on a long figure — below the drawing and, on
+ * an interactive one, below the control as well — so the reader met the
+ * artwork with no idea what it was for and found out afterwards. A caption
+ * that arrives after the looking is a label; one that arrives before it is an
+ * instruction for how to look. This is also what keeps "Fig. 2" adjacent to
+ * the prose that says "see Fig. 2", instead of a screen-height below it.
+ *
  * Numbering uses the same Request-keyed counter as sidenotes: one page render
  * is one Request, so figures restart at 1 on every page.
  */
@@ -32,17 +40,25 @@ const { id = `fig-${n}` } = Astro.props;
 ---
 
 <figure class="figure" id={id}>
-  <slot />
-
   <figcaption class="figure__caption">
     <span class="figure__number">Fig.&nbsp;{n}&nbsp;—&nbsp;</span><slot
       name="caption"
     />
   </figcaption>
+
+  <slot />
 </figure>
 
 <style>
   .figure__number {
     color: var(--muted);
+  }
+
+  /* The caption is above the artwork now, so its spacing belongs below it.
+     Set on the element rather than left to the prose rhythm: the slot's first
+     child is an SVG, which brings no margin of its own. */
+  .figure__caption {
+    margin-block-start: 0;
+    margin-block-end: var(--space-5);
   }
 </style>
