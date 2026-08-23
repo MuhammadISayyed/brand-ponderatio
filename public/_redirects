@@ -1,0 +1,19 @@
+# Old URLs kept alive after the GROUNDINGS -> INQUIRIES rename.
+#
+# No grounding was ever published, so the only address anyone can hold is the
+# section page itself — but that one was live, was in the sitemap, and is still
+# sitting in Cloudflare's edge cache serving a page for a register that no
+# longer exists. A redirect is what turns a dead end into an arrival, and it
+# costs nothing to keep.
+#
+# 301, not 302: the rename is permanent, and a permanent redirect is what
+# consolidates accumulated links onto the real address rather than asking every
+# client to re-check forever. Same reasoning as the pages.dev hop in
+# functions/_middleware.js.
+#
+# The splat covers the part URLs that would have existed had anything shipped
+# under the old register, so a link written from the old PUBLISHING.md still
+# lands somewhere useful rather than on a 404.
+/groundings     /inquiries/   301
+/groundings/    /inquiries/   301
+/groundings/*   /inquiries/   301
