@@ -22,17 +22,34 @@ interface Props {
 }
 
 const { items, empty = 'Nothing filed yet.' } = Astro.props;
+
+/**
+ * A LABEL EVERY ROW SHARES MARKS NOTHING. On the essays page every row said
+ * "Essay" and on the inquiries page every row said "Inquiry" — a column of
+ * identical words down the margin, telling the reader what the heading above
+ * the list had already told them. It is the same mistake the oxide rules made
+ * (see the note at the top of this file): a distinction spent on everything
+ * marks nothing.
+ *
+ * So the label is not a per-page setting but a fact about what is on the
+ * page: it appears when the rows differ and vanishes when they do not. The
+ * home page mixes inquiries with essays and keeps its labels; a section page
+ * of one kind drops them; and an essays page that one day carries a case
+ * alongside the essays gets them back on its own, with nobody remembering to
+ * ask for it.
+ */
+const showLabels = new Set(items.map((item) => item.label)).size > 1;
 ---
 
 {
   items.length === 0 ? (
     <p class="entries__empty">{empty}</p>
   ) : (
-    <ol class="entries">
+    <ol class="entries" data-labelled={String(showLabels)}>
       {items.map((item) => (
         <li class="entry">
           <div class="entry__meta stub">
-            <p class="label">{item.label}</p>
+            {showLabels && <p class="label">{item.label}</p>}
             <p class="entry__sub">
               {item.datetime ? (
                 <time datetime={item.datetime}>{item.meta}</time>
@@ -88,6 +105,12 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
     /* Labels carry the entry's identity — its kind, its reference code — so
        they take the reader's ink rather than metadata grey. */
     color: var(--ink);
+  }
+
+  /* The gap belongs to the label above it, so it goes when the label does —
+     otherwise the metadata hangs off the stub by a line it is not filling. */
+  .entries[data-labelled='false'] .entry__sub {
+    margin-block-start: 0;
   }
 
   .entry__sub {
@@ -164,6 +187,11 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
     .entry__sub {
       margin-block: 0;
       margin-inline-start: var(--space-3);
+    }
+
+    /* Nothing in front of it to sit beside, so it starts at the rail. */
+    .entries[data-labelled='false'] .entry__sub {
+      margin-inline-start: 0;
     }
 
     .entry__status {
