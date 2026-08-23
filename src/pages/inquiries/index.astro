@@ -15,20 +15,24 @@ const items = await inquiryItems();
 
 <BaseLayout
   title="Inquiries"
-  description="Inquiries — one problem worked until it yields, published in sequence."
+  {/* Plain and structural. A meta description is unavoidable — a section page
+      has no prose of its own to draw one from — so it states what the section
+      contains and nothing more, rather than reaching for a voice that is not
+      the machine's to use. */}
+  description="Inquiries — long works, published a chapter at a time."
 >
   <div class="article">
     <header class="article__header">
-      {/* Headline only. A label reading "Inquiries" above a headline reading
-          "Inquiries" says it twice. The standfirst below is the exception to
-          the rule the groundings page kept — this register is new enough that
-          the list underneath does not yet explain itself. */}
-      <h1 class="article__title display-title">Inquiries</h1>
+      {/* HEADLINE ONLY. A label reading "Inquiries" above a headline reading
+          "Inquiries" says it twice, and a section page needs no standfirst —
+          the list underneath is the description.
 
-      <p class="article__deck">
-        One problem, worked until it yields. Each is a whole work, published a
-        chapter at a time.
-      </p>
+          There was one here, and it was written by the machine rather than by
+          the author. That is the whole reason it is gone: every word of prose
+          on this site is the author's, and a section blurb composed to fill a
+          slot is a stranger's voice standing at the top of their shelf. If a
+          line ever belongs here, they will write it. */}
+      <h1 class="article__title display-title">Inquiries</h1>
     </header>
 
     <EntryList items={items} empty="No inquiries opened yet." />
