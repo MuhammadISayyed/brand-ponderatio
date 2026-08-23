@@ -1,0 +1,148 @@
+---
+/**
+ * Whether an inquiry is still being written.
+ *
+ * THE ONLY THING ON THIS SITE THAT MOVES WITHOUT BEING ASKED TO. It exists
+ * under the third amendment in tokens.css §8, which is worth reading before
+ * touching this file — in particular, the mark is a status and not a
+ * decoration, and it must never be reused to make something else feel alive.
+ *
+ * The word carries the meaning and the mark carries the tense: a dot that
+ * breathes, and a hairline ring that leaves it once per cycle and dissolves.
+ * Someone who cannot see it, or who has asked for no motion, loses nothing —
+ * the label says "In progress" either way, and the dot goes solid rather than
+ * disappearing. The animation is decoration on top of a complete statement,
+ * which is the only arrangement in which an animation is allowed to fail.
+ *
+ * The dot is aria-hidden. A screen reader announcing "In progress" and then
+ * describing a pulsing circle would be reporting the typography.
+ */
+/*
+ * NO `class` PROP, deliberately. The root element here carries this
+ * component's style scope, not the caller's, so a class handed down from a
+ * parent stylesheet is a rule that may or may not land depending on how Astro
+ * scopes that particular call. Callers that need to position the badge wrap it
+ * in an element they own — see EntryList.
+ */
+interface Props {
+  status: 'in-progress' | 'complete';
+}
+
+const { status } = Astro.props;
+const working = status === 'in-progress';
+---
+
+<p class="status" data-status={status}>
+  <span class="status__dot" aria-hidden="true"></span>
+  <span class="status__label">{working ? 'In progress' : 'Complete'}</span>
+</p>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-block: 0;
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--muted);
+  }
+
+  .status__dot {
+    /* inline-block on the baseline rather than a flex-centred box, so the dot
+       sits on the same line the caps sit on and the badge has no height of
+       its own to disagree with the text beside it. */
+    display: inline-block;
+    position: relative;
+    inline-size: 5px;
+    block-size: 5px;
+    border-radius: 50%;
+    /* Nudged off the baseline to the optical centre of the cap height. */
+    transform: translateY(-0.35em);
+  }
+
+  /* A finished work gets the SAME MARK, unmoving. Making completion a
+     different shape would say the two states are different kinds of fact;
+     they are one fact with two values, and the difference between them should
+     be the difference between moving and still. */
+  .status[data-status='complete'] .status__dot {
+    background: var(--muted);
+  }
+
+  .status[data-status='in-progress'] .status__dot {
+    background: var(--accent);
+    animation: status-breathe var(--motion-pulse) ease-in-out infinite;
+  }
+
+  .status[data-status='in-progress'] .status__label {
+    color: var(--ink);
+  }
+
+  /* THE RING. A single hairline circle that leaves the dot, widens, and is
+     gone before it gets far — the mark a live signal makes, rather than a
+     light being switched on and off.
+
+     It is a pseudo-element positioned out of flow, so however far it travels
+     it occupies no space and cannot move a line of type. `inset` rather than
+     width/height so it is always concentric with the dot whatever the dot's
+     size becomes. */
+  .status[data-status='in-progress'] .status__dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    /* The ring must never intercept a click or a hover on the text it sits
+       beside; it is a drawing, not a target. */
+    pointer-events: none;
+    animation: status-emit var(--motion-pulse) cubic-bezier(0, 0.55, 0.45, 1)
+      infinite;
+  }
+
+  /* The dot dims and recovers. Bottoming out at --motion-pulse-floor rather
+     than at zero is what makes it read as breathing instead of blinking, and
+     the eye reads a blink as an alert. The long holds at each end keep it
+     from looking like a sine wave doing laps. */
+  @keyframes status-breathe {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: var(--motion-pulse-floor);
+    }
+  }
+
+  /* The ring's whole life happens in the first 55% of the cycle; the rest is
+     silence. That gap is doing real work — a ring that emitted continuously
+     would be a radar sweep, and the pause is what keeps the mark closer to a
+     pulse than to a machine running. It fades out well before it reaches full
+     reach, so the edge dissolves rather than stopping. */
+  @keyframes status-emit {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    55%,
+    100% {
+      transform: scale(var(--motion-pulse-reach));
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Condition 5. The dot stays, solid and at full strength, and the ring
+       never leaves — the reader asked for no motion, not for less
+       information. The word carries the whole message either way. */
+    .status[data-status='in-progress'] .status__dot {
+      animation: none;
+    }
+
+    .status[data-status='in-progress'] .status__dot::after {
+      display: none;
+    }
+  }
+</style>

@@ -9,7 +9,7 @@ to be read once end to end, then used as a reference.
 2. [The daily loop](#2-the-daily-loop)
    - [Templates — the fast path](#2a-templates--the-fast-path)
 3. [Publishing an essay](#3-publishing-an-essay)
-4. [Publishing a grounding](#4-publishing-a-grounding)
+4. [Publishing an inquiry](#4-publishing-an-inquiry)
 5. [Writing: what the Markdown does and does not do](#5-writing-what-the-markdown-does-and-does-not-do)
 6. [The three components](#6-the-three-components)
 7. [Visualizations and animation](#7-visualizations-and-animation)
@@ -29,12 +29,38 @@ The site holds exactly two, and the difference is not length.
 and it is complete on its own page. One `.mdx` file in `src/content/posts/`.
 Lives at `/essays/<slug>/`.
 
-**A grounding** is a long work, published *complete*, read *in order*, divided
-into numbered parts. A grounding is **not** a blog series — you do not publish
-Part I and then write Part II in public. It goes up finished. That is what makes
-its part numbers permanent, and therefore citable. One folder in
-`src/content/groundings/`, one `.mdx` file per part. Lives at
-`/groundings/<work>/` with parts at `/groundings/<work>/<part-slug>/`.
+**An inquiry** is a single problem worked until it yields — a long work,
+published *in sequence*, a chapter at a time, over weeks or months. Unlike the
+**grounding** it replaced, an inquiry does **not** go up finished: publishing
+while the work is still moving is the whole point of the register, and it is why
+an inquiry carries a `status` and a grounding never did.
+
+Its shape is three levels deep:
+
+| Level | Numeral | Renders as | Has a page? |
+| :--- | :--- | :--- | :--- |
+| Inquiry | **none** | `Demand` | yes — the contents page |
+| Part | Spelled out | `Part Two` | **no** — display only |
+| Chapter | Arabic | `Chapter 5` | yes |
+
+**Inquiries are not numbered.** The title is the work's only name — it is what
+a reader calls it and what anyone citing it writes down, and a numeral beside
+it was a second name to keep in step for nobody's benefit. The shelf orders
+itself by `started`, newest first, so there is no sequence to maintain.
+
+A **chapter** is the atomic unit: one `.mdx` file, one page, one thing
+published. A **part** is an optional grouping layer with no route of its own —
+it is a heading on the contents page and a segment in the chapter's position
+line, and nothing more. Many inquiries need no parts at all; leave `parts` off
+and the contents page renders a flat numbered run of chapters with no trace of
+where the headings would have gone.
+
+Chapter numbers are **continuous across parts** — they do not restart at each
+one — because a chapter is cited by its number.
+
+One `.mdx` file in `src/content/inquiries/` is the work itself; one folder in
+`src/content/chapters/` holds its chapters. Lives at `/inquiries/<work>/` with
+chapters at `/inquiries/<work>/<chapter-slug>/`.
 
 If you are unsure which you are writing: if a reader could start at section 3
 and lose nothing, it is an essay.
@@ -89,19 +115,19 @@ collections never try to load them:
 | File | What it is |
 | :--- | :--- |
 | `templates/essay.mdx` | A complete essay: every frontmatter field with its rules, and demo prose exercising all three components |
-| `templates/grounding-part.mdx` | One part of a grounding |
-| `templates/grounding.md` | The walkthrough for a **new work** — registry entry, folder, first parts |
+| `templates/inquiry.mdx` | The work itself — the frontmatter that names it, plus the body that becomes its front matter |
+| `templates/chapter.mdx` | One chapter of an inquiry |
 
 Copy them by hand, or let the script do the mechanical parts:
 
 ```sh
-npm run new -- essay     "A system is what it refuses"
-npm run new -- grounding "The Dispositional Basis of Demand" --slug=demand
-npm run new -- part demand "The quantity and the power"
+npm run new -- essay   "A System Is What It Refuses"
+npm run new -- inquiry "Demand"
+npm run new -- chapter demand "The Quantity and the Power"
 ```
 
-What the script fills in: the slug, today's date, the next part number, the
-`NN-` filename prefix. What it does **not** fill in: anything that is a
+What the script fills in: the slug, today's date, the next inquiry or chapter
+number, the `NN-` filename prefix. What it does **not** fill in: anything that is a
 judgement — the deck, the sources, the argument. A field silently filled with a
 plausible default is worse than an empty one you have to look at.
 
@@ -115,11 +141,10 @@ Two things worth knowing:
   `sources` entry are a matched pair, because the build fails on a citation
   with no source and on a source with no citation. Delete them together.
 
-`npm run new -- grounding` creates the folder and *prints* the registry entry
-for you to paste into `src/lib/groundings.ts`. It does not patch the file:
-editing TypeScript by regex is how a script eventually corrupts one, and the
-paste makes you look at the abstract, which is the one field nobody should be
-able to skip.
+`npm run new -- inquiry` creates two things: the work's `.mdx` file and an empty
+`src/content/chapters/<work>/` folder waiting for Chapter 1. There is no
+registry to paste into — the file *is* the work, which is also what lets it
+carry the front matter a reader meets before Chapter 1.
 
 The rest of this section explains what the templates contain, which is what you
 need when editing rather than creating.
@@ -197,15 +222,31 @@ import Cite from '../../components/Cite.astro';
 import Figure from '../../components/Figure.astro';
 ```
 
-(From a **grounding part**, one level deeper: `'../../../components/…'`.)
+(From a **chapter**, one level deeper: `'../../../components/…'`.)
 
 Import only what you use.
 
 ### Step 4 — write
 
 Prose is ordinary Markdown. `##` for section headings — **not `#`**, the page
-title is already the `<h1>`. Section headings are **sentence case**, in
-deliberate contrast to the title above them, which is title case.
+title is already the `<h1>`.
+
+**Everything that names something takes title case** — the piece's title, its
+section headings, the nav, the listings, the share cards. This replaces the
+older rule, which set headings in sentence case for deliberate contrast with
+the title. The contrast was a distinction the reader had to be taught before it
+meant anything, and it made a heading read as the first line of the paragraph
+under it rather than as the name of the section.
+
+House style is Chicago: capitalise the first and last word and everything in
+between, except articles (`a`, `an`, `the`), coordinating conjunctions (`and`,
+`but`, `or`, `nor`, `for`, `yet`, `so`) and prepositions — prepositions stay
+lowercase however long they are, so it is "Pressure from the Top", not
+"Pressure From the Top". A preposition that lands first or last is capitalised
+anyway: "In Praise of Demanding Marketing", "Pressure from Within".
+
+Full stops stay off titles and headings. Sentences — decks, standfirsts, empty
+states, body prose — are sentences, and none of this applies to them.
 
 ### Step 5 — check it
 
@@ -215,48 +256,115 @@ paragraph that introduces it.
 
 ---
 
-## 4. Publishing a grounding
+## 4. Publishing an inquiry
 
-Three things must agree, and the build checks all three.
+Two files must agree — the work and its chapters — and the build checks that
+they do.
 
-### Step 1 — register the work
+### Step 1 — make the work
 
-`src/lib/groundings.ts`. The title and abstract of a grounding live **in code**,
-not in frontmatter, because they belong to the whole work and there is no file
-that *is* the work:
-
-```ts
-export const GROUNDINGS: Record<string, Grounding> = {
-  demand: {
-    title: 'The Dispositional Basis of Demand',
-    abstract:
-      'Demand is treated in economics as a quantity — something read off a schedule, revealed by what was bought. This grounding argues that it is a disposition: a causal power that exists whether or not it is exercised…',
-  },
-};
+```sh
+npm run new -- inquiry "Demand"
 ```
 
-The **key** (`demand`) is the URL segment and must match the folder name exactly.
-The `abstract` is one paragraph, shown on the spine page above the contents.
+That writes `src/content/inquiries/demand.mdx` and creates an empty
+`src/content/chapters/demand/`. The **filename is the URL segment** and the
+folder name its chapters must sit in. There is no registry.
 
-### Step 2 — make the folder and the parts
+```mdx
+---
+title: Demand                               # REQUIRED. Title case, no full stop.
+standfirst: >                               # REQUIRED. One paragraph: the PROBLEM.
+  Demand is treated in economics as a quantity — something read off a schedule,
+  revealed by what was bought. This inquiry asks whether it is instead a
+  disposition: a causal power that exists whether or not it is exercised.
+status: in-progress                         # REQUIRED. `in-progress` or `complete`.
+started: 2026-08-23                         # REQUIRED
+description: One sentence, for search.      # optional — falls back to standfirst
+slug: demand                                # optional
+parts:                                      # OPTIONAL — see below
+  - number: 1
+    title: What Demand Is Not
+  - number: 2
+    title: Dispositions
+draft: false
+---
+
+The body of this file is the **introduction** — the front matter of the work,
+which a reader meets before Chapter 1. It renders on the contents page,
+between the title and the contents.
+```
+
+### The introduction
+
+There is no separate `/introduction` route, and it does not need one: the
+inquiry's own file *is* the introduction, so the contents page is both the
+front door and the front matter.
+
+It **folds**. Long introductions stand between a reader and the contents they
+may have come for, so the page shows the opening and fades the rest out, with a
+"Read the rest" control beneath it.
+
+The fold is applied *by script, to a page that ships open*. If the script never
+runs, the reader gets the whole introduction and no button — never a fifth of it
+behind a dead control. Nothing is hidden from search engines or reader modes
+either, because everything is in the HTML.
+
+Short introductions are not folded at all. Below roughly 160px of overflow the
+control is not offered, because hiding three lines behind a click is a worse
+deal than showing them.
+
+The **`standfirst` states the problem**, not the findings. It is the only thing
+a reader has on which to decide whether to follow months of work.
+
+It does **not** appear on the contents page — it is the line under the title on
+the shelf, the meta description, and the share card's footer. Putting it above
+the introduction as well meant saying in one paragraph what the introduction was
+about to say properly, to a reader who had already decided to open the work.
+
+**`status: in-progress`** puts a quietly pulsing oxide dot beside the work
+wherever it is listed. That mark is the only thing on this site that moves
+without the reader asking it to; the amendment permitting it, and the five
+conditions it is granted on, are in `src/styles/tokens.css` §8. Set `complete`
+when the last chapter lands and the dot stops moving.
+
+### Step 2 — parts, or no parts
+
+`parts` is **optional and all-or-nothing**. Omit it and the contents page
+renders a flat numbered list of chapters, with the part label dropped from the
+chapter headers entirely — nothing looks amputated.
+
+Declare it and **every** chapter must name a part. Mixing the two fails the
+build, because an inquiry where some chapters are grouped and others float has
+no honest contents page.
+
+Parts have **no page**. A part you have declared but not yet written a chapter
+for renders as a heading reading "To come", which is the shape of the work
+stated in advance — most of what a contents page is for while a work is still
+running.
+
+### Step 3 — the chapters
+
+```sh
+npm run new -- chapter demand "The Quantity and the Power"
+```
 
 ```
-src/content/groundings/demand/
-  01-the-quantity-and-the-power.mdx
-  02-dispositions-are-not-conditionals.mdx
+src/content/chapters/demand/
+  01-dispositions-without-laws.mdx
+  02-the-quantity-and-the-power.mdx
   03-powers-compose.mdx
 ```
 
 The `01-` prefix is **only** so the files sort in your editor. It is stripped
-from the URL (`/groundings/demand/the-quantity-and-the-power/`) and it is *not*
-what orders the argument — the `part` field is.
-
-### Step 3 — part frontmatter
+from the URL (`/inquiries/demand/the-quantity-and-the-power/`) and it is *not*
+what orders the work — the `number` field is.
 
 ```mdx
 ---
-title: The quantity and the power           # REQUIRED
-part: 1                                     # REQUIRED. 1-based, contiguous, unique.
+title: The Quantity and the Power           # REQUIRED. Title case, no full stop.
+number: 2                                   # REQUIRED. 1-based, contiguous, unique.
+part: 1                                     # optional — all-or-nothing across the work
 date: 2026-07-31                            # REQUIRED
 slug: the-quantity-and-the-power            # optional
 updated: 2026-08-02                         # optional
@@ -271,27 +379,50 @@ draft: false
 ---
 ```
 
-Note there is **no `kind`** on a part.
+There is **no `inquiry` field**, and no `kind`. The folder says which work a
+chapter belongs to, so the two cannot disagree.
 
 **The `deck` matters more here than anywhere else.** The contents page is the
-argument in outline: each part's deck says what that part *establishes*, so a
-reader can see why Part III has to follow Part II before reading a word. Leave
-it off and the contents falls back to a bare title, and the page stops doing its
-job. Write what the part establishes, not what it is about.
+argument in outline: each chapter's deck says what that chapter *establishes*,
+so a reader can see why Chapter 6 has to follow Chapter 5 before reading a word.
+Write what the chapter establishes, not what it is about.
 
-### Step 4 — the numbering rules the build enforces
+### Step 4 — the rules the build enforces
 
-- Parts must run **1..n with no gaps**. Expected 3 and found 4? Build fails. A
-  gap means a reader hits a dead end and a citation points at nothing.
-- **No two parts may share a number.** Part VII must mean one thing forever.
-- A folder that is not in `GROUNDINGS` fails with a message naming the folder
-  and listing the known groundings.
+- Chapters must run **1..n with no gaps**, counting drafts. A gap means a reader
+  hits a dead end and a citation points at nothing.
+- **No two chapters may share a number.** Chapter 7 must mean one thing forever.
+- **`part` is all-or-nothing**, and every `part` must match a declared one.
+- **Parts cannot interleave.** Because chapter numbers run continuously, the
+  part numbers must never go backwards along them — Part One, Part Two, Part One
+  again is refused.
+- A chapters folder with no matching file in `src/content/inquiries/` fails with
+  a message naming the folder and listing the inquiries it does know.
+- There is nothing to check at the inquiry level: it has no number, and its
+  order comes from `started`.
 
-To insert a new part into a finished work you must renumber every part after it.
-The URLs survive this — they are slugs, not numbers — but the roman numerals in
-every existing citation of those parts do not. Think before inserting.
+To insert a chapter into a running work you must renumber every chapter after
+it. The URLs survive this — they are slugs, not numbers — but any existing
+citation by number does not. Think before inserting.
 
-Roman numerals are rendered from the `part` integer. You never type "IV".
+Numerals are rendered from the integers. You never type "Two".
+
+### Step 5 — publish one chapter at a time
+
+This is the part that differs from every other register on the site, and it is
+the reason the register exists.
+
+Each chapter carries its own `draft`. Flip **one** to `false` when it is ready
+and leave the rest true. A drafted chapter:
+
+- keeps its place in the numbering, so the sequence never breaks;
+- appears on the contents page **greyed and unlinked**, so a reader can see the
+  shape of what is coming;
+- gets **no page, no share card and no feed entry** until you publish it.
+
+Published chapters go into `/rss.xml` individually as they land, tagged with the
+work, and into a per-inquiry feed at `/inquiries/<work>/rss.xml` for readers who
+want that work and not the essays.
 
 ---
 
@@ -587,14 +718,17 @@ draft: true
   row, no URL.
 
 Enforced in three places, all keyed on `import.meta.env.PROD`:
-`src/lib/listing.ts`, `src/lib/groundings.ts`, `src/pages/essays/[...slug].astro`.
+`src/lib/listing.ts`, `src/lib/inquiries.ts` (`isLive`),
+`src/pages/essays/[...slug].astro`.
 
 Two things to know:
 
-- A draft **part** is removed from its grounding, which can break the
-  contiguous-numbering rule and fail the production build. Drafting Part II of
-  three means parts 1 and 3 remain, and the build correctly refuses. Draft the
-  whole work, or none of it — which is what "published complete" means anyway.
+- A draft **chapter** is the exception, and deliberately so. It is *not* dropped
+  from its inquiry — it keeps its number, so the contiguous-numbering rule still
+  sees the whole work, and it shows on the contents page greyed and unlinked.
+  What it loses is its page, its share card and its feed entry. This is what
+  lets you publish a long work one chapter at a time without the build accusing
+  you of a gap every time you are mid-way through writing.
 - To see the site exactly as the public will, run a production build (§9.1).
   `npm run dev` will never show you the drafts-removed state.
 
@@ -641,9 +775,11 @@ Once, and it takes about five minutes.
    | Build output directory | `dist` |
    | Root directory | *(leave blank)* |
 
-4. Add an environment variable **`NODE_VERSION` = `22.12.0`**. `package.json`
-   requires Node ≥ 22.12; Cloudflare's default is older and the build will fail
-   in a way that does not obviously say "Node version".
+4. Add an environment variable **`NODE_VERSION` = `22.18.0`**. `package.json`
+   requires Node ≥ 22.18 — 22.18 is where node reads TypeScript without a flag,
+   which `scripts/make-og.mjs` needs to share the site's own strings with the
+   rest of the code. Cloudflare's default is older and the build will fail in a
+   way that does not obviously say "Node version".
 5. Deploy. You get `<project>.pages.dev` immediately.
 6. Custom domain: project → **Custom domains** → add it. If the domain is
    already on Cloudflare DNS this is two clicks; if not, you will be given
@@ -674,13 +810,17 @@ on every build and both need absolute URLs:
 
 - **`/sitemap-index.xml`** — from `@astrojs/sitemap`, built from the routes, no
   maintenance. `public/robots.txt` points at it.
-- **`/rss.xml`** — `src/pages/rss.xml.ts`. Essays are one item each; each
-  **grounding is one item pointing at its spine**, not one per part. A work
-  that publishes complete should reach a subscriber once, at the front door
-  where the argument's shape is visible — five items for one work would
-  announce it five times and land the reader in Part I with no outline. A
-  grounding has no date of its own, so it is dated by its most recently dated
-  part. Drafts are excluded by the same `PROD` filter as everywhere else.
+- **`/rss.xml`** — `src/pages/rss.xml.ts`. Essays are one item each, and each
+  **chapter of an inquiry is its own item**, tagged with the work and titled
+  with it. This reverses what the groundings register did, and the reversal is
+  the point: a grounding published complete, so one item per part would have
+  announced one event five times. An inquiry publishes a chapter at a time over
+  months, and serial publication is what a feed is actually for. The inquiry
+  itself is not an item — it is the container, not a thing that happens on a
+  day.
+- **`/inquiries/<work>/rss.xml`** — one feed per inquiry, for a reader who wants
+  that work and not the essays. Same chapters, without the work's name repeated
+  on every title.
 
 ### 9.5 The share card
 
@@ -701,6 +841,32 @@ build to produce byte-identical files would be waste. The per-piece cards are
 the opposite case — the set changes whenever the writing does, and a hand-run
 generator would be a step to forget, failing silently with the wrong card on a
 live link.
+
+**Every card URL carries a `?v=` stamp**, and this is the part that makes an
+edit actually reach anybody. The cards themselves always regenerated correctly
+— change a title, the build redraws the PNG. But the URL stayed the same, and
+an unfurler caches an image against exactly that string, for days at best and
+permanently at worst. The corrected card sat on the origin, unfetched, while
+every chat window kept showing the old one. So the URL now ends in a hash of
+what is drawn on the card: an edit mints an address nothing has cached, and the
+next scrape has to fetch it. It re-keys Cloudflare's edge cache in the same
+stroke.
+
+That hash is only honest while the thing hashed and the thing drawn are one
+object, which is why **the card for a piece is built in exactly one place**,
+`src/lib/og-pieces.ts`, and used both by the page that links to it and by the
+endpoint that renders it. If you teach `renderCard` to draw something new, it
+has to arrive through the card object, or the URL will stop moving when that
+thing does. Never write an `ogImage` path out by hand — use the `*CardUrl`
+helpers, or the page ships a card nobody will see.
+
+The stamp fixes every link shared from now on. It cannot fix a link **already**
+sitting in a Slack channel or a message thread: that was scraped once, against
+a page URL that never changes. After a deploy, `npm run unfurl` fetches the
+live pages, works out which ones the platforms are still stale on, and prints
+the debugger links to force a re-scrape (`-- --open` opens them). Slack has no
+debugger and re-unfurls itself after about half an hour; iMessage has neither,
+caches per device, and keeps the old card forever.
 
 Every card draws through `src/lib/og-card.mjs`, so they are all the same card.
 It is `.mjs` rather than `.ts` so the plain Node script and the Astro build can
@@ -753,11 +919,13 @@ wrong on the live site; do the git revert afterwards, calmly.
       and has a `<title>`
 - [ ] Cover the colour in every diagram — does it still argue what the caption
       says? Every category is labelled in the drawing (§7.3a)
-- [ ] `deck` present (essay: if it earns it; grounding part: yes)
+- [ ] `deck` present (essay: if it earns it; chapter: yes)
 - [ ] `updated` set only if the *argument* moved
 - [ ] `draft: false` (or the field removed)
 - [ ] Read it once on a phone-width window — sidenotes drop inline, the margin
       column collapses at 56.25em
+- [ ] If you EDITED a title or deck on something already published: after the
+      deploy lands, `npm run unfurl` and force the re-scrapes it lists (§9.5)
 
 ### Before the first deploy
 
@@ -804,16 +972,23 @@ Read it. They are written to say what to do. The common ones:
 - `duplicate source key "x"` → two entries claim one key; `<Cite>` would be
   ambiguous.
 
-### "…sits in a folder named 'x', which is not a grounding"
+### "…sits in a folder named 'x', which is not an inquiry"
 
-You made a folder under `groundings/` without registering it. Add it to
-`GROUNDINGS` in `src/lib/groundings.ts`, or move the file. The message lists the
-groundings it does know about.
+You made a folder under `chapters/` with no matching work. Add
+`src/content/inquiries/x.mdx`, or move the file. The message lists the inquiries
+it does know about.
 
-### "parts must run 1..n with no gaps"
+### "`part` is all-or-nothing within an inquiry"
 
-A missing or duplicated `part` number — or a part you set `draft: true` on,
-which removes it from the sequence in a production build. §4, §8.
+Some chapters declare a `part` and some do not. Either give every chapter one,
+or remove the field from all of them. The message names the first chapter
+missing it.
+
+### "chapters must run 1..n with no gaps"
+
+A missing or duplicated `number`. Drafts are **not** the cause here — a drafted
+chapter keeps its place in the sequence on purpose, so that a work in progress
+never fails the build for being unfinished. §4, §8.
 
 ### The dev server will not start / port is taken
 

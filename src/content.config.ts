@@ -114,61 +114,180 @@ const posts = defineCollection({
 });
 
 /**
- * Parts of a GROUNDING — a long work, published complete, read in order.
- * Separate from `posts` because the two are different objects, not two
- * flavours of one: a post is entered directly and stands alone, a part is a
- * move in an argument and means less out of sequence.
+ * An INQUIRY — a single problem worked until it yields, published in sequence
+ * over weeks or months. The register above essays: not a piece you enter and
+ * leave, but a whole work that accumulates in public.
  *
- * Which grounding a part belongs to is NOT declared here. It is derived from
- * the folder the file sits in, so the two cannot disagree — see
- * lib/groundings.ts.
+ * This file IS the work. Its body is the front matter of the argument — the
+ * introduction a reader hits before Chapter 1 — and its frontmatter carries
+ * the name, the problem, and the shape. That is a change from the grounding
+ * this replaced, whose title and abstract lived in a registry in code because
+ * "there is no file that is the work". Now there is one, so the registry is
+ * gone: a work with no file could not carry an introduction, and an inquiry
+ * has to.
  *
- * There is no `status` and there should never be one. Status existed to
- * describe work published while still moving; a grounding ships finished,
- * which is also what makes its part numbers permanent and therefore citable.
+ * STATUS EXISTS HERE, and its absence was the whole point of a grounding. A
+ * grounding shipped complete, so status had nothing to describe. An inquiry
+ * publishes while still moving, so the reader has to be told whether they are
+ * reading a finished case or joining one in progress. That single difference
+ * is what makes this a different register rather than a renamed one.
  */
-const groundingSchema = z.object({
-  title: z.string().min(1, 'title must not be empty'),
-  slug: slugSchema,
+const inquirySchema = z
+  .object({
+    title: z.string().min(1, 'title must not be empty'),
+    slug: slugSchema,
 
-  /** Position in the argument. 1-based, contiguous, unique — checked below. */
-  part: z.number().int().positive(),
+    /*
+     * THERE IS NO `number`, AND THERE SHOULD NOT BE ONE. An inquiry was
+     * briefly numbered — "Inquiry II" — on the theory that a numeral marks the
+     * top of the hierarchy. It marked nothing. A work's title is what a reader
+     * calls it and what anyone citing it writes down; the numeral was a second
+     * name for the same thing, and the only question it answered ("which came
+     * first?") is answered by `started` without asking anyone to maintain a
+     * sequence by hand.
+     *
+     * Chapters keep their numbers, because a chapter really is cited by
+     * position within a work. A work is cited by name.
+     */
 
-  /** When it went up. A grounding publishes complete, so its parts normally
-   *  share one date; they are stored per part anyway, because a part is what
-   *  gets revised. */
-  date: z.date(),
+    /**
+     * One paragraph stating the PROBLEM — not a summary of the findings. It
+     * sits on the index and again at the head of the contents page, and it is
+     * the only thing a reader has to go on before committing to a long work.
+     */
+    standfirst: z.string().min(1, 'standfirst must not be empty'),
 
-  /** When the argument in this part last moved. See the note on posts. */
-  updated: z.date().optional(),
+    /** Meta/SEO. The standfirst is a paragraph; this is a sentence. */
+    description: z.string().min(1).optional(),
 
-  /**
-   * One line of SUBSTANCE for the contents — what this part establishes, not
-   * what it is about. A contents page of bare titles cannot show the shape of
-   * an argument; one with these lines can.
-   *
-   * Optional, so it stays a judgement rather than a slot to fill. Worth
-   * knowing what is lost when it is left off: the contents falls back to the
-   * title alone for that part, and the reader can no longer see why it has to
-   * come where it does.
-   */
-  deck: z.string().min(1).optional(),
+    status: z.enum(['in-progress', 'complete']),
 
-  sources: z.array(sourceSchema).optional(),
-  draft: z.boolean().default(false),
-}).superRefine((data, ctx) => {
-  if (data.updated && data.updated < data.date) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['updated'],
-      message: `updated (${data.updated.toISOString().slice(0, 10)}) is before date (${data.date.toISOString().slice(0, 10)}).`,
+    /** When the first chapter went up, or when the work was opened. */
+    started: z.date(),
+
+    /**
+     * The optional grouping layer. Parts have NO ROUTE — they are a heading
+     * on the contents page and a segment in the chapter's position line, and
+     * nothing else. Omit the field entirely for a flat inquiry.
+     *
+     * Part numbers are declared here rather than inferred from the chapters
+     * that claim them, so a part can be titled. A part nobody has written a
+     * chapter for yet is legal and renders as an empty heading: that is the
+     * shape of the work stated in advance, which is most of what a contents
+     * page is for while the work is still in progress.
+     */
+    parts: z
+      .array(
+        z.object({
+          number: z.number().int().positive(),
+          title: z.string().min(1, 'part title must not be empty'),
+        }),
+      )
+      .optional(),
+
+    draft: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.parts) return;
+
+    // Part numbers are how a chapter names its part, so a duplicate makes the
+    // reference ambiguous and a gap leaves "Part Three" pointing at nothing.
+    const seen = new Set<number>();
+    data.parts.forEach((part, i) => {
+      if (seen.has(part.number)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['parts', i, 'number'],
+          message: `duplicate part number ${part.number}. Chapters name their part by this number, so it must be unique.`,
+        });
+      }
+      seen.add(part.number);
     });
-  }
+
+    [...data.parts]
+      .sort((a, b) => a.number - b.number)
+      .forEach((part, i) => {
+        if (part.number !== i + 1) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['parts'],
+            message: `parts must run 1..n with no gaps. Expected ${i + 1} but found ${part.number}.`,
+          });
+        }
+      });
+  });
+
+const inquiries = defineCollection({
+  loader: glob({ base: './src/content/inquiries', pattern: '**/*.mdx' }),
+  schema: inquirySchema,
 });
 
-const groundings = defineCollection({
-  loader: glob({ base: './src/content/groundings', pattern: '**/*.mdx' }),
-  schema: groundingSchema,
+/**
+ * Chapters of an inquiry — the atomic unit. One MDX file, one page, one thing
+ * published.
+ *
+ * Which inquiry a chapter belongs to is NOT declared here. It is derived from
+ * the folder the file sits in, so the two cannot disagree — see
+ * lib/inquiries.ts. The brief for this register specified a `reference()`
+ * field instead; folder-derivation is kept because a declared parent is a
+ * second source of truth that can drift from the first, and the failure is
+ * silent (a chapter filed under `demand/` that claims `brand` renders in the
+ * wrong work rather than erroring).
+ *
+ * Field names follow the rest of the site — `date`, `deck` — rather than the
+ * brief's `pubDate` and `description`, so that one vocabulary covers essays
+ * and chapters alike. `sources`, `updated` and `slug` are carried over for the
+ * same reason: a chapter is long-form prose with citations, and it should not
+ * need a second, parallel set of names to say so.
+ */
+const chapterSchema = z
+  .object({
+    title: z.string().min(1, 'title must not be empty'),
+    slug: slugSchema,
+
+    /**
+     * Position in the whole inquiry. CONTINUOUS ACROSS PARTS — chapter
+     * numbers do not restart at each part, because a chapter is cited by its
+     * number and "Chapter 2" must mean one thing in the work.
+     */
+    number: z.number().int().positive(),
+
+    /**
+     * Which part this chapter sits under. Optional, and all-or-nothing within
+     * an inquiry — checked in lib/inquiries.ts, which is the only place that
+     * can see every chapter at once.
+     */
+    part: z.number().int().positive().optional(),
+
+    /** When it went up. */
+    date: z.date(),
+
+    /** When the argument in this chapter last moved. See the note on posts. */
+    updated: z.date().optional(),
+
+    /**
+     * One line of SUBSTANCE for the contents — what this chapter establishes,
+     * not what it is about. Optional, so it stays a judgement rather than a
+     * slot to fill.
+     */
+    deck: z.string().min(1).optional(),
+
+    sources: z.array(sourceSchema).optional(),
+    draft: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    if (data.updated && data.updated < data.date) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['updated'],
+        message: `updated (${data.updated.toISOString().slice(0, 10)}) is before date (${data.date.toISOString().slice(0, 10)}).`,
+      });
+    }
+  });
+
+const chapters = defineCollection({
+  loader: glob({ base: './src/content/chapters', pattern: '**/*.mdx' }),
+  schema: chapterSchema,
 });
 
-export const collections = { posts, groundings };
+export const collections = { posts, inquiries, chapters };

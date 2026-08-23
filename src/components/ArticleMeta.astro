@@ -1,11 +1,19 @@
 ---
 /**
- * What this is, when it went up, when it last moved.
+ * When it went up, and when it last moved.
  *
- * It runs INLINE, because it now sits in the centred band beside the byline
- * rather than stacked in the margin column. Grouped with the byline it reads
- * as one line of provenance — who wrote this, what it is, when it happened —
- * which is a sentence the reader can take in at a glance and then leave.
+ * It runs INLINE, because it sits in the centred band beside the byline rather
+ * than stacked in the margin column. Grouped with the byline it reads as one
+ * line of provenance — who wrote this, and when — which is a sentence the
+ * reader can take in at a glance and then leave.
+ *
+ * THERE IS NO `kind` PROP ANY MORE. There was one, carrying "Part II of III"
+ * for a part and nothing for an essay, on the argument that a position is
+ * something a breadcrumb cannot express. That argument was sound about
+ * positions and wrong about where to put them: a chapter now states its
+ * position on its own line above the title, where it belongs, and the band
+ * went back to being provenance only. What was left beside the author's name
+ * was a label answering a question the page had already answered twice.
  *
  * The dot separators are drawn in CSS rather than typed, so no item has to
  * know whether it is last.
@@ -13,25 +21,14 @@
 import { formatDateline, machineDate } from '../lib/format';
 
 interface Props {
-  /**
-   * What this thing is — "Part II of III".
-   *
-   * OPTIONAL, and an essay passes nothing. The breadcrumb above already says
-   * "Essays"; repeating "Essay" here labels the page with a word it has
-   * already been given, two lines apart. A part is different: "Part II of
-   * III" is a position, which the breadcrumb cannot express.
-   */
-  kind?: string;
   published: Date;
   updated?: Date;
 }
 
-const { kind, published, updated } = Astro.props;
+const { published, updated } = Astro.props;
 ---
 
 <div class="meta label">
-  {kind && <span class="meta__item meta__kind">{kind}</span>}
-
   {/* No "Published" label. The first date on a piece is its publication
       date and needs no announcing; only the exception does, which is why
       "Updated" keeps its word. Dropping it is also what lets the whole line
@@ -71,10 +68,6 @@ const { kind, published, updated } = Astro.props;
     content: '·';
     color: var(--rule);
     margin-inline-end: var(--space-2);
-  }
-
-  .meta__kind {
-    color: var(--ink);
   }
 
   /* The word is the quiet half and the date is the answer, so the term drops

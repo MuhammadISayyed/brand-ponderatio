@@ -2,7 +2,7 @@
  * Generates public/og.png — the FALLBACK card, used by every page that is not
  * a piece: the home page, the two listings, the 404.
  *
- * Pieces do not use this. Each essay, grounding and part gets its own card
+ * Pieces do not use this. Each essay, inquiry and chapter gets its own card
  * carrying its own title, built at build time by the endpoints under
  * src/pages/og/. This one is the site introducing itself.
  *
@@ -21,14 +21,16 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { renderCard } from '../src/lib/og-card.mjs';
+import { SITE_CARD } from '../src/lib/og-cards.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 
-const png = await renderCard({
-  title: 'Brand Ponderatio',
-  footer: 'Muhammad Ibrahim ponders marketing.',
-});
+/* SITE_CARD, not the two strings written out again. BaseLayout hashes that
+   same object into this file's `?v=` stamp, so a copy here that drifted would
+   produce a card nobody's cache had any reason to re-fetch — the exact failure
+   the stamp exists to prevent. */
+const png = await renderCard(SITE_CARD);
 
 const out = resolve(root, 'public/og.png');
 writeFileSync(out, png);

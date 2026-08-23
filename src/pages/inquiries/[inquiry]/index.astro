@@ -1,0 +1,650 @@
+---
+/**
+ * An inquiry's contents page — its front door, its front matter, and its
+ * table of contents, in that order.
+ *
+ * NOT a list of titles. For a cumulative argument the contents page is the
+ * argument in outline, and a reader should be able to see the shape of the
+ * case — and why Chapter 6 has to follow Chapter 5 — before reading a word.
+ * That is what `deck` carries on each chapter: what the chapter ESTABLISHES.
+ *
+ * Two things distinguish it from the grounding spine it replaces. The work's
+ * own MDX body is rendered here, as the introduction the reader meets before
+ * Chapter 1 — folded, so it does not stand between the reader and the
+ * contents. And the contents shows
+ * chapters that are not written yet — greyed, unlinked — because a work in
+ * progress that hides its remaining shape is asking the reader to commit
+ * blind.
+ */
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+import {
+  getInquiries, getContents, inquirySlug, chapterHref, isLive,
+  spelledOut, type Chapter,
+} from '../../../lib/inquiries';
+import { inquiryCardUrl } from '../../../lib/og-pieces';
+import { formatDateline, machineDate } from '../../../lib/format';
+
+export const getStaticPaths = (async () => {
+  const inquiries = await getInquiries();
+  return inquiries.map((inquiry) => ({
+    params: { inquiry: inquirySlug(inquiry) },
+    props: { inquiry },
+  }));
+}) satisfies GetStaticPaths;
+
+const { inquiry } = Astro.props;
+const slug = inquirySlug(inquiry);
+const { title, standfirst, description, status, started } = inquiry.data;
+
+const { chapters, groups } = await getContents(slug);
+const { Content } = await render(inquiry);
+
+// Rendered once here and handed to both branches below, so the grouped and
+// flat contents cannot drift into two slightly different rows.
+const rows = (list: Chapter[]) =>
+  list.map((chapter) => ({ chapter, live: isLive(chapter) }));
+---
+
+<BaseLayout
+  title={title}
+  description={description ?? standfirst}
+  ogImage={inquiryCardUrl(inquiry)}
+>
+  <div class="article">
+    <header class="article__header">
+      <div class="article__topline">
+        <Breadcrumb trail={[{ href: '/inquiries/', label: 'Inquiries' }]} />
+      </div>
+
+      {/* NO KICKER ABOVE THE TITLE. There was a numeral here — "Inquiry I" —
+          and when inquiries stopped being numbered what was left was the bare
+          word "Inquiry" sitting two lines under a breadcrumb reading
+          "Inquiries". The title is the only name this work has, so it gets
+          the row to itself. */}
+      <h1 class="article__title display-title">{title}</h1>
+
+      {/* NO STANDFIRST HERE. It still exists, and still does its two jobs —
+          it is the line under the title on the shelf, and it is the meta
+          description and the share card's footer. What it should not do is
+          stand between the title and the introduction, where it says in one
+          paragraph what the introduction is about to say properly. A reader
+          who has already opened the work does not need the blurb that got
+          them to open it. */}
+      <div class="inquiry__state">
+        <StatusBadge status={status} />
+        <p class="inquiry__started">
+          Begun <time datetime={machineDate(started)}>{formatDateline(started)}</time>
+        </p>
+      </div>
+    </header>
+
+    {/* THE INTRODUCTION — the work's front matter, and prose, so it is set as
+        prose. It is long, and it sits between the reader and the contents
+        they may have come for, so it folds.
+
+        RENDERED OPEN AND UNCLAMPED. The fold is added by script, which is the
+        rule this codebase already follows for controls (tokens.css §8, second
+        amendment): render the thing complete, then let script take something
+        away. Done the other way round — markup that ships collapsed and needs
+        JS to open — a failed script would bury most of the introduction
+        behind a dead button, and the one page whose job is to introduce the
+        work would introduce a fifth of it. */}
+    <div class="inquiry__front" data-front>
+      {/* The WINDOW owns the clip and the height; the body inside it is just
+          prose. They have to be two elements: the veil below is positioned
+          against the window's clipped box, and a veil inside the body would
+          resolve `bottom` against the full 1500px of text and sit off-screen
+          where nobody would ever see it. */}
+      <div class="front-window" data-front-window>
+        <div class="prose" id="inquiry-introduction" data-front-body>
+          <Content />
+        </div>
+
+        {/* THE VEIL. It was a mask-image on the text, which had to be switched
+            off the instant the fold opened — so the faded lines snapped to
+            full strength while the box was still growing. As its own element
+            it can fade out over the same duration the box takes, which is the
+            difference between the page opening and the page flinching. */}
+        <span class="front-window__veil" aria-hidden="true"></span>
+      </div>
+
+      {/* SHIPPED HIDDEN, revealed by the script that does the folding. Two
+          reasons it lives here rather than being created in JS: a control
+          built at runtime carries no scope attribute, so none of the styles
+          below would reach it; and `hidden` in the markup is what guarantees
+          a reader whose script failed is never shown a button that does
+          nothing. */}
+      <button class="front-toggle" type="button" data-front-toggle hidden
+        aria-expanded="false" aria-controls="inquiry-introduction">
+        <span class="front-toggle__label" data-front-label>Keep Reading</span>
+        {/* Drawn rather than typed: a "▾" is a glyph whose size and baseline
+            are the font's business, and this one has to sit dead centre in a
+            ring. */}
+        <span class="front-toggle__mark" aria-hidden="true">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 4.5 6 8l3.5-3.5" />
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    {
+      chapters.length === 0 ? (
+        <p class="contents__empty">No chapters published yet.</p>
+      ) : groups ? (
+        <div class="contents contents--grouped">
+          {groups.map((group) => (
+            <section class="part">
+              <h2 class="part__head">
+                <span class="part__number">Part {spelledOut(group.number)}</span>
+                <span class="part__title">{group.title}</span>
+              </h2>
+
+              {group.chapters.length === 0 ? (
+                <p class="part__pending">To come.</p>
+              ) : (
+                <ol class="contents__list">
+                  {rows(group.chapters).map(({ chapter, live }) => (
+                    <li class="contents__item" data-live={live}>
+                      <p class="label contents__number">
+                        Chapter {chapter.data.number}
+                      </p>
+                      <div class="contents__body">
+                        <h3 class="contents__title">
+                          {live ? (
+                            <a href={chapterHref(slug, chapter)}>{chapter.data.title}</a>
+                          ) : (
+                            <span>{chapter.data.title}</span>
+                          )}
+                        </h3>
+                        {chapter.data.deck && (
+                          <p class="contents__deck">{chapter.data.deck}</p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          ))}
+        </div>
+      ) : (
+        /* THE FLAT CASE. No part headings, and no trace of where they would
+           have gone — see the degradation rule in lib/inquiries. */
+        <ol class="contents contents__list">
+          {rows(chapters).map(({ chapter, live }) => (
+            <li class="contents__item" data-live={live}>
+              <p class="label contents__number">Chapter {chapter.data.number}</p>
+              <div class="contents__body">
+                <h2 class="contents__title">
+                  {live ? (
+                    <a href={chapterHref(slug, chapter)}>{chapter.data.title}</a>
+                  ) : (
+                    <span>{chapter.data.title}</span>
+                  )}
+                </h2>
+                {chapter.data.deck && (
+                  <p class="contents__deck">{chapter.data.deck}</p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  /**
+   * Folds the introduction.
+   *
+   * THE PAGE SHIPS OPEN, AND THE CONTROL SHIPS HIDDEN. Everything here takes
+   * something away, which is the only safe direction for a disclosure: if this
+   * never runs, the reader gets the whole introduction and no button, rather
+   * than a fifth of it behind a control that does nothing. See tokens.css §8.
+   *
+   * Binds on astro:page-load, not DOMContentLoaded — with the client router
+   * the second navigation never fires the latter.
+   */
+  const FOLDED_HEIGHT = 300;
+
+  /* Below this much overflow the fold is not worth it: hiding three lines
+     behind a button asks the reader for a click to save them a glance, which
+     is a worse deal than just showing the text. */
+  const WORTH_FOLDING = 160;
+
+  /* Milliseconds per pixel travelled, and the floor and ceiling it is held
+     between. A fixed duration cannot serve both a short introduction and a
+     long one — 240ms is leisurely across 200px and a catapult across 1500 —
+     so the time is bought by the distance and then clamped so that neither
+     end becomes absurd. */
+  const MS_PER_PX = 0.32;
+  const MIN_MS = 280;
+  const MAX_MS = 620;
+
+  const durationFor = (distance: number): number =>
+    Math.round(Math.min(MAX_MS, Math.max(MIN_MS, Math.abs(distance) * MS_PER_PX)));
+
+  function setUpFold() {
+    const front = document.querySelector<HTMLElement>('[data-front]');
+    const win = document.querySelector<HTMLElement>('[data-front-window]');
+    const body = document.querySelector<HTMLElement>('[data-front-body]');
+    const button = document.querySelector<HTMLButtonElement>('[data-front-toggle]');
+    const label = document.querySelector<HTMLElement>('[data-front-label]');
+    if (!front || !win || !body || !button || !label) return;
+
+    if (body.scrollHeight <= FOLDED_HEIGHT + WORTH_FOLDING) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Fold and reveal together, so the two can never be out of step — there is
+    // no moment at which the text is clipped and unopenable.
+    front.dataset.folded = 'true';
+    win.style.maxHeight = `${FOLDED_HEIGHT}px`;
+    button.hidden = false;
+
+    let settle: number | undefined;
+
+    /**
+     * Runs the box between two heights.
+     *
+     * `data-animating` holds the clip on for the whole gesture. Without it the
+     * clip is released on the first frame, the full text paints instantly, and
+     * the box then grows underneath text that is already on screen — which is
+     * what made the old version feel like a lurch rather than an unfolding.
+     */
+    const runTo = (target: number | null) => {
+      const from = win.getBoundingClientRect().height;
+      const to = target === null ? body.scrollHeight : target;
+
+      win.style.setProperty('--fold-duration', `${durationFor(to - from)}ms`);
+      front.dataset.animating = 'true';
+      // A number at both ends: `auto` does not interpolate.
+      win.style.maxHeight = `${from}px`;
+
+      window.clearTimeout(settle);
+
+      requestAnimationFrame(() => {
+        front.dataset.folded = target === null ? 'false' : 'true';
+        win.style.maxHeight = `${to}px`;
+
+        const done = () => {
+          delete front.dataset.animating;
+          // Released so the block can reflow freely afterwards — on a window
+          // resize, or when a font lands. Left pinned, the text would be
+          // silently cut off the moment it reflowed taller.
+          if (target === null) win.style.maxHeight = 'none';
+        };
+
+        // Driven by a timer rather than `transitionend`, which does not fire
+        // if the transition never starts — an interrupted change, a zeroed
+        // duration, a browser that decided nothing moved. The failure there is
+        // silent and permanent, and this has to be reliable because it is what
+        // un-clips the text.
+        settle = window.setTimeout(done, reduced ? 0 : durationFor(to - from) + 40);
+      });
+    };
+
+    const onClick = () => {
+      if (button.getAttribute('aria-expanded') === 'true') {
+        runTo(FOLDED_HEIGHT);
+        label.textContent = 'Fold Away';
+        button.setAttribute('aria-expanded', 'false');
+        // Folding away above the reader's scroll position would leave them
+        // looking at the contents with no idea what moved.
+        front.scrollIntoView({
+          block: 'nearest',
+          behavior: reduced ? 'auto' : 'smooth',
+        });
+      } else {
+        runTo(null);
+        button.setAttribute('aria-expanded', 'true');
+      }
+      label.textContent =
+        button.getAttribute('aria-expanded') === 'true' ? 'Fold Away' : 'Keep Reading';
+    };
+
+    button.addEventListener('click', onClick);
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        window.clearTimeout(settle);
+        button.removeEventListener('click', onClick);
+      },
+      { once: true },
+    );
+  }
+
+  document.addEventListener('astro:page-load', setUpFold);
+</script>
+
+<style>
+  .inquiry__state {
+    grid-column: 3;
+    grid-row: 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-5);
+    margin-block-start: var(--space-7);
+  }
+
+  .inquiry__started {
+    margin-block: 0;
+    font-family: var(--font-text);
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--muted);
+  }
+
+  /* ==========================================================================
+     THE INTRODUCTION, AND ITS FOLD
+
+     The introduction is prose and is set as prose, but it ends where the
+     contents begins and the reader should feel that. A rule rather than extra
+     space: space alone reads as a paragraph break at this length.
+     ====================================================================== */
+
+  .inquiry__front {
+    grid-column: 3;
+    padding-block-end: var(--space-8);
+    border-block-end: var(--rule-weight) solid var(--rule);
+  }
+
+  /* `:global` because this comes out of <Content />, which is MDX and carries
+     no scope attribute of this page's.
+
+     An h2 opens with --space-9 above it to mark a section break, and the
+     header already ends with --space-9 below it. Stacked, the introduction
+     began a screen and a half down the page. The first thing in the
+     introduction is not breaking from anything — it IS the break. */
+  .inquiry__front :global([data-front-body] > :first-child) {
+    margin-block-start: 0;
+  }
+
+  /* Only ever given a height by script — see the note in the markup. Without
+     JS there is no max-height, the veil is transparent, and the introduction
+     is simply all there.
+
+     `--fold-duration` is set per gesture by the script, because one fixed
+     duration cannot serve both a 200px introduction and a 1500px one: the
+     short one crawls and the long one is fired out of the page. */
+  .front-window {
+    position: relative;
+    transition: max-height var(--fold-duration, var(--motion-fold))
+      var(--motion-fold-ease);
+  }
+
+  /* CLIPPED WHILE FOLDED, AND WHILE MOVING. This is what was wrong before.
+     The clip used to hang off `data-folded` alone, which the script flips at
+     the START of the gesture — so overflow went visible on frame one, the
+     whole introduction appeared at once, and the box then grew underneath
+     text that was already fully on screen. It read as a flinch followed by a
+     shove. Holding the clip until the animation has finished is what makes
+     the text arrive with the box instead of ahead of it.
+
+     Released afterwards rather than left on permanently, so a sidenote in an
+     introduction can still reach into the margin. */
+  [data-front][data-folded='true'] .front-window,
+  [data-front][data-animating='true'] .front-window {
+    overflow: hidden;
+  }
+
+  /* THE VEIL IS THE AFFORDANCE. A hard crop at a line of text reads as a
+     layout bug; text thinning into the paper reads as a page continuing,
+     which is the one thing the control has to communicate before it is read.
+     The button underneath then only confirms it.
+
+     It is a sibling of the text rather than a mask on it, so it can fade out
+     across the same span of time the box takes to open. Tall and gradual: a
+     short fade is a gradient, a long one is a horizon. */
+  .front-window__veil {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 9rem;
+    background: linear-gradient(to bottom, transparent, var(--paper) 88%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--fold-duration, var(--motion-fold))
+      var(--motion-fold-ease);
+  }
+
+  [data-front][data-folded='true'] .front-window__veil {
+    opacity: 1;
+  }
+
+  .front-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-block-start: var(--space-5);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    /* A control that leaves nothing and loads nothing, but it is still the
+       reader's move to make, so it takes the accent the way a link does. */
+    color: var(--accent);
+  }
+
+  .front-toggle__label {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+
+  .front-toggle:hover .front-toggle__label {
+    text-decoration-thickness: 2px;
+  }
+
+  /* The chevron sits in a ring, which is what makes it read as a target
+     rather than as punctuation after the words. Hairline, so it stays in the
+     apparatus register and does not become a button-shaped button. */
+  .front-toggle__mark {
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    /* Nothing here moves on its own. It answers the pointer, and it answers
+       the click — see the second amendment in tokens.css §8. */
+    transition:
+      transform var(--motion-fold) var(--motion-ease),
+      background-color var(--motion-fold) var(--motion-ease);
+  }
+
+  .front-toggle:hover .front-toggle__mark,
+  .front-toggle:focus-visible .front-toggle__mark {
+    /* A 2px drop towards the thing it will reveal. Small enough to be felt
+       rather than watched. */
+    transform: translateY(2px);
+  }
+
+  .front-toggle__mark svg {
+    inline-size: 0.6875rem;
+    block-size: 0.6875rem;
+    display: block;
+  }
+
+  /* Open: the chevron turns to point back the way it came. The rotation is
+     the whole state indicator — the label changes too, but the mark is what
+     the eye is already on when the click lands, so object constancy is worth
+     the 240ms. */
+  .front-toggle[aria-expanded='true'] .front-toggle__mark {
+    transform: rotate(180deg);
+  }
+
+  .front-toggle[aria-expanded='true']:hover .front-toggle__mark,
+  .front-toggle[aria-expanded='true']:focus-visible .front-toggle__mark {
+    transform: rotate(180deg) translateY(2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .front-window,
+    .front-window__veil,
+    .front-toggle__mark {
+      transition: none;
+    }
+  }
+
+  /* ==========================================================================
+     CONTENTS
+     NO TOTAL IS STATED. A count of chapters said nothing the list below does
+     not say better: the numerals run down the margin and the last one IS the
+     total. The contents page is the argument in outline; its size is a fact
+     about the file, not about the argument.
+
+     The contents spans the whole grid so each entry can put its numeral in
+     the margin column — the same edge the index metadata and figure numbers
+     align to, so the page keeps one vertical line for apparatus.
+     ====================================================================== */
+
+  .contents {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  .contents__list {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  .part {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    padding-block-start: var(--space-8);
+  }
+
+  /* The part heading spans both columns and puts its spelled-out numeral in
+     the margin, level with the title — the same rail the chapter numbers use,
+     so the two levels stack against one line instead of two. */
+  .part__head {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-items: baseline;
+    margin-block: 0;
+    padding-block-end: var(--space-4);
+    border-block-end: var(--rule-weight) solid var(--rule);
+    font-size: var(--type-h2-size);
+    line-height: var(--type-h2-leading);
+    font-weight: var(--weight-regular);
+  }
+
+  .part__number {
+    grid-column: 1;
+    font-family: var(--font-text);
+    font-size: var(--type-label-size);
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+    color: var(--accent);
+  }
+
+  .part__title {
+    grid-column: 3;
+  }
+
+  .part__pending {
+    grid-column: 3;
+    margin-block: var(--space-6) 0;
+    color: var(--muted);
+  }
+
+  .contents__item {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    padding-block: var(--space-7);
+  }
+
+  .contents__number {
+    grid-column: 1;
+    /* Same rail as every other thing in the margin column, and level with
+       the first line of the title beside it rather than with the top of its
+       box. */
+    margin-block-start: 0.15em;
+  }
+
+  .contents__body {
+    grid-column: 3;
+  }
+
+  .contents__title {
+    font-size: var(--type-h3-size);
+    line-height: var(--type-h3-leading);
+    margin-block: 0;
+    font-weight: var(--weight-regular);
+  }
+
+  .contents__title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .contents__title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  /* NOT YET WRITTEN. Greyed and unlinked, and deliberately not hidden: the
+     shape of what is coming is the reason to follow a work in progress. The
+     colour is the whole signal — no "coming soon" badge, which would be a
+     second thing saying what the grey already says. */
+  .contents__item[data-live='false'] .contents__title,
+  .contents__item[data-live='false'] .contents__number,
+  .contents__item[data-live='false'] .contents__deck {
+    color: var(--muted);
+  }
+
+  .contents__deck {
+    margin-block: var(--space-2) 0;
+    font-size: var(--type-index-deck-size);
+    line-height: var(--type-index-deck-leading);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .contents__empty {
+    grid-column: 3;
+    color: var(--muted);
+  }
+
+  @media (max-width: 56.25em) {
+    /* Duplicated from --bp-margin-collapse; media conditions cannot read
+       custom properties. */
+    .contents,
+    .contents__list,
+    .contents__item,
+    .part,
+    .part__head {
+      display: block;
+    }
+
+    .contents__number {
+      margin-block: 0 var(--space-2);
+    }
+
+    .part__number {
+      display: block;
+      margin-block-end: var(--space-2);
+    }
+  }
+</style>

@@ -1,7 +1,7 @@
 ---
 /**
  * The listing. One component, used by the index, the essays page and the
- * groundings page — so "the same view" is a fact rather than a resemblance
+ * inquiries page — so "the same view" is a fact rather than a resemblance
  * three templates happen to maintain.
  *
  * Entries were separated by a full-width oxide rule each, which turned a
@@ -13,6 +13,7 @@
  * full-width rules never did.
  */
 import type { ListItem } from '../lib/listing';
+import StatusBadge from './StatusBadge.astro';
 
 interface Props {
   items: ListItem[];
@@ -39,6 +40,14 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
                 item.meta
               )}
             </p>
+            {/* Under the count rather than beside it: the margin column is
+                narrow, and a status pushed onto a second line by a long
+                chapter count would wrap differently row to row. */}
+            {item.status && (
+              <div class="entry__status">
+                <StatusBadge status={item.status} />
+              </div>
+            )}
           </div>
 
           <div class="entry__body">
@@ -88,6 +97,10 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
     line-height: var(--type-apparatus-leading);
     font-variant-numeric: lining-nums tabular-nums;
     color: var(--muted);
+  }
+
+  .entry__status {
+    margin-block-start: var(--space-2);
   }
 
   .entry__body {
@@ -150,6 +163,14 @@ const { items, empty = 'Nothing filed yet.' } = Astro.props;
 
     .entry__sub {
       margin-block: 0;
+      margin-inline-start: var(--space-3);
+    }
+
+    .entry__status {
+      /* Joins the run of inline metadata rather than dropping to its own
+         line — the margin column is a row here, not a column. */
+      display: inline;
+      margin-block-start: 0;
       margin-inline-start: var(--space-3);
     }
 

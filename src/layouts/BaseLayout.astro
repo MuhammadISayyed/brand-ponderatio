@@ -22,10 +22,14 @@ interface Props {
    */
   ogType?: 'website' | 'article';
   /**
-   * Absolute path to this page's share card. Every piece has its own, built
-   * by the endpoints under src/pages/og/ and carrying its title; the pages
-   * that are not a piece — the listings, the 404 — fall back to the site
-   * card, which is the only one that can be a fixed file.
+   * Absolute path to this page's share card, INCLUDING its `?v=` stamp. Every
+   * piece has its own, built by the endpoints under src/pages/og/ and carrying
+   * its title; the pages that are not a piece — the listings, the 404 — fall
+   * back to the site card, which is the only one that can be a fixed file.
+   *
+   * Pass one of the *CardUrl helpers from lib/og-pieces rather than writing
+   * the path out: the stamp is what makes an edited card actually reach
+   * anybody, and a hand-written path silently has none. See lib/og-cards.
    */
   ogImage?: string;
 }
@@ -37,12 +41,17 @@ interface Props {
  * thing you are reading. Both strings live in lib/site.
  */
 import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { SITE_CARD, stamped } from '../lib/og-cards.mjs';
 
 const {
   title,
   description = SITE_DESCRIPTION,
   ogType = 'website',
-  ogImage = '/og.png',
+  /* Stamped like every other card. The site card changes about as often as
+     the site is renamed, but when it does change it has to be able to reach
+     the caches — and the strings hashed here are the ones make-og.mjs draws,
+     both taken from SITE_CARD. */
+  ogImage = stamped('/og.png', SITE_CARD),
 } = Astro.props;
 
 // The home page sets its title to the site name; every other page is
@@ -56,7 +65,7 @@ const documentTitle = title === SITE_TITLE ? title : `${title} — ${SITE_TITLE}
  */
 const nav = [
   { href: '/essays/', label: 'Essays' },
-  { href: '/groundings/', label: 'Groundings' },
+  { href: '/inquiries/', label: 'Inquiries' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -111,7 +120,7 @@ const socialImage = Astro.site
     <link
       rel="alternate"
       type="application/rss+xml"
-      title={`${SITE_TITLE} — essays and groundings`}
+      title={`${SITE_TITLE} — essays and inquiries`}
       href="/rss.xml"
     />
 
@@ -191,7 +200,7 @@ const socialImage = Astro.site
       </nav>
     </header>
 
-    <main id="main" transition:name="main">
+    <main id="main">
       <slot />
     </main>
 
@@ -349,38 +358,69 @@ const socialImage = Astro.site
 </style>
 
 <style is:global>
-  /* The cross-page transition: a fade on the main column ONLY.
+  /* THE CROSS-PAGE TRANSITION: one dissolve, identical in every direction.
+     The outgoing page holds still at full opacity and the incoming page fades
+     in over the top of it. Nothing translates, nothing scales, and going back
+     up to a contents page looks exactly like going down into a chapter.
 
-     The default view transition animates `root`, which is the entire page —
-     header included. That is explicitly not what this design wants, so the
-     root animation is cancelled and the fade is re-applied to the named
-     `main` group instead. The header and footer stay in the root snapshot,
-     now un-animated, and so hold still across the navigation.
+     WHY THE MAIN COLUMN IS NO LONGER ITS OWN GROUP, which is the whole point
+     of this rewrite. `main` used to carry `transition:name="main"`, which
+     lifts it out of the root snapshot into a group of its own. A group
+     animates its BOX — position and size — from where it was to where it
+     lands, and `main` is a full-page-height element whose box is measured
+     against the viewport. Navigate from the foot of a chapter up to the
+     contents and the scroll resets from 1116 to 0, so the box moves 1116px
+     between the two snapshots and the browser dutifully animates the whole
+     column sliding up through the viewport while it fades. Navigate INTO a
+     chapter from a listing and both pages are already at the top, the box
+     moves by nothing, and you get the clean fade the design was after. Same
+     CSS, same duration, no direction-specific rules anywhere — the asymmetry
+     was never in the animation, it was in the scroll delta the animation was
+     being handed.
+
+     `root` has no such problem: its box IS the viewport, so it is the same
+     rectangle before and after, always, and there is nothing for a group
+     animation to interpolate.
+
+     THE HEADER STILL HOLDS STILL, which was the original reason for singling
+     out `main`. It holds still for a better reason now. The header and footer
+     are identical on both pages, and the outgoing snapshot never drops below
+     full opacity — so those pixels are covered by identical pixels for the
+     whole transition and simply never change. Fading BOTH layers, as a
+     symmetric crossfade does, would have let the paper show through the
+     middle of the dissolve and made the header dip; holding the old one
+     opaque is what prevents that.
 
      Astro's client router disables view-transition animations outright under
      prefers-reduced-motion, so this needs no media query of its own. */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
 
-  @keyframes main-fade-in {
+  @keyframes page-fade-in {
     from {
       opacity: 0;
     }
   }
 
-  @keyframes main-fade-out {
-    to {
-      opacity: 0;
-    }
+  /* Held, not animated. Its base opacity is 1 and it stays there for the
+     length of the transition, acting as the backdrop the new page arrives
+     over. */
+  ::view-transition-old(root) {
+    animation: none;
   }
 
-  ::view-transition-old(main) {
-    animation: main-fade-out var(--motion-page-fade) var(--motion-ease) both;
+  ::view-transition-new(root) {
+    animation: page-fade-in var(--motion-page-fade) var(--motion-ease) both;
   }
 
-  ::view-transition-new(main) {
-    animation: main-fade-in var(--motion-page-fade) var(--motion-ease) both;
+  /* The two snapshots are stacked plainly. `isolation: isolate` on the pair
+     exists so that blend modes composite between the images; there are none
+     here, and leaving it on would put the layers in a separate stacking
+     context for no reason. */
+  ::view-transition-image-pair(root) {
+    isolation: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    mix-blend-mode: normal;
   }
 </style>

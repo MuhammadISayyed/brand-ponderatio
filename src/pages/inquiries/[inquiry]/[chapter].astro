@@ -1,0 +1,62 @@
+---
+/**
+ * One chapter of an inquiry, routed by SLUG. Not by the chapter number —
+ * numbers move when a work in progress gains a chapter in the middle, and a
+ * shared URL that silently points at a different chapter is worse than one
+ * that 404s. See chapterSlug in lib/inquiries.
+ *
+ * Only LIVE chapters get a route. A draft appears on the contents page,
+ * greyed and unlinked; it does not get a page that could be found or shared
+ * before it is finished.
+ */
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import ChapterLayout from '../../../layouts/ChapterLayout.astro';
+import {
+  getInquiries, getChapters, liveChapters, inquirySlug, chapterSlug,
+} from '../../../lib/inquiries';
+
+export const getStaticPaths = (async () => {
+  const routes = [];
+  for (const inquiry of await getInquiries()) {
+    const slug = inquirySlug(inquiry);
+    const chapters = liveChapters(await getChapters(slug));
+    const parts = inquiry.data.parts;
+
+    for (const [i, chapter] of chapters.entries()) {
+      routes.push({
+        params: { inquiry: slug, chapter: chapterSlug(chapter) },
+        props: {
+          inquiry,
+          chapter,
+          // Resolved here rather than in the layout so the layout stays a
+          // pure render of props it was handed.
+          part:
+            chapter.data.part === undefined
+              ? undefined
+              : parts?.find((p) => p.number === chapter.data.part),
+          // Neighbours among the LIVE chapters, so "next" never points at a
+          // draft and the last published chapter honestly has none.
+          previous: chapters[i - 1],
+          next: chapters[i + 1],
+        },
+      });
+    }
+  }
+  return routes;
+}) satisfies GetStaticPaths;
+
+const { inquiry, chapter, part, previous, next } = Astro.props;
+const { Content, headings } = await render(chapter);
+---
+
+<ChapterLayout
+  inquiry={inquiry}
+  chapter={chapter}
+  headings={headings}
+  part={part}
+  previous={previous}
+  next={next}
+>
+  <Content />
+</ChapterLayout>

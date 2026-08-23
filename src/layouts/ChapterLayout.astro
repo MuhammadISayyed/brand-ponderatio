@@ -1,14 +1,17 @@
 ---
 /**
- * One part of a grounding — a chapter, on its own page.
+ * One chapter of an inquiry — the atomic unit, on its own page.
  *
- * A part IS an essay in every respect except its header, so it uses the same
- * `.article*` classes from styles/article.css rather than a parallel set that
- * happens to match today. The only differences are what replaces the dateline
- * (position in the work), the running head, and the navigation at the foot.
+ * A chapter IS an essay in every respect except its header, so it uses the
+ * same `.article*` classes from styles/article.css rather than a parallel set
+ * that happens to match today. The differences are the position line that
+ * replaces the dateline's kind label, the running head, and the navigation at
+ * the foot.
  *
- * There is no second level of division. Parts are the chapters; nothing
- * nests inside them but sections.
+ * CHAPTERS ARE LONG. Nothing has been added to this page that competes with
+ * the body text — no reading-progress widget beyond the rule that was already
+ * under the running head, no floating anything, no estimated read time. The
+ * measure, the leading and the vertical rhythm are the design.
  */
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
@@ -17,32 +20,37 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import ArticleMeta from '../components/ArticleMeta.astro';
 import Byline from '../components/Byline.astro';
 import {
-  GROUNDINGS, groundingHref, partHref, partSlug, roman, type Part,
-} from '../lib/groundings';
+  inquiryHref, chapterHref, inquirySlug, spelledOut,
+  type Chapter, type Inquiry,
+} from '../lib/inquiries';
+import { chapterCardUrl } from '../lib/og-pieces';
 
 interface Props {
-  grounding: string;
-  part: Part;
+  inquiry: Inquiry;
+  chapter: Chapter;
   headings: MarkdownHeading[];
-  total: number;
-  previous?: Part;
-  next?: Part;
+  /** The chapter's part, already resolved. Absent for a flat inquiry. */
+  part?: { number: number; title: string };
+  /** Live chapters only — an unpublished neighbour is not a neighbour. */
+  previous?: Chapter;
+  next?: Chapter;
 }
 
-const { grounding, part, total, previous, next } = Astro.props;
-const work = GROUNDINGS[grounding];
-const { title, deck, date, updated, sources } = part.data;
-const n = part.data.part;
+const { inquiry, chapter, part, previous, next } = Astro.props;
+const slug = inquirySlug(inquiry);
+const work = inquiry.data;
+const { title, deck, date, updated, sources } = chapter.data;
+const n = chapter.data.number;
 
-// Same audit as an essay, same reasons — see lib/citations. Per part, because
-// each part is its own page and carries its own bibliography.
-const citedCounts = scanCitations(part.body ?? '');
+// Same audit as an essay, same reasons — see lib/citations. Per chapter,
+// because each chapter is its own page and carries its own bibliography.
+const citedCounts = scanCitations(chapter.body ?? '');
 {
   const declared = new Set((sources ?? []).map((s) => s.key));
   for (const key of citedCounts.keys()) {
     if (!declared.has(key)) {
       throw new Error(
-        `${part.id}: <Cite source="${key}"> does not match any entry in this part's sources. ` +
+        `${chapter.id}: <Cite source="${key}"> does not match any entry in this chapter's sources. ` +
           `Declared keys: ${[...declared].join(', ') || '(none)'}.`,
       );
     }
@@ -50,7 +58,7 @@ const citedCounts = scanCitations(part.body ?? '');
   for (const source of sources ?? []) {
     if (!citedCounts.has(source.key) && !source.background) {
       throw new Error(
-        `${part.id}: source "${source.key}" is never cited. ` +
+        `${chapter.id}: source "${source.key}" is never cited. ` +
           `Cite it, mark it \`background: true\`, or remove it.`,
       );
     }
@@ -62,7 +70,7 @@ const citedCounts = scanCitations(part.body ?? '');
   title={`${title} — ${work.title}`}
   description={deck}
   ogType="article"
-  ogImage={`/og/groundings/${grounding}/${partSlug(part)}.png`}
+  ogImage={chapterCardUrl(inquiry, chapter)}
 >
   {/* Sticky, and empty until the header has scrolled away. Answers "where am
       I in this part", which is the question that only appears once a part
@@ -72,8 +80,8 @@ const citedCounts = scanCitations(part.body ?? '');
       {/* "Contents" rather than the work's name: the bar is sticky and has
           no room for a 32-character title, and the answer to that is to name
           the DESTINATION rather than abbreviate the title. */}
-      <a class="runninghead__work" href={groundingHref(grounding)}>Contents</a>
-      <span class="runninghead__part">Part {roman(n)}</span>
+      <a class="runninghead__work" href={inquiryHref(slug)}>Contents</a>
+      <span class="runninghead__part">Chapter {n}</span>
       <span class="runninghead__section" data-runninghead-section></span>
     </div>
     {/* The rule under the running head IS the progress indicator — it fills
@@ -85,25 +93,65 @@ const citedCounts = scanCitations(part.body ?? '');
   <article class="article">
     <header class="article__header">
       <div class="article__topline">
+        {/* THE FULL TRAIL: Inquiries / <the work>. It stops at the parent,
+            per the Breadcrumb component's first rule — the h1 below already
+            says which chapter this is.
+
+            It briefly stopped at "Inquiries" alone, on the theory that the
+            work was named in the position line below and a second mention
+            would be redundant. That had it backwards. A breadcrumb's job is
+            to show the path and offer the way back up it, and a one-item
+            trail shows no path at all. The position line is orientation, not
+            navigation, and it cannot stand in for the trail. */}
         <Breadcrumb
           trail={[
-            { href: '/groundings/', label: 'Groundings' },
-            { href: groundingHref(grounding), label: work.title },
+            { href: '/inquiries/', label: 'Inquiries' },
+            { href: inquiryHref(slug), label: work.title },
           ]}
         />
       </div>
 
+      {/* THE POSITION LINE — where this chapter sits INSIDE the work. It no
+          longer repeats the work's name: the breadcrumb above carries that
+          now, and carrying it twice, two lines apart, is exactly what the
+          breadcrumb's own rules exist to prevent.
+
+          What is left is the part and the chapter, which a breadcrumb
+          genuinely cannot express — a part has no page to link to, and a
+          breadcrumb never ends at the page you are on. The Part segment
+          disappears entirely for a flat inquiry rather than degrading to
+          something; see the degradation rule in lib/inquiries.
+
+          Position line and title share the header's title row — see the note
+          on the four-row contract in styles/article.css. */}
+      <div class="position__block">
+        <p class="position">
+          {part && (
+            <span class="position__seg">
+              <span class="position__level">Part</span>
+              <span class="position__word">{spelledOut(part.number)}</span>
+              <span class="position__dot" aria-hidden="true">·</span>
+            </span>
+          )}
+
+          <span class="position__seg">
+            <span class="position__level">Chapter</span>
+            <span class="position__arabic">{n}</span>
+          </span>
+        </p>
+
       <h1 class="article__title display-title">{title}</h1>
+      </div>
 
       {deck && <p class="article__deck">{deck}</p>}
 
       <div class="article__band">
+        {/* NO `kind`, exactly as an essay passes none. The band is provenance
+            — who wrote this, and when — and a position label wedged in beside
+            the author's name was answering a question already answered twice
+            above it, in the breadcrumb and in the position line. */}
         <Byline />
-        <ArticleMeta
-          kind={`Part ${roman(n)} of ${roman(total)}`}
-          published={date}
-          updated={updated}
-        />
+        <ArticleMeta published={date} updated={updated} />
       </div>
     </header>
 
@@ -143,21 +191,28 @@ const citedCounts = scanCitations(part.body ?? '');
       }
 
       {/* Three slots, always: back, up, forward. The contents link is
-          unconditional because a reader who arrived at Part V from a shared
-          link has no other way up that does not require scrolling to find the
-          running head. */}
-      <nav class="part-nav" aria-label="Parts">
+          unconditional because a reader who arrived at Chapter 5 from a
+          shared link has no other way up that does not require scrolling to
+          find the running head.
+
+          NEVER LEAVES THE INQUIRY. Previous and next are the neighbouring
+          chapters of this work and nothing else — a "next" that landed the
+          reader in an essay, or in a different inquiry, would be presenting
+          two unrelated pieces as consecutive moves in one argument. Where
+          there is no neighbour the slot stays empty; the end of the published
+          run is a real fact and the gap states it. */}
+      <nav class="part-nav" aria-label="Chapters">
         <div class="part-nav__slot">
           {previous && (
-            <a class="part-nav__link" href={partHref(grounding, previous)}>
-              <span class="label">Part {roman(previous.data.part)}</span>
+            <a class="part-nav__link" href={chapterHref(slug, previous)}>
+              <span class="label">Chapter {previous.data.number}</span>
               <span class="part-nav__title">{previous.data.title}</span>
             </a>
           )}
         </div>
 
         <div class="part-nav__slot part-nav__slot--up">
-          <a class="part-nav__link" href={groundingHref(grounding)}>
+          <a class="part-nav__link" href={inquiryHref(slug)}>
             <span class="label">Contents</span>
             <span class="part-nav__title">{work.title}</span>
           </a>
@@ -165,8 +220,8 @@ const citedCounts = scanCitations(part.body ?? '');
 
         <div class="part-nav__slot part-nav__slot--next">
           {next && (
-            <a class="part-nav__link" href={partHref(grounding, next)}>
-              <span class="label">Part {roman(next.data.part)}</span>
+            <a class="part-nav__link" href={chapterHref(slug, next)}>
+              <span class="label">Chapter {next.data.number}</span>
               <span class="part-nav__title">{next.data.title}</span>
             </a>
           )}
@@ -332,6 +387,73 @@ const citedCounts = scanCitations(part.body ?? '');
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  /* ==========================================================================
+     POSITION LINE
+     Where the format announces itself. Roman, spelled-out and arabic in one
+     line, each in its own treatment, so a reader who has never seen this
+     structure before can tell that three different kinds of thing are being
+     counted — before reading the words that say so.
+
+     Everything here is apparatus-sized. The line is orientation, not a
+     headline; the h1 underneath is the headline, and a position line that
+     competed with it would make the page look like it had two titles.
+     ====================================================================== */
+
+  .position__block {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .position {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-2);
+    margin-block: 0 var(--space-3);
+    font-family: var(--font-text);
+    font-size: var(--type-apparatus-size);
+    line-height: var(--type-apparatus-leading);
+    color: var(--muted);
+  }
+
+  .position__seg {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  /* "Part" and "Chapter" — the labels that teach the convention.
+     Set smaller and lighter than the numerals they introduce, because once
+     the convention is learned they are the part that stops being read. */
+  .position__level {
+    letter-spacing: var(--type-label-tracking);
+    text-transform: var(--type-label-transform);
+    font-weight: var(--weight-medium);
+  }
+
+  /* SPELLED OUT. A word rather than a figure is what separates the grouping
+     level from the unit inside it — "Part Two · Chapter 5" needs no other cue
+     to read as two different kinds of counting. */
+  .position__word {
+    color: var(--ink-2);
+  }
+
+  /* ARABIC, lining and tabular so the digit sits on the same rail as every
+     other number in the apparatus. */
+  .position__arabic {
+    font-variant-numeric: lining-nums tabular-nums;
+    font-weight: var(--weight-medium);
+    color: var(--ink);
+  }
+
+  .position__dot {
+    /* The lightest thing on the line, but still ON it: at --rule these
+       disappeared entirely and the three segments ran together into one
+       phrase. A separator that cannot be seen is not separating anything. */
+    color: var(--muted);
+    opacity: 0.6;
   }
 
   /* ==========================================================================

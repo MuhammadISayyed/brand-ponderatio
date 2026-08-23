@@ -12,7 +12,7 @@ export const SITE_TITLE = 'Brand Ponderatio';
 
 /**
  * The line under it. PERSONAL RATHER THAN INSTITUTIONAL: "essays and
- * groundings, long arguments published complete" described the shelf the work
+ * inquiries, long arguments worked in public" described the shelf the work
  * sits on, which is a fact about the filing and not a reason to read. A
  * person thinking about something in public is the reason.
  */

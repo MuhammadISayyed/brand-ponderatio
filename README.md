@@ -1,6 +1,6 @@
 # Brand Ponderatio
 
-A publication of essays and groundings. Static Astro, no client framework,
+A publication of essays and inquiries. Static Astro, no client framework,
 deployed as flat files.
 
 The site is **Brand Ponderatio**; the author is **Muhammad Ibrahim**. The two
@@ -11,15 +11,40 @@ articles carry the author's byline.
 
 **Essays** are standalone arguments. One file, one page, newest first.
 
-**Groundings** are long works, published complete and read in order, divided
-into numbered parts. A grounding is not a blog series: it goes up finished, and
-its contents page is the argument in outline rather than a list of titles —
-each part's `deck` says what that part *establishes*, so a reader can see why
-Part III has to follow Part II before reading a word.
+**Inquiries** are long works — one problem worked until it yields, published a
+chapter at a time over weeks or months. An inquiry is not a finished book
+dropped in one piece, and it is not a blog series either: it has a fixed shape
+declared up front, and it fills in. Its contents page is the argument in outline
+rather than a list of titles — each chapter's `deck` says what that chapter
+*establishes*, so a reader can see why Chapter 6 has to follow Chapter 5 before
+reading a word, including for chapters not yet written.
 
-Parts are numbered in roman numerals on the page and permanently identified by
-their integer `part` field. Numbers must run `1..n` with no gaps; the build
-fails loudly if they do not (`src/lib/groundings.ts`).
+Three levels; only the two inner ones are numbered, so the hierarchy reads
+without any of them competing with the work's name:
+
+| Level | Numeral | Renders as | Has a page? |
+| :--- | :--- | :--- | :--- |
+| Inquiry | none — the title | `Demand` | yes |
+| Part | Spelled out | `Part Two` | no — display only |
+| Chapter | Arabic | `Chapter 5` | yes |
+
+An inquiry is cited by name; a chapter is cited by position within one. The
+shelf orders itself by `started`, so there is no sequence to keep by hand.
+
+Parts are an optional grouping layer; omit them and the contents degrades to a
+flat run of chapters with no trace of where the headings would have gone.
+Chapter numbers are continuous across parts and must run `1..n` with no gaps —
+the build fails loudly if they do not (`src/lib/inquiries.ts`).
+
+The inquiry's own file is its **introduction** — there is no separate route for
+one. It renders on the contents page under the title, folded, with the opening
+visible and the rest behind a control. The fold is applied by script to a page
+that ships open, so a failed script leaves the whole introduction rather than a
+dead button.
+
+An inquiry carries a `status`. While it is `in-progress` a quietly pulsing mark
+sits beside it wherever it is listed — the only autonomous motion on the site,
+admitted under a written amendment in `tokens.css` §8.
 
 ## Running it
 
@@ -43,17 +68,17 @@ astro dev status | astro dev logs | astro dev stop
 
 ```
 src/
-  content/           essays (posts/) and groundings, as MDX
-  content.config.ts  the schemas — the only definition of what a post or a part is
-  layouts/           BaseLayout (the shell), EssayLayout, PartLayout
-  pages/             routes; the grounding spine and part routes are dynamic
-  components/        Figure, Sidenote, Cite, Byline, Breadcrumb, EntryList
-  lib/               groundings (ordering, numerals), listing, counters, format
+  content/           essays (posts/), inquiries/ and chapters/, as MDX
+  content.config.ts  the schemas — the only definition of what a post or a chapter is
+  layouts/           BaseLayout (the shell), EssayLayout, ChapterLayout
+  pages/             routes; the inquiry contents and chapter routes are dynamic
+  components/        Figure, Sidenote, Cite, Byline, Breadcrumb, EntryList, StatusBadge
+  lib/               inquiries (ordering, numerals, validation), listing, counters, format
   styles/            tokens.css → global.css → article.css, in that order
 templates/
   essay.mdx          annotated templates — copy, or use `npm run new`
-  grounding-part.mdx
-  grounding.md       walkthrough for starting a new grounding
+  inquiry.mdx        the work itself, and the body that becomes its front matter
+  chapter.mdx        one chapter of an inquiry
 scripts/
   new.mjs            `npm run new -- essay "Title"` — copies a template into place
   make-og.mjs        `npm run og` — regenerates public/og.png, output committed
@@ -69,21 +94,26 @@ document beside it. Read it before changing anything visual.
 ## Writing something new
 
 ```sh
-npm run new -- essay     "A system is what it refuses"
-npm run new -- grounding "The Dispositional Basis of Demand" --slug=demand
-npm run new -- part demand "The quantity and the power"
+npm run new -- essay   "A System Is What It Refuses"
+npm run new -- inquiry "Demand"
+npm run new -- chapter demand "The Quantity and the Power"
 ```
 
-Fills in the slug, the date and the next part number; leaves every judgement to
-you. Templates live in `templates/` if you would rather copy by hand. Full
+Fills in the slug, the date and the next inquiry or chapter number; leaves every
+judgement to you. Templates live in `templates/` if you would rather copy by hand. Full
 walkthrough in **PUBLISHING.md**.
 
 ## Drafts
 
 Set `draft: true` in a file's frontmatter. Drafts render in `dev` and are
 filtered out of production builds — see the `import.meta.env.PROD` checks in
-`src/lib/listing.ts`, `src/lib/groundings.ts`, and
+`src/lib/listing.ts`, `src/lib/inquiries.ts` (`isLive`), and
 `src/pages/essays/[...slug].astro`.
+
+A drafted **chapter** is the deliberate exception: it keeps its number so the
+sequence never breaks, and shows on the contents page greyed and unlinked. It
+gets no page, no card and no feed entry until published. That is what lets a
+long work go up one chapter at a time.
 
 ## Deploying
 
@@ -105,4 +135,5 @@ Generated automatically on every build:
 | Path | What |
 | :--- | :--- |
 | `/sitemap-index.xml` | Built from the routes; referenced by `robots.txt` |
-| `/rss.xml` | Essays, plus one item per grounding pointing at its spine |
+| `/rss.xml` | Essays, plus one item per published chapter, tagged with its inquiry |
+| `/inquiries/<work>/rss.xml` | One feed per inquiry |

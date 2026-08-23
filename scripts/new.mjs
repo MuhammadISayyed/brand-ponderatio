@@ -1,12 +1,12 @@
 /**
  * Copies a template into place with the mechanical fields already filled.
  *
- *   npm run new -- essay "A system is what it refuses"
- *   npm run new -- grounding "The Dispositional Basis of Demand"
- *   npm run new -- part demand "The quantity and the power"
+ *   npm run new -- essay   "A System Is What It Refuses"
+ *   npm run new -- inquiry "Demand"
+ *   npm run new -- chapter demand "The Quantity and the Power"
  *
- * It fills in ONLY what is derivable — the slug, today's date, the next part
- * number, the filename prefix. Everything that is a judgement (the deck, the
+ * It fills in ONLY what is derivable — the slug, today's date, the next
+ * chapter number, the filename prefix. Everything that is a judgement (the deck, the
  * sources, whether the piece is an essay at all) is left as template prose for
  * you to answer, because a field silently filled with a plausible default is
  * worse than an empty one you have to look at.
@@ -85,53 +85,62 @@ if (kind === 'essay') {
   Next: write the deck, delete the fields and imports you do not use,
         then set draft: false when it is ready.
 `);
-} else if (kind === 'grounding') {
+} else if (kind === 'inquiry') {
   const title = rest.join(' ').trim();
-  if (!title) die('Usage: npm run new -- grounding "Full title of the work"');
+  if (!title) die('Usage: npm run new -- inquiry "Title of the work"');
 
   const slug = slugFlag ?? slugify(title);
-  const dir = join(root, 'src/content/groundings', slug);
-  if (existsSync(dir)) die(`src/content/groundings/${slug}/ already exists.`);
+  const path = join(root, 'src/content/inquiries', `${slug}.mdx`);
+  const dir = join(root, 'src/content/chapters', slug);
+
+  /* NOTHING TO NUMBER. An inquiry has no position field — the shelf orders
+     itself by `started`, which this fills with today. */
+  const body = template('inquiry.mdx')
+    .replace('title: Replace this inquiry title', `title: ${yamlTitle(title)}`)
+    .replace('started: 2026-01-01', `started: ${today()}`);
+
+  write(path, body);
+  /* The chapters folder is created empty and on purpose. An inquiry whose
+     folder does not exist yet is a work you have to remember the layout of;
+     one that exists and is empty is a work waiting for Chapter 1. */
   mkdirSync(dir, { recursive: true });
 
-  /* The registry entry is PRINTED, not patched in. Editing a TypeScript file
-     by regex is how a script eventually corrupts one, and this is a five-second
-     paste that also makes you look at the abstract — which is the one field
-     nobody should be able to skip. */
   console.log(`
-  Created  src/content/groundings/${slug}/
+  Created  src/content/inquiries/${slug}.mdx
+  Created  src/content/chapters/${slug}/
+  URL      /inquiries/${slug}/   (once draft: false)
 
-  Now paste this into GROUNDINGS in src/lib/groundings.ts, and write the
-  abstract — one paragraph, what the whole work argues:
+  Next: write the standfirst — one paragraph stating the PROBLEM — and the
+        body, which is the work's front matter and the last thing a reader
+        sees before Chapter 1.
 
-    ${slug}: {
-      title: '${title.replace(/'/g, "\\'")}',
-      abstract:
-        'One paragraph. What the whole work argues.',
-    },
-
-  Then add parts:  npm run new -- part ${slug} "Title of Part I"
+  Then:   npm run new -- chapter ${slug} "Title of Chapter 1"
 `);
-} else if (kind === 'part') {
+} else if (kind === 'chapter') {
   const [work, ...titleWords] = rest;
   const title = titleWords.join(' ').trim();
-  if (!work || !title) die('Usage: npm run new -- part <grounding-folder> "Part title"');
+  if (!work || !title) die('Usage: npm run new -- chapter <inquiry> "Chapter title"');
 
-  const dir = join(root, 'src/content/groundings', work);
-  if (!existsSync(dir)) {
+  if (!existsSync(join(root, 'src/content/inquiries', `${work}.mdx`))) {
     die(
-      `No grounding folder at src/content/groundings/${work}/.\n  ` +
-        `Create the work first:  npm run new -- grounding "Full title"`,
+      `No inquiry at src/content/inquiries/${work}.mdx.\n  ` +
+        `Create the work first:  npm run new -- inquiry "Title of the work"`,
     );
   }
 
-  /* Next part number = one more than the highest `part:` already declared.
-     Read from the frontmatter rather than counted from the filenames, because
-     the `part` field is what actually orders the argument — a file with a
-     misleading NN- prefix must not shift the sequence. */
+  const dir = join(root, 'src/content/chapters', work);
+  mkdirSync(dir, { recursive: true });
+
+  /* Next chapter number = one more than the highest `number:` already
+     declared. Read from the frontmatter rather than counted from the
+     filenames, because the `number` field is what actually orders the work — a
+     file with a misleading NN- prefix must not shift the sequence.
+
+     DRAFTS ARE COUNTED. They keep their place in the sequence, so the next
+     chapter follows the last one written, not the last one published. */
   const existing = readdirSync(dir).filter((f) => f.endsWith('.mdx'));
   const numbers = existing.map((f) => {
-    const m = readFileSync(join(dir, f), 'utf8').match(/^part:\s*(\d+)\s*$/m);
+    const m = readFileSync(join(dir, f), 'utf8').match(/^number:\s*(\d+)\s*$/m);
     return m ? Number(m[1]) : 0;
   });
   const next = numbers.length ? Math.max(...numbers) + 1 : 1;
@@ -140,25 +149,28 @@ if (kind === 'essay') {
   const prefix = String(next).padStart(2, '0');
   const path = join(dir, `${prefix}-${slug}.mdx`);
 
-  const body = template('grounding-part.mdx')
-    .replace('title: Replace this part title', `title: ${yamlTitle(title)}`)
-    .replace(/^part: 1$/m, `part: ${next}`)
+  const body = template('chapter.mdx')
+    .replace('title: Replace this chapter title', `title: ${yamlTitle(title)}`)
+    .replace(/^number: 1$/m, `number: ${next}`)
     .replace('date: 2026-01-01', `date: ${today()}`);
 
   write(path, body);
   console.log(`
-  Created  src/content/groundings/${work}/${prefix}-${slug}.mdx
-  Part     ${next}
-  URL      /groundings/${work}/${slug}/   (once draft: false)
+  Created  src/content/chapters/${work}/${prefix}-${slug}.mdx
+  Chapter  ${next}
+  URL      /inquiries/${work}/${slug}/   (once draft: false)
 
-  Next: write the deck — what this part ESTABLISHES. It is what the
+  Next: write the deck — what this chapter ESTABLISHES. It is what the
         contents page uses to show the shape of the argument.
+
+        If ${work} declares \`parts\`, set \`part:\` on this chapter too —
+        it is all-or-nothing across the work and the build will say so.
 `);
 } else {
   die(
     `Usage:
-    npm run new -- essay     "Your title"
-    npm run new -- grounding "Full title of the work"
-    npm run new -- part <grounding-folder> "Part title"`,
+    npm run new -- essay   "Your Title"
+    npm run new -- inquiry "Title of the Work"
+    npm run new -- chapter <inquiry> "Chapter Title"`,
   );
 }

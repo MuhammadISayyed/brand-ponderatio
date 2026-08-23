@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.18.0"
   },
   "scripts": {
     "dev": "astro dev",
@@ -12,6 +12,7 @@
     "astro": "astro",
     "new": "node scripts/new.mjs",
     "og": "node scripts/make-og.mjs",
+    "unfurl": "node scripts/unfurl.mjs",
     "icons": "node scripts/make-icons.mjs"
   },
   "dependencies": {

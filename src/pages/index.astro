@@ -4,15 +4,15 @@
  *
  * The two section pages show one kind each; this shows both, because a
  * visitor who has just arrived should not have to guess which of two lists
- * holds the thing they were sent to read. Groundings come first: there are
- * few of them and each is a large object, so burying them under a run of
- * essays would hide the biggest thing on the site.
+ * holds the thing they were sent to read. Inquiries come first: there are few
+ * of them and each is a large object, so burying them under a run of essays
+ * would hide the biggest thing on the site.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EntryList from '../components/EntryList.astro';
-import { postItems, groundingItems } from '../lib/listing';
+import { postItems, inquiryItems } from '../lib/listing';
 
-const items = [...(await groundingItems()), ...(await postItems())];
+const items = [...(await inquiryItems()), ...(await postItems())];
 ---
 
 <BaseLayout title="Brand Ponderatio">

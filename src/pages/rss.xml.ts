@@ -2,34 +2,37 @@
  * The feed, at /rss.xml.
  *
  * WHAT COUNTS AS AN ITEM. Essays, one item each — straightforward. And each
- * GROUNDING as ONE item pointing at its spine, not one item per part.
+ * CHAPTER of an inquiry as its own item, tagged with the work it belongs to.
  *
- * That is the whole argument for a feed on this site. A grounding publishes
- * complete, so a subscriber who got five items in a row for one work would be
- * told five times about a thing that happened once, and would arrive at Part I
- * with no way to see the shape of what follows. The spine page is the argument
- * in outline; it is the right front door, and it is what the feed points at.
+ * THIS REVERSES THE RULE THIS FILE USED TO STATE, and the reversal is the
+ * point of the register that replaced groundings. A grounding published
+ * complete, so one item per part would have told a subscriber five times
+ * about a thing that happened once; the feed pointed at the spine instead. An
+ * inquiry publishes a chapter at a time over months. Pointing at the contents
+ * page would mean either one notification at the start, for a work with
+ * nothing in it yet, or a silently re-dated item the reader has already seen.
+ * Serial publication is what a feed is actually for, and a chapter is the
+ * thing that gets published.
  *
- * A grounding has no date of its own — dates live on parts — so it is dated by
- * its most recently dated part. That is the day the work last changed, which
- * is what a reader sorting a feed by date actually wants to know.
+ * The inquiry itself is NOT an item. It is not a thing that happens on a day —
+ * it is the container, and the tag on each chapter is what names it.
  *
- * Drafts are excluded exactly as they are everywhere else: the two helpers
- * below already filter on import.meta.env.PROD, so this file inherits the rule
- * rather than restating it and risking a third version of it.
+ * Drafts are excluded exactly as they are everywhere else: `liveChapters` and
+ * `getInquiries` already apply the rule, so this file inherits it rather than
+ * restating it and risking a third version.
  */
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { getCollection } from 'astro:content';
 import { postHref } from '../lib/format';
 import {
-  GROUNDINGS,
-  groundingSlugs,
-  getParts,
-  groundingHref,
-} from '../lib/groundings';
+  getInquiries,
+  getChapters,
+  liveChapters,
+  inquirySlug,
+  chapterHref,
+} from '../lib/inquiries';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
-
 
 export async function GET(context: APIContext) {
   const posts = await getCollection('posts', ({ data }) =>
@@ -43,29 +46,24 @@ export async function GET(context: APIContext) {
     link: postHref(post),
   }));
 
-  const groundingItems = (
+  const chapterItems = (
     await Promise.all(
-      groundingSlugs().map(async (slug) => {
-        const parts = await getParts(slug);
-        // A registered grounding with no published parts is a work in
-        // progress, not an announcement. Nothing to point a subscriber at.
-        if (parts.length === 0) return null;
-
-        const latest = parts.reduce(
-          (newest, part) =>
-            part.data.date > newest ? part.data.date : newest,
-          parts[0].data.date,
-        );
-
-        return {
-          title: GROUNDINGS[slug].title,
-          pubDate: latest,
-          description: GROUNDINGS[slug].abstract,
-          link: groundingHref(slug),
-        };
+      (await getInquiries()).map(async (inquiry) => {
+        const slug = inquirySlug(inquiry);
+        return liveChapters(await getChapters(slug)).map((chapter) => ({
+          // The work's name travels with the title. A feed reader shows a
+          // flat list from many sources, and "Dispositions Without Laws"
+          // arriving on its own gives a subscriber no way to tell it is the
+          // fifth move in an argument they have been following.
+          title: `${inquiry.data.title} · Chapter ${chapter.data.number}: ${chapter.data.title}`,
+          pubDate: chapter.data.date,
+          description: chapter.data.deck,
+          link: chapterHref(slug, chapter),
+          categories: [inquiry.data.title],
+        }));
       }),
     )
-  ).filter((item) => item !== null);
+  ).flat();
 
   return rss({
     title: SITE_TITLE,
@@ -74,7 +72,7 @@ export async function GET(context: APIContext) {
     // loudly if it is missing, which is the correct outcome — a feed of
     // relative links is not a feed.
     site: context.site!,
-    items: [...essayItems, ...groundingItems].sort(
+    items: [...essayItems, ...chapterItems].sort(
       (a, b) => b.pubDate.getTime() - a.pubDate.getTime(),
     ),
     customData: '<language>en</language>',

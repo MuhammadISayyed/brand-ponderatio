@@ -269,7 +269,7 @@
   --type-body-leading: 1.45;
 
   /* Section headings — the DOCUMENT face, everywhere: in an essay, in a
-     grounding, in a listing. Headings belong to the printed voice even when the prose
+     inquiry, in a listing. Headings belong to the printed voice even when the prose
      under them does not.
 
      Set in --weight-regular, Goudy having no other. Headings step up in size
@@ -566,7 +566,85 @@
      What this does NOT license: hover-to-reveal, which is a lookup table
      wearing a diagram's clothes and is invisible on touch; autoplaying
      figures; and anything that moves while the reader is reading the prose
-     beside it. */
+     beside it.
+
+     EXTENDED TO DISCLOSURE CONTROLS, on the same reasoning and the same four
+     conditions. An inquiry's introduction folds, and the chevron that folds
+     it turns when pressed and drops 2px towards what it will reveal when
+     pointed at. Neither is autonomous: nothing happens until the reader acts,
+     and nothing keeps happening after they stop.
+
+     Condition 2 is the one that does the work here, and it is met the way it
+     has to be — the page is rendered OPEN and the fold is applied by script,
+     so a script that never runs leaves the whole introduction on the page
+     rather than a dead button in front of it. A control that hides content
+     when it fails is not progressive enhancement; it is a trapdoor.
+
+     Condition 4's 150ms ceiling is deliberately exceeded here, at 240ms, and
+     the exception is narrow: that ceiling exists so a reader cannot outrun a
+     figure's response, but this response is a HEIGHT CHANGE that moves the
+     whole page under them. Snapping is what would be disorienting. The
+     easing is doing object constancy, not performance. */
+
+  /* THIRD AMENDMENT: A WORK IN PROGRESS MAY SAY SO, AND MAY BREATHE.
+     Made deliberately, and it is the first thing admitted here that moves on
+     the page's own initiative with no reader action behind it. That is a real
+     concession and the conditions are correspondingly tight.
+
+     Admitted because an INQUIRY publishes while still moving, and the reader
+     has to know that before they start. A finished work and an unfinished one
+     look identical in a contents list, and the cost of the confusion is not
+     small: a reader who does not know reaches the last published chapter and
+     reads the absence of an ending as a conclusion. A static word does say it
+     — but a status is the one thing on this page that is true only right now,
+     and a mark that is quietly alive says "still going" faster than the word
+     is read.
+
+     Granted on five conditions. Anything that cannot meet all five is a
+     static label instead:
+
+       1. IT IS A STATUS, NOT DECORATION. It appears only where the work's
+          state is being reported, and only for `in-progress`. A finished
+          inquiry gets the same mark, unmoving. Nothing else on the site may
+          borrow it.
+       2. IT NEVER MOVES THE PAGE. A 5px dot and a ring emanating from it,
+          both drawn inside the dot's own box: opacity and a transform on an
+          absolutely-positioned pseudo-element. No reflow, no layout shift,
+          nothing that moves a line of type while it is being read. The ring
+          overflows the dot visually and occupies nothing.
+       3. IT IS SLOW ENOUGH TO BE IGNORED. A full cycle takes 2.8 seconds. The
+          dot dims rather than blinking — its amplitude stops well short of
+          zero — and the ring leaves once per cycle and is gone before it is
+          halfway out, so at any given moment there is at most one faint
+          expanding edge. A pulse fast enough to count is a notification, and
+          this is not one.
+       4. IT NEVER APPEARS BESIDE RUNNING PROSE. Listings, contents headers
+          and section fronts only. Nothing animates in the margin of a
+          paragraph the reader is inside.
+       5. IT STOPS DEAD UNDER prefers-reduced-motion, leaving the solid dot
+          and the word — which is the whole message, so nothing is lost.
+
+     Note what is still refused on the strength of this: spinners, progress
+     rings, animated counts, and any second thing that pulses. One breathing
+     mark on the page is a status; two is a dashboard. */
+  /* Folding the introduction open, and the chevron that does it. See the
+     extension to the second amendment above for why this is allowed to run
+     longer than a figure's 150ms. */
+  --motion-fold: 240ms;
+
+  /* Decelerating, and more sharply than the page fade's curve. Opening a fold
+     moves everything below it down the page, and the reader's eye is tracking
+     the text they were already reading — so it has to arrive rather than
+     stop. The script scales the DURATION with the distance travelled; this is
+     the shape that duration is spent in. */
+  --motion-fold-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --motion-pulse: 2800ms;
+  /* How far the dot dims at the bottom of its breath. Not zero — see
+     condition 3. */
+  --motion-pulse-floor: 0.45;
+  /* How far the ring travels before it is gone, as a multiple of the dot. */
+  --motion-pulse-reach: 3.2;
 
   /* Cross-page transition: a fade on the MAIN COLUMN ONLY.
      The margin column and the header stay put. */

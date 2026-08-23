@@ -18,7 +18,7 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 import ArticleMeta from '../components/ArticleMeta.astro';
 import Byline from '../components/Byline.astro';
 import { scanCitations, citeId, sourceId } from '../lib/citations';
-import { postSlug } from '../lib/format';
+import { essayCardUrl } from '../lib/og-pieces';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -65,7 +65,7 @@ const citedCounts = scanCitations(post.body ?? '');
   title={title}
   description={deck}
   ogType="article"
-  ogImage={`/og/essays/${postSlug(post)}.png`}
+  ogImage={essayCardUrl(post)}
 >
   <article class="article">
     <header class="article__header">

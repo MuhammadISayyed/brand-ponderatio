@@ -13,7 +13,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { getCollection } from 'astro:content';
 import { renderCard } from '../../../lib/og-card.mjs';
 import { postSlug } from '../../../lib/format';
-import { SITE_DESCRIPTION } from '../../../lib/site';
+import { essayCard, type Card } from '../../../lib/og-pieces';
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection('posts', ({ data }) =>
@@ -22,23 +22,15 @@ export const getStaticPaths = (async () => {
 
   return posts.map((post) => ({
     params: { slug: postSlug(post) },
-    props: {
-      title: post.data.title,
-      kind: post.data.kind,
-      /* The piece's own line where it has one. A deck is already the sentence
-         the author wrote to introduce this piece; the site line is what to
-         say when there is nothing better. */
-      deck: post.data.deck,
-    },
+    /* What goes on the card is not decided here — see lib/og-pieces. The page
+       that links to this one stamps its URL with a hash of this same card, and
+       the two only stay true to each other by coming from one function. */
+    props: { card: essayCard(post.data) },
   }));
 }) satisfies GetStaticPaths;
 
 export const GET: APIRoute = async ({ props }) => {
-  const png = await renderCard({
-    title: props.title as string,
-    kicker: props.kind === 'case' ? 'Case' : 'Essay',
-    footer: (props.deck as string | undefined) ?? SITE_DESCRIPTION,
-  });
+  const png = await renderCard(props.card as Card);
 
   return new Response(png, {
     headers: {

@@ -1,0 +1,36 @@
+---
+/**
+ * The shelf. Every inquiry, with visible room on it for the next one.
+ *
+ * Renders through the same <EntryList> as the index and the essays page, so
+ * the three listings are the same view of different sets rather than three
+ * templates that agree today.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryList from '../../components/EntryList.astro';
+import { inquiryItems } from '../../lib/listing';
+
+const items = await inquiryItems();
+---
+
+<BaseLayout
+  title="Inquiries"
+  description="Inquiries — one problem worked until it yields, published in sequence."
+>
+  <div class="article">
+    <header class="article__header">
+      {/* Headline only. A label reading "Inquiries" above a headline reading
+          "Inquiries" says it twice. The standfirst below is the exception to
+          the rule the groundings page kept — this register is new enough that
+          the list underneath does not yet explain itself. */}
+      <h1 class="article__title display-title">Inquiries</h1>
+
+      <p class="article__deck">
+        One problem, worked until it yields. Each is a whole work, published a
+        chapter at a time.
+      </p>
+    </header>
+
+    <EntryList items={items} empty="No inquiries opened yet." />
+  </div>
+</BaseLayout>
