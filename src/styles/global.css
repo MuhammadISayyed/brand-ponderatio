@@ -463,6 +463,9 @@
      ====================================================================== */
 
   ::selection {
+    /* Opaque fallback first, for a browser without color-mix: --ground is
+       wrong on a hovered sidenote but it is never invisible on the page. */
     background: var(--ground);
+    background: var(--selection);
   }
 }

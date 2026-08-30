@@ -1,0 +1,112 @@
+---
+/**
+ * A NUMBERED SECTION BREAK inside a chapter.
+ *
+ *   <SectionMark />          ->  I, then II, then III, in document order
+ *   <SectionMark title="…" /> ->  the numeral with a title under it
+ *
+ * The author writes chapters in numbered movements rather than titled ones:
+ * a section is not a topic with a name, it is a turn in one argument, and the
+ * numeral is the whole of its identity. This renders that turn.
+ *
+ * IT IS AN `<h2>`, not a decorated `<p>`. Three things depend on that and all
+ * three are real: the document outline (a screen reader moving by heading must
+ * find the same three movements a sighted reader sees), the running head in
+ * ChapterLayout (which reads `.prose h2` and would otherwise report nothing
+ * for the whole chapter), and the id, which makes a movement linkable —
+ * `#sec-ii` is a citable address for a section that has no name to link by.
+ * The word "Section" is present for the heading's accessible name and hidden
+ * from the page, where the numeral's size and isolation already say it.
+ *
+ * NO RULE, DELIBERATELY. The obvious design is a hairline across the measure
+ * with the numeral sitting on it, and the rules doctrine in tokens.css
+ * forbids exactly that — "a rule above every heading is scaffolding left in
+ * the build". What separates the movements here is what the doctrine says
+ * should: space, and a change of register from the 18px working face to a
+ * document-face numeral. Nothing is joined, so nothing needs dividing.
+ *
+ * CENTRED, AND IT IS THE ONE THING ON THE PAGE THAT IS. Every other element
+ * shares the main column's left edge, because everything else is read in
+ * sequence and a second left edge costs the eye a re-anchor. A section
+ * numeral is not read in sequence — it is looked at once, on the way past —
+ * and centring is what a book does with an unnamed movement for exactly that
+ * reason: it reads as a rest rather than as the start of a line. It is also
+ * what keeps the numeral clear of the margin column, where sidenotes float
+ * and would land on it.
+ *
+ * The numeral is TRACKED HARD, at a quarter of an em. Roman numerals are
+ * repeated strokes — II, III, XI — and at text spacing they close into a
+ * picket fence that has to be counted rather than read. Centring makes the
+ * tracking free: there is no left edge for the extra space to break.
+ *
+ * SIZE IS RESTRAINED ON PURPOSE. It sat at 36px, which put a numeral between
+ * the h2 and the title in weight and made every movement look like a new
+ * chapter. At the h2's size with this much air around it, the space does the
+ * announcing and the numeral only has to be found.
+ */
+import { nextSectionNumber, roman } from '../lib/section-counter';
+
+interface Props {
+  /**
+   * Optional. A movement can carry a name as well as a numeral; most do not,
+   * and the design is built for the bare numeral rather than tolerating it.
+   */
+  title?: string;
+  /** Overrides the derived id, which is `sec-` plus the lowercased numeral. */
+  id?: string;
+}
+
+const n = nextSectionNumber(Astro.request);
+const numeral = roman(n);
+const { title, id = `sec-${numeral.toLowerCase()}` } = Astro.props;
+---
+
+<h2 class="sectionmark" id={id}>
+  <span class="u-sr-only">Section </span><span class="sectionmark__numeral">{numeral}</span
+  >{title && <span class="sectionmark__title">{title}</span>}
+</h2>
+
+<style>
+  .sectionmark {
+    /* The break is the space. 128px above and 64px below — the numeral
+       belongs to the movement it opens, not to the one it closes, which is
+       the same asymmetry every heading on the site uses, opened up because
+       this break is the largest one a chapter has. */
+    margin-block: var(--space-10) var(--space-8);
+    text-align: center;
+    /* Landing on `#sec-ii` must not park the numeral against the top edge of
+       the viewport, and the sticky running head sits there too. */
+    scroll-margin-block-start: var(--space-8);
+  }
+
+  /* A chapter that opens on its first movement — this one does — must not
+     start with 128px of nothing above the numeral. The header already owns
+     that clearing. */
+  .sectionmark:first-child {
+    margin-block-start: 0;
+  }
+
+  .sectionmark__numeral {
+    display: block;
+    font-family: var(--font-doc);
+    font-size: var(--type-h2-size);
+    line-height: 1;
+    /* The tracking adds a quarter-em after the last stroke as well as between
+       them, which pulls an optically centred numeral to the left. The indent
+       gives it back. */
+    letter-spacing: 0.25em;
+    text-indent: 0.25em;
+    color: var(--ink);
+  }
+
+  .sectionmark__title {
+    display: block;
+    /* Set from the numeral's own tracked line rather than the paragraph
+       below, so numeral and title read as one mark. */
+    margin-block-start: var(--space-4);
+    font-size: var(--type-h2-size);
+    line-height: var(--type-h2-leading);
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+</style>

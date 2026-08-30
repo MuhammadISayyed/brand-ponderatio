@@ -33,11 +33,26 @@
      Anything used at 11–13px must clear 4.5:1; large text may sit at 3:1. */
 
   --paper: #f7f1e3;      /* Page background */
-  --ground: #ece4d3;     /* Highlights, code blocks, selection */
+  --ground: #ece4d3;     /* Highlights, code blocks */
   --ink: #211d17;        /* Body text.                        14.9:1 AAA */
   --ink-2: #4f483f;      /* Decks, secondary text.             8.0:1 AAA */
   --muted: #6d6455;      /* Metadata, captions, node strokes.  5.2:1 AA  */
   --rule: #dfd6c2;       /* Hairlines */
+
+  /* SELECTION IS TRANSLUCENT, AND THAT IS THE WHOLE POINT.
+
+     It used to be --ground, the same flat cream as every highlight on the
+     site — including the one a sidenote takes when you hover or focus it. So
+     selecting text inside a hovered sidenote painted --ground onto --ground
+     and the selection vanished: the reader dragged across the words and
+     nothing happened. An opaque selection colour is only ever correct against
+     one background, and this site has more than one.
+
+     A tint of the accent at low alpha darkens whatever is underneath it
+     instead of replacing it, so it reads on the paper, on --ground, and on
+     anything either of them is later joined by. It is the site's own colour,
+     which is what keeps a UI affordance from arriving as a fourth hue. */
+  --selection: color-mix(in srgb, var(--accent) 18%, transparent);
 
   /* --muted was #8a837a and measured 3.3:1 on the old background — below AA
      at the 11px and 13px sizes it is actually used for. It was not a casualty

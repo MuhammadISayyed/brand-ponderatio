@@ -1,0 +1,127 @@
+---
+/**
+ * FIGURE — the loop, and the reason it is not a circle.
+ *
+ * The chapter names three phases: understand the context, act coherently
+ * inside it, augment what the acting throws off. Drawn as a ring, that is a
+ * process diagram — three boxes and a wheel, the kind of picture that says
+ * "and repeat" and argues nothing. Drawn as a run of three with the return
+ * passing back underneath, the sequence and its closing are two different
+ * strokes, and the reader can see that the loop has a direction.
+ *
+ * NOTHING IN THE ACCENT. The house style reserves it for the single
+ * load-bearing element in a diagram, and there is no single element here:
+ * three equal phases and the return that joins them are one figure, and
+ * picking one out would be an argument the drawing is not making. When a
+ * diagram has nothing load-bearing, the accent goes unspent.
+ *
+ * NO LABELS BEYOND THE PHASES. The phases are numbered in the prose directly
+ * above, so numbering them again in the boxes is the list read twice; and a
+ * sentence written along the return path is a caption that has wandered into
+ * the artwork. What the return means belongs in the prose or in the caption,
+ * where it can be written properly.
+ *
+ * STATIC, AND IT HAS TO BE. The motion doctrine's second amendment admits an
+ * interactive figure only where the state change IS the argument. There is no
+ * state here.
+ *
+ * The viewBox is 512 wide because --grid-main-col is 32rem: one user unit is
+ * one CSS pixel, so 15px labels are 15px on the page rather than whatever the
+ * scale factor makes of them.
+ */
+
+interface Props {
+  id?: string;
+}
+
+const { id = 'loop' } = Astro.props;
+const titleId = `${id}-title`;
+const descId = `${id}-desc`;
+
+/* Three equal boxes across the measure — 3 × 142 + 2 × 42 = 512 — so the
+   phases are visibly the same size as each other. None of the three is the
+   important one. */
+const BOX = { y: 4, w: 142, h: 64 };
+const PHASES = [
+  { x: 1, lines: ['Understanding', 'context'] },
+  { x: 185, lines: ['Taking coherent', 'actions'] },
+  { x: 369, lines: ['Augmenting', 'positive effects'] },
+];
+
+/** Mid-height of the row, where the arrows between the boxes sit. */
+const MID = BOX.y + BOX.h / 2;
+const FOOT = BOX.y + BOX.h;
+---
+
+<div class="fig">
+  <svg viewBox="0 0 512 122" role="img" aria-labelledby={titleId} aria-describedby={descId}>
+    <title id={titleId}>
+      Three phases in a row — understanding context, taking coherent actions,
+      augmenting positive effects — with a return path running back from the
+      third to the first.
+    </title>
+    <desc id={descId}>
+      The three phases run left to right and the return path passes back
+      underneath them, from the third phase to the first.
+    </desc>
+
+    {
+      PHASES.map((phase) => (
+        <>
+          <rect class="fig__box" x={phase.x} y={BOX.y} width={BOX.w} height={BOX.h} rx="4" />
+          <text class="fig__label" x={phase.x + BOX.w / 2} y={MID - 7} text-anchor="middle">
+            {phase.lines[0]}
+          </text>
+          <text class="fig__label" x={phase.x + BOX.w / 2} y={MID + 12} text-anchor="middle">
+            {phase.lines[1]}
+          </text>
+        </>
+      ))
+    }
+
+    {/* Forward, between the boxes. */}
+    <line class="fig__arrow" x1="149" y1={MID} x2="171" y2={MID} />
+    <path class="fig__head" d={`M 179 ${MID} L 171 ${MID - 4} L 171 ${MID + 4} Z`} />
+    <line class="fig__arrow" x1="333" y1={MID} x2="355" y2={MID} />
+    <path class="fig__head" d={`M 363 ${MID} L 355 ${MID - 4} L 355 ${MID + 4} Z`} />
+
+    {/* The return, in the same weight and the same colour as the two above
+        it: one kind of movement, drawn one way. */}
+    <path
+      class="fig__arrow"
+      fill="none"
+      d={`M 440 ${FOOT} V 102 Q 440 114 428 114 H 84 Q 72 114 72 102 V ${FOOT + 8}`}
+    />
+    <path class="fig__head" d={`M 72 ${FOOT} L 68 ${FOOT + 8} L 76 ${FOOT + 8} Z`} />
+  </svg>
+</div>
+
+<style>
+  .fig svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .fig__box {
+    fill: var(--diagram-node-fill);
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  .fig__label {
+    font-family: var(--font-text);
+    font-size: var(--diagram-label-size);
+    fill: var(--diagram-label-color);
+  }
+
+  .fig__arrow {
+    stroke: var(--diagram-node-stroke);
+    stroke-width: var(--diagram-stroke-weight);
+  }
+
+  .fig__head {
+    fill: var(--diagram-node-stroke);
+  }
+</style>

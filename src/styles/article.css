@@ -510,6 +510,28 @@
   margin: 0;
 }
 
+/* A PLATE — a scanned or photographed image reproduced inside a figure, as
+   opposed to a diagram drawn for this page.
+
+   `multiply` is the whole rule. These are line drawings on white, and the page
+   is cream: dropped in flat, each one sits on the page as a bright white
+   rectangle with a hard edge that the eye reads as a hole. Multiplied, the
+   white ground drops out and only the ink survives, so a 1960 diagram lands on
+   the paper the rest of the page is printed on.
+
+   It works because the artwork is black on white and nothing else. A
+   photograph, or a scan with a coloured ground, must NOT take this class — it
+   would be tinted by the paper rather than settled onto it.
+
+   No border, no shadow, no rounded corner: the plate is a piece of the page,
+   not a card sitting on top of it. */
+.prose .plate {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  mix-blend-mode: multiply;
+}
+
 /* Wide content scrolls inside itself rather than pushing the page sideways.
    Sätteri wraps GFM tables for us; this catches anything else. */
 .prose .table-scroll {
