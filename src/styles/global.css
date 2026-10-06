@@ -191,12 +191,16 @@
 
   /* The space above a heading is what marks the section break — it is doing
      the job a rule would otherwise be asked to do, so it has to be decisive.
-     Roughly four times the space below it: the heading belongs to the text it
-     introduces, not to the text it follows. */
+     Four times the space below it: the heading belongs to the text it
+     introduces, not to the text it follows.
+
+     64px, down from 96. The larger figure was set when sections opened on a
+     centred numeral; under a plain h2 it read as a page break rather than a
+     section break, nearly four empty lines of 26px leading. */
   h2 {
     font-size: var(--type-h2-size);
     line-height: var(--type-h2-leading);
-    margin-block: var(--space-9) var(--space-4);
+    margin-block: var(--space-8) var(--space-4);
   }
 
   h3 {

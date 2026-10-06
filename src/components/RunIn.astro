@@ -1,0 +1,42 @@
+---
+/**
+ * A RUN-IN HEAD: the opening words of a paragraph that name the point it
+ * makes, set on the same line as the paragraph rather than above it.
+ *
+ *   <RunIn>It has to help us breathe</RunIn>. When being involved…
+ *
+ * These were italic, which is also how the prose stresses a word, so a new
+ * point and an emphasised phrase looked identical. Semibold roman in the
+ * working face separates the two jobs: italic is left meaning emphasis only,
+ * and a reader skimming a section sees its points line up down the page.
+ *
+ * Not a heading element. A run-in head belongs to its paragraph, and the
+ * document outline should not gain an entry for every point in a list.
+ *
+ * The full stop goes OUTSIDE the component, in the prose, so it is set in
+ * the paragraph's weight rather than the head's.
+ */
+---
+
+<span class="runin"><slot /></span>
+
+<style>
+  .runin {
+    font-family: var(--font-text);
+    font-weight: var(--weight-semibold);
+    font-style: normal;
+    color: var(--ink);
+  }
+
+  /* A POINT IS A GROUP OF PARAGRAPHS, not one. The paragraph a run-in head
+     opens can be followed by others that continue the same point without a
+     head of their own, and at even spacing the bold lines land at irregular
+     intervals with nothing to say which paragraphs belong to which. Doubling
+     the space ABOVE each head, and only there, groups them by proximity:
+     tight within a point, open between points.
+
+     Not after a heading, which already opens with its own space. */
+  :global(.prose p:has(> .runin:first-child):not(:is(h2, h3) + p)) {
+    margin-block-start: var(--space-7);
+  }
+</style>

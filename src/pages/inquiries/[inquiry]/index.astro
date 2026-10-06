@@ -440,6 +440,14 @@ const rows = (list: Chapter[]) =>
     color: var(--accent);
   }
 
+  /* The `display` above outranks the browser's own rule for `hidden`, which
+     is what kept this button on screen under an introduction too short to
+     fold. The attribute has to win, or the script's decision not to fold
+     means nothing. */
+  .front-toggle[hidden] {
+    display: none;
+  }
+
   .front-toggle__label {
     text-decoration: underline;
     text-decoration-thickness: 1px;

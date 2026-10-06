@@ -1,0 +1,96 @@
+---
+/**
+ * A DEFINITION SET APART from the prose that argues for it:
+ *
+ *   <Definition>A brand is a set of …</Definition>
+ *
+ * Used when a chapter's whole argument converges on one sentence, and that
+ * sentence is what a reader will come back to quote. It is the author's own
+ * claim, so it is NOT a blockquote: a blockquote is someone else's voice, and
+ * the site sets those receded in --ink-2 behind a hairline. This goes the
+ * other way, forward in full ink.
+ *
+ * NO LABEL. The prose before it already says a definition is coming, so a
+ * caption saying "Definition" only repeats it.
+ *
+ * FRAMED BY AN ORNAMENT, ABOVE AND BELOW. The oxide stub was tried first and
+ * was too slight to carry the most important sentence in the work. This is
+ * the book's answer instead: a lozenge between two hairlines, the device a
+ * printer sets around a passage the page is built to stop at. Drawn in SVG so
+ * its weight and spacing are ours rather than a font's, and repeated under
+ * the sentence so the block closes rather than trails off into the next
+ * paragraph. It is an exception to the rules doctrine in tokens.css and is
+ * meant to be one: there should be very few of these in the whole site.
+ *
+ * LEFT-ALIGNED, on the main column's edge like everything else in the prose.
+ * It was centred, and that made it a second axis on a page that has one.
+ * Size and the ornaments already set it apart; alignment does not need to.
+ *
+ * The sentence is in the DOCUMENT face, which is safe here because it is one
+ * sentence at display size with no emphasis inside it (the face has no
+ * italic), set well above the h2 so it outranks the section that holds it.
+ */
+const ornament = `
+  <svg class="definition__ornament" viewBox="0 0 120 12" aria-hidden="true">
+    <line x1="0" y1="6" x2="48" y2="6" />
+    <path d="M60 0.5 65.5 6 60 11.5 54.5 6Z" />
+    <line x1="72" y1="6" x2="120" y2="6" />
+  </svg>`;
+---
+
+<div class="definition">
+  <Fragment set:html={ornament} />
+  {/* A div, not a p: MDX wraps the slotted sentence in its own <p>, and a p
+      inside a p is ejected by the parser, leaving this one empty. */}
+  <div class="definition__text"><slot /></div>
+  <Fragment set:html={ornament} />
+</div>
+
+<style>
+  /* 64px each side. It was 96, but the ornaments already set the block
+     apart, and the two together left a hole in the page. */
+  .definition {
+    margin-block: var(--space-8);
+  }
+
+  .definition :global(.definition__ornament) {
+    display: block;
+    inline-size: 7.5rem;
+    block-size: 0.75rem;
+    overflow: visible;
+  }
+
+  .definition :global(.definition__ornament line) {
+    stroke: var(--accent);
+    stroke-width: 1;
+  }
+
+  .definition :global(.definition__ornament path) {
+    fill: var(--accent);
+  }
+
+  .definition__text {
+    margin-block: var(--space-6);
+    font-family: var(--font-doc);
+    font-size: 2rem; /* 32px, well above the h2's 25px */
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  /* The <p> MDX puts inside must inherit the size rather than take the
+     prose paragraph's. */
+  .definition__text :global(p) {
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+  }
+
+  /* At phone width 32px leaves three words a line; step down. */
+  @media (max-width: 40em) {
+    .definition__text {
+      font-size: 1.625rem;
+    }
+  }
+</style>

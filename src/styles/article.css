@@ -47,9 +47,10 @@
   grid-column: 1 / -1;
   grid-row: 1;
   grid-template-columns: subgrid;
-  /* Matches the band's own top margin, so the band sits in a symmetrical
-     clearing between the title block and the prose. */
-  margin-block-end: var(--space-9);
+  /* 64px, the same space a section break takes, so the text starts at the
+     distance any section would. It was 96, and stacked on the opening h2's own
+     space it put 160px between the byline and the first line of the piece. */
+  margin-block-end: var(--space-8);
 }
 
 /* Four rows, and EVERYTHING A READER READS SHARES ONE LEFT EDGE.
@@ -127,6 +128,13 @@
 .prose {
   grid-column: 3;
   grid-row: 2;
+}
+
+/* The header's own space already opens the text. An h2 or a definition at the
+   top would otherwise add its section-break space on top of it, because the
+   two margins sit in different grid areas and do not collapse. */
+.prose > :first-child {
+  margin-block-start: 0;
 }
 
 /* The sources block sits at the foot of the post at every width, not only
